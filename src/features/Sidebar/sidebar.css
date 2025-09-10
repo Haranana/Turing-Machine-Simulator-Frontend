@@ -1,0 +1,37 @@
+.sidebar {
+  width: 15vh;
+  min-height: 100vh;
+  background: #2d2d2d;
+  color: white;
+  padding-top: 20px;
+  position: fixed; 
+  left: 0;
+  top: 0;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 20px 0;
+}
+
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  display: block;
+  border-radius: 8px;
+}
+
+.sidebar a:hover {
+  background: #444;
+}
+
+.sidebar .icon{
+  max-width: 50px;
+  max-height: 50px;
+}
+
