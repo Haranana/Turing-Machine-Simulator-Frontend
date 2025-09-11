@@ -1,4 +1,19 @@
 .page{
+   text-align: center;
+   display: flex;
+   justify-content: center;
+   margin: 20px;
    
-    
 }
+
+
+
+/*
+.code-editor {    
+    border: solid ,#a4a4a4;
+}  
+
+.code-editor .monaco-editor-background{    
+    background: #d0d0d0 !important;
+} 
+*/ 

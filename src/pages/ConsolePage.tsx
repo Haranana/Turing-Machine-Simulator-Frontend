@@ -4,7 +4,12 @@ import './page.css';
 export default  function ConsolePage() {
     return(
         <div className="page">
-            <Editor height="90vh" defaultLanguage="plaintext" defaultValue="Lorem Ipsum" />
+            <Editor className="code-editor" defaultLanguage="plaintext"
+             defaultValue="Lorem Ipsum"
+             height="90vh"
+             width="90vw"
+             theme="light"
+             />
         </div>
     );
 }

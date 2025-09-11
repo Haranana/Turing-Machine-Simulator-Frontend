@@ -9,11 +9,9 @@
 }
 
 .content{
-    flex-wrap: 1;
-    order: 1;
+    
 }
 
 .outlet-wrap{
-    margin-left: 10px;
-     text-align: center;
+    flex: 1;
 }
