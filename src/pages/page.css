@@ -3,8 +3,98 @@
    display: flex;
    justify-content: center;
    margin: 20px;
-   
 }
+
+.login-page{
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-button{
+    height: 5vh;
+    width: 20vw;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    border-radius:9999px;
+    border: none;
+    background-color: #6c6c6c;
+    color: white;
+
+    transition: 0.3s ease;
+}
+
+.login-button:hover{
+    background-color: #444;
+    cursor: pointer;
+}
+
+.login-text-field{
+    height: 5vh;
+    width: 20vw;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    border-radius:9999px;
+    border:none;
+    background-color: #9b9b9b;
+    color: white;    
+    box-sizing: border-box
+}
+
+.login-text-field::placeholder{
+    color: white;
+    padding-left: 1em;
+}
+
+.login-checkbox{
+    width: 15px;
+  height: 15px;
+  border-radius: 50%;       
+  appearance: none;           
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  border: 2px solid #6c6c6c;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+}
+
+.login-checkbox:checked{
+    background-color: #6c6c6c;   /* zielone wypełnienie */
+}
+
+.remember-me-link{
+    color: #6c6c6c;
+}
+
+.login-remember-forgot{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 20vw; 
+  margin: 1vh auto; 
+}
+
+.login-password-wrapper{
+    position: relative;
+    width: 20vw;  
+}
+
+.login-password-wrapper .login-text-field{
+  width: 100%;
+  padding-right: 2.5em; 
+}
+
+.password-icon{
+  max-width: 20px;
+  max-height: 20px;
+  position: absolute;
+  right: 0.7em;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
 
 
 
