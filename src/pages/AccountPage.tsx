@@ -1,7 +1,9 @@
+import './page.css';
+
 export default  function AccountPage() {
     return(
-    <>
-    <p>AccountPage</p>
-    </>
+    <div className="page">
+        <p>AccountPage</p>
+    </div>
     );
 }

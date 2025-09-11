@@ -1,7 +1,9 @@
+import './page.css';
+
 export default  function SettingsPage() {
     return(
-    <>
-    <p>SettingsPage</p>
-    </>
+        <div className="page">
+            <p>SettingsPage</p>
+        </div>  
     );
 }

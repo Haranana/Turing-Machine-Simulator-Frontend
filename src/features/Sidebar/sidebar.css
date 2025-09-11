@@ -1,21 +1,24 @@
+:root { --sidebar-width: 6rem; }
+
 .sidebar {
-  width: 15vh;
+  width: var(--sidebar-width);
   min-height: 100vh;
   background: #2d2d2d;
   color: white;
-  padding-top: 20px;
-  position: fixed; 
   left: 0;
   top: 0;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .sidebar ul {
   list-style: none;
+  margin-top: 0;
   padding: 0;
 }
 
 .sidebar li {
-  margin: 20px 0;
+  margin-top: 0;
 }
 
 .sidebar a {

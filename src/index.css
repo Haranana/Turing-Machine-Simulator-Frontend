@@ -1,0 +1,19 @@
+#main-body{
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.main-layout{
+    display: flex;
+}
+
+.content{
+    flex-wrap: 1;
+    order: 1;
+}
+
+.outlet-wrap{
+    margin-left: 10px;
+     text-align: center;
+}
