@@ -8,6 +8,7 @@
   --color-primary-3: #606060;
   --color-primary-4: #373737;
   --color-debug-1: red;
+  --color-debug-2: rgb(13, 255, 0);
 
   --font-main: "Gill Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }

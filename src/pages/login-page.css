@@ -2,16 +2,21 @@
 /*login window*/
 .login-window{
     display: flex;
-    background-color: var(--color-bg-2);
+    
     width: 30vw;
     height: 70vh;
     align-self: center;
     flex-direction: column;
     align-items: center;
-    box-shadow: 3px 3px 7px 7px rgba(0, 0, 0, 0.316);
-    border-radius: 50px;
+    
+
+    
     padding-top: 7vh;
     font-family: var(--font-main);
+
+        box-shadow: 3px 3px 7px 7px rgba(0, 0, 0, 0.316);
+    border-radius: 50px;
+    background-color: var(--color-bg-2);
 }
 
 /*header*/

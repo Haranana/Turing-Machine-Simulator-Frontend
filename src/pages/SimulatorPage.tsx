@@ -1,15 +1,25 @@
 import './page.css';
+import {TapeView} from "../features/Tape/Tape.tsx"
+import type { TapeState, TapeSymbol, Tape } from "../features/Tape/Tape.tsx"
+
+function prepData(){
+    const tapeMockInput: TapeState = {
+        head: 0 ,
+        tape: new Map<number, TapeSymbol>(),
+        };
+    
+    for(let i=0; i<100; i++){
+        tapeMockInput.tape.set(i, i.toString());
+    }
+
+    return tapeMockInput;
+}
+
 
 export default  function SimulatorPage() {
     return(
         <div className="page">
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent dictum metus et sapien vehicula consequat.
-                 Suspendisse risus risus, interdum at orci eget, blandit scelerisque arcu. Morbi lacinia varius ligula et porta.
-                  Phasellus tincidunt, tortor eu facilisis pellentesque, tortor tortor pulvinar lectus, scelerisque consequat quam sapien sit amet mauris.
-                   Morbi semper augue nunc, id interdum ipsum consectetur nec. Nulla consequat suscipit urna, in faucibus felis rutrum at.
-                 Suspendisse at dapibus sem. Sed quis turpis at mauris tempus malesuada. Sed eget diam quis risus consectetur congue.
-                  Curabitur eu consectetur dolor, eu ultricies urna
-                  .</p>
+            <TapeView tapeState={prepData()}></TapeView>
         </div>
     );
 }

@@ -1,0 +1,17 @@
+.tape{
+    display: flex;
+    background-color: var(--color-debug-1);
+    padding: 10px;
+    min-width: 80vw;
+    min-height: 10vh;
+    align-items: stretch;
+    justify-content: center;
+}
+
+.tape-cell{
+    background-color: var(--color-debug-2);
+    padding: 5px;
+    border: solid 3px;
+    flex-grow: 1;
+    align-items: center;
+}
