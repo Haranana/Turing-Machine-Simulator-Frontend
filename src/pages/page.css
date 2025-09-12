@@ -2,29 +2,45 @@
    text-align: center;
    display: flex;
    justify-content: center;
+
    margin: 20px;
 }
 
-.login-page{
+.login-window{
+    display: flex;
+    background-color: var(--color-bg-2);
+    width: 30vw;
+    height: 70vh;
+    align-self: center;
     flex-direction: column;
     align-items: center;
+    box-shadow: 3px 3px 7px 7px rgba(0, 0, 0, 0.316);
+    border-radius: 50px;
+    padding-top: 7vh;
+    font-family: var(--font-main);
+}
+
+.login-header{
+    font-family: var(--font-main);
+    font-size: 250%;
 }
 
 .login-button{
     height: 5vh;
     width: 20vw;
-    margin-top: 1vh;
+    margin-top: 5vh;
     margin-bottom: 1vh;
     border-radius:9999px;
     border: none;
-    background-color: #6c6c6c;
-    color: white;
+    background-color: var(--color-primary-3);
+    color: var(--color-text-light);
+    font-family: var(--font-main);
 
     transition: 0.3s ease;
 }
 
 .login-button:hover{
-    background-color: #444;
+    background-color: var(--color-primary-4);
     cursor: pointer;
 }
 
@@ -35,14 +51,15 @@
     margin-bottom: 1vh;
     border-radius:9999px;
     border:none;
-    background-color: #9b9b9b;
-    color: white;    
-    box-sizing: border-box
+    background-color: var(--color-primary-2);
+    color: var(--color-text-light);    
+    box-sizing: border-box;
+    padding-left: 1em;
+    font-family: var(--font-main);
 }
 
 .login-text-field::placeholder{
     color: white;
-    padding-left: 1em;
 }
 
 .login-checkbox{
@@ -53,18 +70,21 @@
   -webkit-appearance: none;
   -moz-appearance: none;
 
-  border: 2px solid #6c6c6c;
+  border: 2px solid var(--color-primary-2);
   outline: none;
   cursor: pointer;
   position: relative;
+
+    top: 50%;
+  transform: translateY(35%);
 }
 
 .login-checkbox:checked{
-    background-color: #6c6c6c;   /* zielone wypełnienie */
+    background-color: var(--color-primary-2);   
 }
 
 .remember-me-link{
-    color: #6c6c6c;
+    color: var(--color-primary-2);
 }
 
 .login-remember-forgot{
@@ -78,6 +98,14 @@
 .login-password-wrapper{
     position: relative;
     width: 20vw;  
+}
+
+.login-signup{
+    margin-top: 1vh;
+}
+
+.login-signup-link{
+    color: var(--color-primary-2);   
 }
 
 .login-password-wrapper .login-text-field{
@@ -94,16 +122,3 @@
   transform: translateY(-50%);
   cursor: pointer;
 }
-
-
-
-
-/*
-.code-editor {    
-    border: solid ,#a4a4a4;
-}  
-
-.code-editor .monaco-editor-background{    
-    background: #d0d0d0 !important;
-} 
-*/ 

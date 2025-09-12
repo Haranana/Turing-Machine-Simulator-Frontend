@@ -1,3 +1,17 @@
+:root {
+  --color-bg: #ffffff;
+  --color-bg-2: #dedede;
+  --color-text-dark: #111;
+  --color-text-light: #e9e9e9;
+  --color-primary-1: #b5b5b5;
+  --color-primary-2: #7c7c7c;
+  --color-primary-3: #606060;
+  --color-primary-4: #373737;
+  --color-debug-1: red;
+
+  --font-main: "Gill Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
 #main-body{
     margin: 0;
     padding: 0;

@@ -3,8 +3,8 @@
 .sidebar {
   width: var(--sidebar-width);
   min-height: 100vh;
-  background: #2d2d2d;
-  color: white;
+  background: var(--color-primary-4);
+  color: var(--color-bg);
   left: 0;
   top: 0;
   margin-top: 0;
@@ -22,7 +22,7 @@
 }
 
 .sidebar a {
-  color: white;
+  color: var(--color-bg);
   text-decoration: none;
   padding: 10px 20px;
   display: block;
@@ -30,7 +30,7 @@
 }
 
 .sidebar a:hover {
-  background: #444;
+  background: var(--color-primary-3);
 }
 
 .sidebar .icon{
