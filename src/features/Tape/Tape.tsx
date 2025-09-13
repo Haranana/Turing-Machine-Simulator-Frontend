@@ -35,6 +35,7 @@ export const TapeView = ({ tapeState , radius=10, cellPx=80, animateMs=400}: Tap
  
   // Renderujemy pełne okno widoku (także puste komórki!)
   const BUFFER = 1;
+  const baseOffset = -BUFFER * cellPx;
   const from = head - radius - BUFFER;
   const to   = head + radius + BUFFER;
 
@@ -92,9 +93,9 @@ export const TapeView = ({ tapeState , radius=10, cellPx=80, animateMs=400}: Tap
   };
 
   const trackStyle: React.CSSProperties = {
-    transform: `translateX(${offsetPx}px)`,
-    transition: noTransition ? "none" : `transform ${animateMs}ms ease`,
-  };
+  transform: `translate3d(${baseOffset + offsetPx}px, 0, 0)`,
+  transition: noTransition ? "none" : `transform ${animateMs}ms ease`,
+};
 
   const viewportStyle: React.CSSProperties = {
     width: `${(2 * radius + 1) * cellPx}px`,
