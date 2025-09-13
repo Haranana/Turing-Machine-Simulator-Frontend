@@ -1,17 +1,48 @@
-.tape{
-    display: flex;
-    background-color: var(--color-debug-1);
-    padding: 10px;
-    min-width: 80vw;
-    min-height: 10vh;
-    align-items: stretch;
-    justify-content: center;
+.tape-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
 }
 
-.tape-cell{
-    background-color: var(--color-debug-2);
-    padding: 5px;
-    border: solid 3px;
-    flex-grow: 1;
-    align-items: center;
+/* Okno widoku – stała szerokość, ukrywa przepełnienie */
+.tape-viewport {
+  overflow: hidden;
+  background-color: var(--color-debug-1);
+  padding: 8px;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset;
+}
+
+/* Pasek z komórkami, który przesuwamy translateX */
+.tape-track {
+  display: flex;
+  align-items: stretch;
+  will-change: transform;
+}
+
+.tape-cell {
+  background-color: var(--color-debug-2);
+  border: solid 2px #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 14px;
+  user-select: none;
+}
+
+.tape-cell-head {
+  outline: 3px solid #fff8;
+  box-shadow: 0 0 0 2px #1e90ff inset;
+}
+
+.tape-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tape-head-index {
+  font-family: monospace;
 }
