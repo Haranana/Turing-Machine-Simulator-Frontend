@@ -16,7 +16,7 @@ interface TapeViewInput{
   animateMs?: number;  
 }
 
-export const TapeView = ({ tapeState , radius=10, cellPx=40, animateMs=400}: TapeViewInput) => {
+export const TapeView = ({ tapeState , radius=10, cellPx=80, animateMs=400}: TapeViewInput) => {
 
     const [head, setHead] = useState<number>(tapeState.head);
 
@@ -34,8 +34,9 @@ export const TapeView = ({ tapeState , radius=10, cellPx=40, animateMs=400}: Tap
 
  
   // Renderujemy pełne okno widoku (także puste komórki!)
-  const from = head - radius;
-  const to   = head + radius;
+  const BUFFER = 1;
+  const from = head - radius - BUFFER;
+  const to   = head + radius + BUFFER;
 
   const cells = useMemo(() => {
     const list = [];

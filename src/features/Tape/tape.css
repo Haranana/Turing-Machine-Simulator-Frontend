@@ -1,7 +1,7 @@
 .tape-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  
   align-items: center;
 }
 
@@ -9,8 +9,6 @@
 .tape-viewport {
   overflow: hidden;
   background-color: var(--color-debug-1);
-  padding: 8px;
-  border-radius: 6px;
   box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset;
 }
 
@@ -22,13 +20,14 @@
 }
 
 .tape-cell {
+    box-sizing: border-box;
   background-color: var(--color-debug-2);
-  border: solid 2px #333;
+  border: solid 3px #333;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  font-size: 14px;
+  font-size: 22px;
   user-select: none;
 }
 

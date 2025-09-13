@@ -1,6 +1,6 @@
 import './page.css';
 import {TapeView} from "../features/Tape/Tape.tsx"
-import type { TapeState, TapeSymbol, Tape } from "../features/Tape/Tape.tsx"
+import type { TapeState, TapeSymbol } from "../features/Tape/Tape.tsx"
 
 function prepData(){
     const tapeMockInput: TapeState = {
