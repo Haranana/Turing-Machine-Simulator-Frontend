@@ -45,3 +45,19 @@
 .tape-head-index {
   font-family: monospace;
 }
+
+
+.simulation-controls{
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.simulation-controls-button{
+  min-width: 50px;
+  min-height: 50px;
+  color: white;
+  background-color: var(--color-primary-2);
+  margin: 1px;
+  cursor: pointer;
+}

@@ -2,6 +2,7 @@ import "./tape.css"
 
 export type TapeSymbol = string;          // usually a singe char
 export type Tape   = Map<number, TapeSymbol>;
+import {PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon} from "@heroicons/react/24/solid"
 import { useState , useRef, useMemo } from "react";
 
 export interface TapeState {
@@ -103,6 +104,9 @@ export const TapeView = ({ tapeState , radius=10, cellPx=80, animateMs=400}: Tap
   };
 
   return (
+    <div>
+
+    
     <div className="tape-wrapper">
       <div className="tape-viewport" style={viewportStyle}>
         <div className="tape-track" style={trackStyle} onTransitionEnd={handleTransitionEnd}>
@@ -114,6 +118,20 @@ export const TapeView = ({ tapeState , radius=10, cellPx=80, animateMs=400}: Tap
         <button onClick={() => step(-1)} disabled={isAnimating}>◀︎</button>
         <span className="tape-head-index">head: {head}</span>
         <button onClick={() => step(+1)} disabled={isAnimating}>▶︎</button>
+      </div>
+    </div>
+
+      <div className="simulation-controls">
+        <div className="simulation-controls-button"><PlayIcon></PlayIcon></div>
+        <div  className="simulation-controls-button"><PauseIcon></PauseIcon></div>
+        <div  className="simulation-controls-button"><StopIcon></StopIcon></div>
+        <div  className="simulation-controls-button"><PlayPauseIcon></PlayPauseIcon></div>
+
+        <div className="simulation-jump">
+          
+          <div  className="simulation-controls-button simulation-jump-button"><ForwardIcon></ForwardIcon></div>
+        </div>
+        
       </div>
     </div>
   );
