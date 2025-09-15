@@ -2,12 +2,11 @@ import './page.css';
 import './setting-page.css'
 import {useSimulationAliases} from '../features/SimulationAliases/simulationAliases'
 import type {AliasesFields} from '../features/SimulationAliases/simulationAliases'
-import {CheckIcon} from "@heroicons/react/24/solid"
 import { useRef } from 'react';
 
 export default  function SettingsPage() {
 
-    const { sep1, sep2, left, stay, right, setAll, setField} = useSimulationAliases()
+    const { sep1, sep2, left, stay, right, setAll} = useSimulationAliases()
 
     const sep1Ref = useRef<HTMLInputElement>(null);
     const sep2Ref = useRef<HTMLInputElement>(null);

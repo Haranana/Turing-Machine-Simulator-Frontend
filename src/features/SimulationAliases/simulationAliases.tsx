@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export type AliasesFields = {
   sep1: string;
@@ -15,7 +16,9 @@ export type SimulationAliases = AliasesFields & {
   setField: (k: keyof AliasesFields, v: string) => void;
 }
 
-export const useSimulationAliases = create<SimulationAliases>((set)=>({
+export const useSimulationAliases = create<SimulationAliases>()(
+    persist(
+    (set)=>({
     sep1: ",",
     sep2: ",",
     left: "L",
@@ -35,5 +38,8 @@ export const useSimulationAliases = create<SimulationAliases>((set)=>({
     setField: (k, v) => {
         set( {[k] : v}); 
     },
-
-}));
+    }),
+    {
+        name: "simulation-aliases",
+    })
+);
