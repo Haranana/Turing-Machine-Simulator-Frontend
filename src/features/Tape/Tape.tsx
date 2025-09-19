@@ -3,7 +3,7 @@ import "./tape.css";
 
 import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon } from "@heroicons/react/24/solid";
 import { useState, useRef, useMemo, useEffect } from "react";
-import type { Simulation ,TapeSymbol, TapeViewInput, Phase  } from "./tapeTypes";
+import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep  } from "./tapeTypes";
 
 
 export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 400 }: TapeViewInput) => {
@@ -33,10 +33,57 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 400 
   const stepRef = useRef<number>(0);
 
   // simulation state (placeholder)
-  const [simulation] = useState<Simulation>({
+  const [simulation , setSimulation] = useState<Simulation>({
     steps: [],
     isEmpty: false,
   });
+
+  //load debug simulation data
+  useEffect(()=>{
+    let simStep1 : SimulationStep = {
+      tapeIndex : 0,
+      action : "RIGHT", 
+      readChar : "0",
+      writtenChar : "1",
+      stateBefore : "q0",
+      stateAfter : "q1",
+    }
+
+    let simStep2 : SimulationStep = {
+      tapeIndex : 0,
+      action : "RIGHT", 
+      readChar : "0",
+      writtenChar : "1",
+      stateBefore : "q1",
+      stateAfter : "q1",
+    }
+
+    let simStep3 : SimulationStep = {
+      tapeIndex : 0,
+      action : "RIGHT", 
+      readChar : "0",
+      writtenChar : "2",
+      stateBefore : "q1",
+      stateAfter : "q2",
+    }
+
+    let newSteps : Array<SimulationStep> = Array(simStep1, simStep2, simStep3);
+
+    let newSimulation : Simulation = {
+      steps: newSteps,
+      isEmpty: false,
+    }
+
+    setSimulation(newSimulation);
+  }, []);
+
+  /*
+  const [simulation] = ()=>{
+    return useState<Simulation>({
+    steps: [],
+    isEmpty: false,
+    });
+  }*/
 
   const BUFFER = 1;
   const baseOffset = -BUFFER * cellPx;
@@ -107,10 +154,31 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 400 
     });
   };
 
+
+  const transActionToNumber =  () : -1 | 0 | 1 =>{
+        switch (simulation.steps[stepRef.current].action){
+          case "LEFT":
+            return -1;
+          case "STAY":
+            return 0;
+          case "RIGHT":
+            return +1;
+        }
+    };
+
   useEffect(() => {
     if (!isPlaying) return;
     if (phase === "idle") {
-      startStep(+1);
+
+      if(stepRef.current >= simulation.steps.length){
+        setIsPlaying(false);
+        
+      }else{
+
+      const stepDir : -1 | 0 | 1 = transActionToNumber();
+      startStep(stepDir);
+      }
+    
     }
   }, [isPlaying, phase]); 
 
