@@ -9,7 +9,8 @@ function prepData(){
         };
     
     for(let i=0; i<100; i++){
-        tapeMockInput.tape.set(i, i.toString());
+        (i+1)%10===0? tapeMockInput.tape.set(i, "1") : tapeMockInput.tape.set(i, "0");
+
     }
 
     return tapeMockInput;

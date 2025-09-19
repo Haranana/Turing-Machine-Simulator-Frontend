@@ -1,51 +1,52 @@
-import "./tape.css"
+import "./tape.css";
 
-export type TapeSymbol = string;          // usually a singe char
-export type Tape   = Map<number, TapeSymbol>;
-import {PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon} from "@heroicons/react/24/solid"
-import { useState , useRef, useMemo } from "react";
 
-export interface TapeState {
-  head: number;                
-  tape: Tape;                  //only non empty ones!
-}
+import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon } from "@heroicons/react/24/solid";
+import { useState, useRef, useMemo, useEffect } from "react";
+import type { Simulation ,TapeSymbol, TapeViewInput, Phase  } from "./tapeTypes";
 
-interface TapeViewInput{
-  tapeState: TapeState;
-  radius?: number;
-  cellPx?: number;
-  animateMs?: number;  
-}
 
-export const TapeView = ({ tapeState , radius=10, cellPx=80, animateMs=400}: TapeViewInput) => {
-
-    const [head, setHead] = useState<number>(tapeState.head);
+export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 400 }: TapeViewInput) => {
+  const [head, setHead] = useState<number>(tapeState.head);
 
   // Przesunięcie wizualne taśmy (px). 0 oznacza “wyrównane”.
   const [offsetPx, setOffsetPx] = useState<number>(0);
 
-  // Czy aktualnie trwa animacja (aby ignorować kolejne kliknięcia).
+  // Czy aktualnie trwa animacja (dla przycisków).
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Flaga na “snap bez transition” tuż po commicie ruchu.
+  // Flaga na “snap bez transition”.
   const [noTransition, setNoTransition] = useState(false);
 
-    // Pamiętamy kierunek aktualnego kroku, żeby wiedzieć co zcommmitować w onTransitionEnd.
+  // Odtwarzanie.
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // Mała maszyna stanów: idle -> anim -> snap -> idle ...
+  const [phase, setPhase] = useState<Phase>("idle");
+
+  // Kierunek animacji.
   const dirRef = useRef<number>(0);
 
- 
-  // Renderujemy pełne okno widoku (także puste komórki!)
+  // refs do diagnostyki / UI
+  const stateRef = useRef<string>("");
+  const outputRef = useRef<"Accepted" | "Rejected" | "Undecided" | "">("");
+  const stepRef = useRef<number>(0);
+
+  // simulation state (placeholder)
+  const [simulation] = useState<Simulation>({
+    steps: [],
+    isEmpty: false,
+  });
+
   const BUFFER = 1;
   const baseOffset = -BUFFER * cellPx;
   const from = head - radius - BUFFER;
-  const to   = head + radius + BUFFER;
+  const to = head + radius + BUFFER;
 
   const cells = useMemo(() => {
     const list = [];
     for (let i = from; i <= to; i++) {
-
       const value: TapeSymbol | undefined = tapeState.tape.get(i);
-      
       list.push(
         <div
           key={i}
@@ -58,80 +59,146 @@ export const TapeView = ({ tapeState , radius=10, cellPx=80, animateMs=400}: Tap
       );
     }
     return list;
-    // zależności: head, zakres, mapa (intencjonalnie minimalne)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [from, to, head, tapeState.tape, cellPx]);
 
+  const trackRef = useRef<HTMLDivElement | null>(null);
 
-  // Jeden krok: dir = -1 (w lewo), 0 (stój), +1 (w prawo)
-  const step = (dir: -1 | 0 | 1) => {
-    if (isAnimating) return;
-    if (dir === 0) return;
+  //making sure transition is active
+  const forceReflow = () => {
+    trackRef.current?.getBoundingClientRect();
+  };
+
+
+  const startStep = (dir: -1 | 0 | 1) => {
+    if (phase !== "idle" || dir === 0) return;
 
     dirRef.current = dir;
+    setPhase("anim");
     setIsAnimating(true);
     setNoTransition(false);
-
-    // Jeżeli head idzie w prawo (+1), taśma wizualnie przesuwa się w lewo (−cellPx)
-    const visualShift = -dir * cellPx;
-    setOffsetPx(visualShift);
+    forceReflow();                   
+    setOffsetPx(-dir * cellPx);       // transition
   };
 
-  // Po zakończeniu transition “commit” i snap do 0 bez transition
-  const handleTransitionEnd = () => {
-    if (!isAnimating) return;
+  
+  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
+    if (e.target !== trackRef.current) return;
+    if (e.propertyName !== "transform") return;
+    if (phase !== "anim") return;
 
-    // 1) commit: faktycznie zmieniamy head
-    setHead(h => h + dirRef.current);
-
-    // 2) natychmiast wyłączamy transition i cofamy offset do 0, aby nie było skoku
+  
+    setHead((h) => h + dirRef.current);
+    stepRef.current += 1;
     setIsAnimating(false);
-    setNoTransition(true);
-    setOffsetPx(0);
 
-    // 3) w następnym ticku znów włączymy transition dla kolejnych kroków
-    //    (tutaj wystarczy zostawić noTransition=true do czasu kolejnego stepu)
+    setPhase("snap");
+    setNoTransition(true);
+
+    // offset = 0, return without transition
+    requestAnimationFrame(() => {
+      setOffsetPx(0);
+      forceReflow();
+
+      // set trans to true and set phase to idle
+      requestAnimationFrame(() => {
+        setNoTransition(false);
+        setPhase("idle");
+      });
+    });
   };
+
+  useEffect(() => {
+    if (!isPlaying) return;
+    if (phase === "idle") {
+      startStep(+1);
+    }
+  }, [isPlaying, phase]); 
 
   const trackStyle: React.CSSProperties = {
-  transform: `translate3d(${baseOffset + offsetPx}px, 0, 0)`,
-  transition: noTransition ? "none" : `transform ${animateMs}ms ease`,
-};
+    transform: `translate3d(${baseOffset + offsetPx}px, 0, 0)`,
+    transition: noTransition ? "none" : `transform ${animateMs}ms ease`,
+    willChange: "transform",
+  };
 
   const viewportStyle: React.CSSProperties = {
     width: `${(2 * radius + 1) * cellPx}px`,
-    height: `${cellPx + 2 * 8}px`, // + padding/border jeśli chcesz
+    height: `${cellPx + 2 * 8}px`,
+  };
+
+  const playSimulation = () => {
+    setIsPlaying(true);
+  };
+
+  const pauseSimulation = () => {
+    setIsPlaying(false);
+  };
+
+  const resetSimulation = () => {
+    setIsPlaying(false);
+    setIsAnimating(false);
+    setNoTransition(true);
+    setOffsetPx(0);
+    setHead(tapeState.head);
+    stepRef.current = 0;
+    setPhase("idle");
+    requestAnimationFrame(() => setNoTransition(false));
+  };
+
+  const jumpToSimulation = (_step: number) => {
+    // TODO
   };
 
   return (
-    <div>
+    <div className="simulation-interface">
+      {/* shows current state, steps, and output */}
+      <div className="simulation-data">
+        <p>State: {stateRef.current}</p>
+        <p>Output: {outputRef.current}</p>
+        <p>Step: {stepRef.current ?? ""}</p>
+      </div>
 
-    
-    <div className="tape-wrapper">
-      <div className="tape-viewport" style={viewportStyle}>
-        <div className="tape-track" style={trackStyle} onTransitionEnd={handleTransitionEnd}>
-          {cells}
+      <div className="tape-wrapper">
+        <div className="tape-viewport" style={viewportStyle}>
+          <div
+            className="tape-track"
+            ref={trackRef}
+            style={trackStyle}
+            onTransitionEnd={handleTransitionEnd}
+          >
+            {cells}
+          </div>
+        </div>
+
+        <div className="tape-controls">
+          <button onClick={() => startStep(-1)} disabled={phase !== "idle"}>
+            ◀︎
+          </button>
+          <span className="tape-head-index">head: {head}</span>
+          <button onClick={() => startStep(+1)} disabled={phase !== "idle"}>
+            ▶︎
+          </button>
         </div>
       </div>
-
-      <div className="tape-controls">
-        <button onClick={() => step(-1)} disabled={isAnimating}>◀︎</button>
-        <span className="tape-head-index">head: {head}</span>
-        <button onClick={() => step(+1)} disabled={isAnimating}>▶︎</button>
-      </div>
-    </div>
 
       <div className="simulation-controls">
-        <div className="simulation-controls-button"><PlayIcon></PlayIcon></div>
-        <div  className="simulation-controls-button"><PauseIcon></PauseIcon></div>
-        <div  className="simulation-controls-button"><StopIcon></StopIcon></div>
-        <div  className="simulation-controls-button"><PlayPauseIcon></PlayPauseIcon></div>
+        <button className="simulation-controls-button" onClick={playSimulation}>
+          <PlayIcon />
+        </button>
+        <button className="simulation-controls-button" onClick={pauseSimulation}>
+          <PauseIcon />
+        </button>
+        <button className="simulation-controls-button" onClick={resetSimulation}>
+          <StopIcon />
+        </button>
+        <button className="simulation-controls-button" onClick={pauseSimulation}>
+          <PlayPauseIcon />
+        </button>
 
         <div className="simulation-jump">
-          
-          <div  className="simulation-controls-button simulation-jump-button"><ForwardIcon></ForwardIcon></div>
+          <button className="simulation-controls-button simulation-jump-button">
+            <ForwardIcon />
+          </button>
         </div>
-        
       </div>
     </div>
   );

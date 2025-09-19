@@ -1,3 +1,14 @@
+.simulation-interface{
+
+}
+
+.simulation-data{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  font-family: var(--font-main);
+}
+
 .tape-wrapper {
   display: flex;
   flex-direction: column;
@@ -8,8 +19,8 @@
 /* Okno widoku – stała szerokość, ukrywa przepełnienie */
 .tape-viewport {
   overflow: hidden;
-  background-color: var(--color-debug-1);
-  box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset;
+  background-color: var(--color-bg);
+ /* box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset;*/
 }
 
 /* Pasek z komórkami, który przesuwamy translateX */
@@ -21,8 +32,9 @@
 
 .tape-cell {
     box-sizing: border-box;
-  background-color: var(--color-debug-2);
-  border: solid 3px #333;
+  background-color: var(--color-primary-1);
+  color: var(--color-text-light);
+  border: solid 3px var(--color-bg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,8 +44,8 @@
 }
 
 .tape-cell-head {
-  outline: 3px solid #fff8;
-  box-shadow: 0 0 0 2px #1e90ff inset;
+
+  background-color:var(--color-primary-2) ; 
 }
 
 .tape-controls {
@@ -60,4 +72,10 @@
   background-color: var(--color-primary-2);
   margin: 1px;
   cursor: pointer;
+  border: none;
+  border-radius: 5px;
+}
+
+.simulation-controls-button:hover{
+   background-color: var(--color-primary-1);
 }
