@@ -6,8 +6,13 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep  } from "./tapeTypes";
 
 
-export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 400 }: TapeViewInput) => {
+export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
+
   const [head, setHead] = useState<number>(tapeState.head);
+
+  const [tapeValues, setTapeValues] = useState<Map<number, TapeSymbol>>(
+    tapeState.tape
+  );
 
   // Przesunięcie wizualne taśmy (px). 0 oznacza “wyrównane”.
   const [offsetPx, setOffsetPx] = useState<number>(0);
@@ -93,7 +98,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 400 
   const cells = useMemo(() => {
     const list = [];
     for (let i = from; i <= to; i++) {
-      const value: TapeSymbol | undefined = tapeState.tape.get(i);
+      const value: TapeSymbol | undefined = tapeValues.get(i);
       list.push(
         <div
           key={i}
@@ -106,7 +111,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 400 
       );
     }
     return list;
-  }, [from, to, head, tapeState.tape, cellPx]);
+  }, [from, to, head, tapeState.tape, cellPx, tapeValues]);
 
   const trackRef = useRef<HTMLDivElement | null>(null);
 
@@ -117,6 +122,14 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 400 
 
 
   const startStep = (dir: -1 | 0 | 1) => {
+
+      //see if value of tape cell under head needs to be changed
+    setTapeValues(prev => {
+      const newMap = new Map(prev);
+      newMap.set(head, simulation.steps[stepRef.current].writtenChar);    
+      return newMap;
+    });
+
     if (phase !== "idle" || dir === 0) return;
 
     dirRef.current = dir;
@@ -152,6 +165,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 400 
         setPhase("idle");
       });
     });
+
   };
 
 
@@ -192,6 +206,31 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 400 
     width: `${(2 * radius + 1) * cellPx}px`,
     height: `${cellPx + 2 * 8}px`,
   };
+
+  const clearTape = () => {
+    setTapeValues(prev => {
+      const cleared = new Map<number, TapeSymbol>();
+      prev.forEach((_, key) => {
+        cleared.set(key, ""); 
+      });
+      return cleared;
+    });
+  }
+
+  const writeInputOnTape = (input: string) => {
+    const inputArray : string[] = input.split('');
+    setTapeValues(() => {
+      const newMap = new Map<number, TapeSymbol>();
+      for(let i: number = 0; i < inputArray.length; i++){
+        newMap.set(i, inputArray[i]);
+      }
+      return newMap;
+    });
+  }
+
+  const returnHeadToStart = () => {
+    setHead(0);
+  }
 
   const playSimulation = () => {
     setIsPlaying(true);
