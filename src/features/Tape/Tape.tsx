@@ -151,6 +151,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
     }
 
     setSimulation(newSimulation);
+    stateRef.current = newSimulation.steps[0].stateBefore;
   }, []);
 
   const BUFFER = 1;
@@ -203,6 +204,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
     
     if(dir === 0){
       stepRef.current = stepRef.current + 1;
+      stateRef.current = simulation.steps[stepRef.current].stateBefore;
       return;
     }
 
@@ -226,11 +228,13 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
     console.log("move: ", dir);
     if(dir === 0){
       stepRef.current-=1;
+      stateRef.current = simulation.steps[stepRef.current].stateBefore;
       setTapeValues(prev => {
       const newMap = new Map(simulation.steps[stepRef.current].tapeBefore.tape);    
       return newMap;
       });
       return;
+
     }
     
     dirRef.current = dir;
@@ -308,8 +312,10 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
         return newMap;
       });
     }
-    stepDirRef.current = 0;
 
+
+    stepDirRef.current = 0;
+    stateRef.current = simulation.steps[stepRef.current].stateBefore;
   };
 
   // translate transaction action (move Left, move right etc.) of given step from simulation to number (-1, 0, 1)
