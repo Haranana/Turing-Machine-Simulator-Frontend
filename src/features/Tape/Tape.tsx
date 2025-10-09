@@ -3,14 +3,14 @@ import "./tape.css";
 
 import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon } from "@heroicons/react/24/solid";
 import { useState, useRef, useMemo, useEffect } from "react";
-import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep  } from "./tapeTypes";
+import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape } from "./tapeTypes";
 
 
 export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
 
   const [head, setHead] = useState<number>(tapeState.head);
 
-  const defaultTape : Map<number, TapeSymbol> = tapeState.tape;
+  let defaultTape : Map<number, TapeSymbol> = tapeState.tape;
 
   const [tapeValues, setTapeValues] = useState<Map<number, TapeSymbol>>(
     tapeState.tape
@@ -47,6 +47,24 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
   //load debug simulation data
   useEffect(()=>{
+    let simStep1TapeAfter : Tape = new Map<number, string>([
+      [0 , "1"],
+      [1 , "0"],
+      [2 , "1"],
+    ])
+
+    let simStep2TapeAfter : Tape = new Map<number, string>([
+      [0 , "1"],
+      [1 , "1"],
+      [2 , "1"],
+    ])
+
+    let simStep3TapeAfter : Tape = new Map<number, string>([
+      [0 , "1"],
+      [1 , "1"],
+      [2 , "2"],
+    ])
+
     let simStep1 : SimulationStep = {
       tapeIndex : 0,
       action : "RIGHT", 
@@ -54,6 +72,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
       writtenChar : "1",
       stateBefore : "q0",
       stateAfter : "q1",
+      tapeAfter : simStep1TapeAfter,
     }
 
     let simStep2 : SimulationStep = {
@@ -63,6 +82,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
       writtenChar : "1",
       stateBefore : "q1",
       stateAfter : "q1",
+      tapeAfter : simStep2TapeAfter,
     }
 
     let simStep3 : SimulationStep = {
@@ -72,6 +92,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
       writtenChar : "2",
       stateBefore : "q1",
       stateAfter : "q2",
+      tapeAfter : simStep3TapeAfter,
     }
 
     let newSteps : Array<SimulationStep> = Array(simStep1, simStep2, simStep3);
@@ -127,8 +148,8 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
       //see if value of tape cell under head needs to be changed
     setTapeValues(prev => {
-      const newMap = new Map(prev);
-      newMap.set(head, simulation.steps[stepRef.current].writtenChar);    
+      const newMap = new Map(simulation.steps[stepRef.current].tapeAfter);
+      //newMap.set(head, simulation.steps[stepRef.current].writtenChar);    
       return newMap;
     });
 

@@ -8,10 +8,14 @@ function prepData(){
         tape: new Map<number, TapeSymbol>(),
         };
     
+    /*
     for(let i=0; i<100; i++){
         (i+1)%10===0? tapeMockInput.tape.set(i, "1") : tapeMockInput.tape.set(i, "0");
 
-    }
+    }*/
+   tapeMockInput.tape.set(0 , "0");
+   tapeMockInput.tape.set(1 , "0");
+   tapeMockInput.tape.set(2 , "1");
 
     return tapeMockInput;
 }
