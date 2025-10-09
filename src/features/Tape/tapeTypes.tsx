@@ -10,7 +10,7 @@ export type SimulationStep = {
     writtenChar : string,
     stateBefore : State,
     stateAfter : State,
-    tapeAfter : Tape,
+    tapeBefore : TapeState,
 };
 
 export type Simulation = {
