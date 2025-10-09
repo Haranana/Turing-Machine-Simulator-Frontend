@@ -10,6 +10,8 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
   const [head, setHead] = useState<number>(tapeState.head);
 
+  const defaultTape : Map<number, TapeSymbol> = tapeState.tape;
+
   const [tapeValues, setTapeValues] = useState<Map<number, TapeSymbol>>(
     tapeState.tape
   );
@@ -65,7 +67,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
     let simStep3 : SimulationStep = {
       tapeIndex : 0,
-      action : "RIGHT", 
+      action : "STAY", 
       readChar : "0",
       writtenChar : "2",
       stateBefore : "q1",
@@ -168,9 +170,10 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
   };
 
-
-  const transActionToNumber =  () : -1 | 0 | 1 =>{
-        switch (simulation.steps[stepRef.current].action){
+  // translate transaction action (move Left, move right etc.) of given step from simulation to number (-1, 0, 1)
+  // by default it translates current step
+    const transActionToNumber =  (stepId : number = stepRef.current) : -1 | 0 | 1 =>{
+        switch (simulation.steps[stepId].action){
           case "LEFT":
             return -1;
           case "STAY":
@@ -228,8 +231,22 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
     });
   }
 
+  const doNextSimulationStep = () => {
+      const stepDir : -1 | 0 | 1 = transActionToNumber();
+      startStep(stepDir);
+  }
+
+  const doPrevSimulationStep = () => {
+    const stepDir : -1 | 0 | 1 = transActionToNumber(stepRef.current-1);
+      startStep(stepDir);
+  }
+
   const returnHeadToStart = () => {
     setHead(0);
+  }
+
+  const restartSimulation = () => {
+
   }
 
   const playSimulation = () => {
@@ -247,6 +264,9 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
     setOffsetPx(0);
     setHead(tapeState.head);
     stepRef.current = 0;
+    setTapeValues(
+      defaultTape
+    );
     setPhase("idle");
     requestAnimationFrame(() => setNoTransition(false));
   };
@@ -277,11 +297,11 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
         </div>
 
         <div className="tape-controls">
-          <button onClick={() => startStep(-1)} disabled={phase !== "idle"}>
+          <button onClick={doPrevSimulationStep} disabled={phase !== "idle"}>
             ◀︎
           </button>
           <span className="tape-head-index">head: {head}</span>
-          <button onClick={() => startStep(+1)} disabled={phase !== "idle"}>
+          <button onClick={doNextSimulationStep} disabled={phase !== "idle"}>
             ▶︎
           </button>
         </div>
