@@ -4,6 +4,8 @@ import {useSimulationAliases} from '../features/SimulationAliases/simulationAlia
 import type {AliasesFields} from '../features/SimulationAliases/simulationAliases'
 import { useRef } from 'react';
 
+
+
 export default  function SettingsPage() {
 
     const { sep1, sep2, left, stay, right, setAll} = useSimulationAliases()
