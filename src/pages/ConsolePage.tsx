@@ -68,58 +68,68 @@ export default function ConsolePage() {
             ],
 
             whitespace: [
-                  [/\s+/, "white"],
-                  [/\/\/.*/, "comment"],
-                  
+              [/[ \t\r]+/, "white"],
+              [/\/\/.*/, "comment"],    
+            ],
+
+            newline: [
+              [/\r?\n/, "", "@popall"]
             ],
 
             afterCurrentState:[
+              { include: "@newline" },
               { include: "@whitespace" },
               [reSep1, "delimiter" , "expectsReadSymbol"],
-              [/.*/, { cases: { '@eos': { token: 'invalid', next: '@pop' } } }],
+              //[/.*/, { cases: { '@eos': { token: 'invalid', next: '@pop' } } }],
             ],
 
             expectsReadSymbol:[
+              { include: "@newline" },
               { include: "@whitespace" },
               [reSymbol , "variable" , "afterReadSymbol"],
-              [/.*/, { cases: { '@eos': { token: 'invalid', next: '@pop' } } }],
+
             ],
 
             afterReadSymbol:[
+              { include: "@newline" },
               { include: "@whitespace" },
               [reSep2, "constant", "afterSep2"],
-              [/.*/, { cases: { '@eos': { token: 'invalid', next: '@pop' } } }],
+
             ],
 
             afterSep2:[
+              { include: "@newline" },
               { include: "@whitespace" },
                [reState , "string" , "afterNextState"],
-               [/.*/, { cases: { '@eos': { token: 'invalid', next: '@pop' } } }],
+
             ],
 
             afterNextState:[
+              { include: "@newline" },
               { include: "@whitespace" },
                [reSep1 , "delimiter" , "expectsWrittenSymbol"],
-               [/.*/, { cases: { '@eos': { token: 'invalid', next: '@pop' } } }],
+
             ],
 
             expectsWrittenSymbol:[
+              { include: "@newline" },
               { include: "@whitespace" },
               [reSymbol, "variable" , "afterWrittenSymbol"],
-              [/.*/, { cases: { '@eos': { token: 'invalid', next: '@pop' } } }],
+
             ],
 
             afterWrittenSymbol:[
+              { include: "@newline" },
               { include: "@whitespace" },
               [reSep1, "delimiter", "expectsAction"],
-              [/.*/, { cases: { '@eos': { token: 'invalid', next: '@pop' } } }],
+
             ],
 
-            expectsAction:[
+            expectsAction: [
               { include: "@whitespace" },
-              [reAction, "function", "@pop"],
-              [/.*/, { cases: { '@eos': { token: 'invalid', next: '@pop' } } }],         
-            ],
+              [reAction, "function", "@popall"],   
+              [/\r?\n/, "", "@popall"],         
+            ]
         }
     });
 
@@ -137,8 +147,8 @@ export default function ConsolePage() {
       );
       
       lines.forEach((rawLine, i) => {
-        const code = rawLine.replace(/\/\/.*$/, ""); 
-        if (!code.trim()) return;               
+        const code = rawLine.replace(/\/\/.*$/, ""); //delete comments
+        if (!code.trim()) return;               // if line is empty (only whitelines) skip
 
         if (!reTransition.test(code)) {
           markers.push({
