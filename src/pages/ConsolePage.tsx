@@ -80,7 +80,6 @@ export default function ConsolePage() {
               { include: "@newline" },
               { include: "@whitespace" },
               [reSep1, "delimiter" , "expectsReadSymbol"],
-              //[/.*/, { cases: { '@eos': { token: 'invalid', next: '@pop' } } }],
             ],
 
             expectsReadSymbol:[

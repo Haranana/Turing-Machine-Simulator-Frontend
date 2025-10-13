@@ -203,9 +203,21 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
     if (phase !== "idle") return;
     
     if(dir === 0){
-      stepRef.current = stepRef.current + 1;
-      stateRef.current = simulation.steps[stepRef.current].stateBefore;
+
+      if(currentStep === simulation.steps.length - 1){
+        stateRef.current = simulation.steps[currentStep].stateAfter;
+      }else{
+        stateRef.current = simulation.steps[currentStep+1].stateBefore;
+      }
+      
+      stepRef.current = currentStep + 1;
+      if (stepRef.current >= simulation.steps.length) {
+        setIsPlaying(false);
+      }
       return;
+
+
+     
     }
 
     dirRef.current = dir;
@@ -215,6 +227,8 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
     stepDirRef.current = 1;
     forceReflow();                   
     setOffsetPx(-dir * cellPx);       // transition
+
+    console.log("2");
   };
 
   const reverseStep = (dir : -1 | 0 | 1) => {
@@ -246,8 +260,23 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
     setOffsetPx(-dir * cellPx);       // transition
   }
 
+    useEffect(() => {
+    if (!isPlaying) return;
+    if (phase === "idle") {
+
+      if(stepRef.current >= simulation.steps.length){
+        setIsPlaying(false);
+      }else{
+        console.log("1");
+        const stepDir : -1 | 0 | 1 = transActionToNumber();
+        startStep(stepDir);
+      }
+    
+    }
+  }, [isPlaying, phase]); 
+
   const doNextSimulationStep = () => {
-        if(stepRef.current >= simulation.steps.length){
+    if(stepRef.current >= simulation.steps.length){
       console.log("size error");
       return;
     }
@@ -315,7 +344,13 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
 
     stepDirRef.current = 0;
-    stateRef.current = simulation.steps[stepRef.current].stateBefore;
+    if(stepRef.current >= simulation.steps.length - 1){
+        stateRef.current = simulation.steps[stepRef.current].stateAfter;
+      }else{
+        stateRef.current = simulation.steps[stepRef.current+1].stateBefore;
+      }
+
+    console.log("3");
   };
 
   // translate transaction action (move Left, move right etc.) of given step from simulation to number (-1, 0, 1)
@@ -331,21 +366,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
         }
     };
 
-  useEffect(() => {
-    if (!isPlaying) return;
-    if (phase === "idle") {
 
-      if(stepRef.current >= simulation.steps.length){
-        setIsPlaying(false);
-        
-      }else{
-
-      const stepDir : -1 | 0 | 1 = transActionToNumber();
-      startStep(stepDir);
-      }
-    
-    }
-  }, [isPlaying, phase]); 
 
   const trackStyle: React.CSSProperties = {
     transform: `translate3d(${baseOffset + offsetPx}px, 0, 0)`,
