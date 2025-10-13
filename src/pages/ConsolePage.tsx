@@ -1,17 +1,22 @@
-import { Editor , useMonaco } from "@monaco-editor/react";
+import { Editor , useMonaco, } from "@monaco-editor/react";
 import {useSimulationAliases} from '../features/SimulationAliases/simulationAliases'
-import type {AliasesFields} from '../features/SimulationAliases/simulationAliases'
+import type monaco from 'monaco-editor';
 
 import './page.css';
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const LANGUAGE_ID = "tm";
 
+
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+
+
 
 export default function ConsolePage() {
 
     const monaco = useMonaco();
+    const editorRef = useRef<monaco.editor.IStandaloneCodeEditor|null>(null);
 
     const { sep1, sep2, left, stay, right} = useSimulationAliases();
 
@@ -120,15 +125,58 @@ export default function ConsolePage() {
 
 
     }, [monaco , sep1, sep2, left, stay, right]);
-    
-   
-   
 
+
+    function validateModel(model: monaco.editor.ITextModel, monaco: typeof import('monaco-editor')){
+ 
+      const lines = model.getLinesContent(); 
+      const markers: monaco.editor.IMarkerData[] = [];
+      
+      const reTransition = new RegExp(
+        `^\\s*((?:(?!${esc(sep1)}|\\n).)+)\\s*${esc(sep1)}\\s*(.)\\s*${esc(sep2)}\\s*((?:(?!${esc(sep1)}|\\n).)+)\\s*${esc(sep1)}\\s*(.)\\s*${esc(sep1)}\\s*(?:${esc(left)}|${esc(stay)}|${esc(right)})\\s*(?:\/\/.*)?$`
+      );
+      
+      lines.forEach((rawLine, i) => {
+        const code = rawLine.replace(/\/\/.*$/, ""); 
+        if (!code.trim()) return;               
+
+        if (!reTransition.test(code)) {
+          markers.push({
+            severity: monaco.MarkerSeverity.Error,
+            message: "Niepoprawna składnia reguły.",
+            startLineNumber: i + 1,
+            startColumn: 1,
+            endLineNumber: i + 1,
+            endColumn: rawLine.length + 1,
+          });
+        }
+      });
+
+      monaco.editor.setModelMarkers(model, "tm-validator", markers);
+      
+    }
 
 
     return(
         <div className="page">
-            <Editor className="code-editor" 
+
+            <Editor 
+            
+            onMount={(editor, monaco) => { 
+               editorRef.current = editor;
+                const model = editor.getModel();
+                if (!model) return;
+
+                validateModel(model, monaco);
+
+                const sub = editor.onDidChangeModelContent(() => {
+                  validateModel(model, monaco);
+                });
+
+                editor.onDidDispose(() => sub.dispose());
+           }}
+            
+            className="code-editor" 
              defaultLanguage={LANGUAGE_ID}
              defaultValue="q1,a,q2,b,S"
              height="90vh"
