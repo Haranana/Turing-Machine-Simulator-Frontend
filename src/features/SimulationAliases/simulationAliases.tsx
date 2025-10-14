@@ -38,6 +38,7 @@ export const useSimulationAliases = create<SimulationAliases>()(
     setField: (k, v) => {
         set( {[k] : v}); 
     },
+    
     }),
     {
         name: "simulation-aliases",

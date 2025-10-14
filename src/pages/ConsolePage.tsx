@@ -4,6 +4,7 @@ import type monaco from 'monaco-editor';
 
 import './page.css';
 import { useEffect, useRef } from "react";
+import { useSimulationProgram } from "../features/SimulationProgram/simulationProgram";
 
 const LANGUAGE_ID = "tm";
 
@@ -19,6 +20,7 @@ export default function ConsolePage() {
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor|null>(null);
 
     const { sep1, sep2, left, stay, right} = useSimulationAliases();
+    const {codeLines , setField} = useSimulationProgram();
 
     useEffect(() => {
       if (!monaco) return;
@@ -165,6 +167,10 @@ export default function ConsolePage() {
       
     }
 
+    /*
+    const arr : string[] = ["aaa" , "bbb", "ccc"]; 
+    const code : string = arr.join("\n");
+    */
 
     return(
         <div className="page">
@@ -172,6 +178,9 @@ export default function ConsolePage() {
             <Editor 
             
             onMount={(editor, monaco) => { 
+
+
+
                editorRef.current = editor;
                 const model = editor.getModel();
                 if (!model) return;
@@ -184,10 +193,18 @@ export default function ConsolePage() {
 
                 editor.onDidDispose(() => sub.dispose());
            }}
+
+           onChange={()=>{
+              if(!editorRef.current) return;
+              const editor = editorRef.current;
+              const model = editor.getModel();
+              if (!model) return;
+              setField( model.getLinesContent())
+           }}
             
             className="code-editor" 
              defaultLanguage={LANGUAGE_ID}
-             defaultValue="q1,a,q2,b,S"
+             defaultValue = {codeLines.join("\n")}
              height="90vh"
              width="90vw"
              theme="light"
