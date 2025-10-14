@@ -204,10 +204,10 @@ export default function ConsolePage() {
             
             className="code-editor" 
              defaultLanguage={LANGUAGE_ID}
-             defaultValue = {codeLines.join("\n")}
+             value = {codeLines.join("\n")}
              height="90vh"
              width="90vw"
-             theme="light"
+             theme="tm-theme"
              options={{
                 fontSize: 24,
             }}
