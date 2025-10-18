@@ -19,6 +19,9 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
     tapeState.tape
   );
 
+  // Krok do którego użytkownik chce skoczyc
+  let jumpToRef = useRef<number | null>(null);
+
   // Przesunięcie wizualne taśmy (px). 0 oznacza “wyrównane”.
   const [offsetPx, setOffsetPx] = useState<number>(0);
 
@@ -483,6 +486,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
       </div>
 
       <div className="simulation-controls">
+        <input className="JumpToInput" type="number" min={0} max={simulation==null? 0 : simulation.steps.length} placeholder="Jump to" onChange={(e)=>{jumpToRef.current=parseInt(e.target.value)}}></input>
         <button className="simulation-controls-button" onClick={playSimulation}>
           <PlayIcon />
         </button>
@@ -497,7 +501,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
         </button>
 
         <div className="simulation-jump">
-          <button className="simulation-controls-button simulation-jump-button" onClick={()=>{jumpToSimulation(0)}}>
+          <button className="simulation-controls-button simulation-jump-button" onClick={()=>{if(jumpToRef.current) jumpToSimulation(jumpToRef.current)}}>
             <ForwardIcon />
           </button>
         </div>
