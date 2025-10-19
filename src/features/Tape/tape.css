@@ -9,6 +9,32 @@
   font-family: var(--font-main);
 }
 
+.SimulationControls{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.JumpToControls{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 20%
+}
+
+.FlowControls{
+ display: flex;
+ flex-direction: row;
+ justify-content: center;
+}
+
+.SpeedControls{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 20%
+}
+
 .tape-wrapper {
   display: flex;
   flex-direction: column;
@@ -66,6 +92,17 @@
 }
 
 .simulation-controls-button{
+  min-width: 50px;
+  min-height: 50px;
+  color: white;
+  background-color: var(--color-primary-2);
+  margin: 1px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+}
+
+.SimulationControlsButton{
   min-width: 50px;
   min-height: 50px;
   color: white;

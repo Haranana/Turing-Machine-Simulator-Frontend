@@ -6,19 +6,22 @@ export type TransitionAction = "LEFT" | "STAY" | "RIGHT";
 export type SimulationStep = {
     tapeIndex : number,
     action : TransitionAction, 
-    readChar : string,
-    writtenChar : string,
+    readChar : string | null,
+    writtenChar : string | null,
     stateBefore : State,
-    stateAfter : State,
+    stateAfter : State | null,
     tapeBefore : TapeState,
 };
 
 export type Simulation = {
     steps : SimulationStep[];
+    startingState : State,
+    acceptingState: State,
+    rejectingState: State,
     isEmpty : boolean,
 }
 
-export type TapeSymbol = string;          // usually a single char
+export type TapeSymbol = string | null;          // usually a single char
 
 export type Tape = Map<number, TapeSymbol>;
 

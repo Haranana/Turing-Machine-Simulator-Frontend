@@ -1,7 +1,7 @@
 import "./tape.css";
 
 
-import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon } from "@heroicons/react/24/solid";
+import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon, ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from "@heroicons/react/24/solid";
 import { useState, useRef, useMemo, useEffect } from "react";
 import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape, TapeState } from "./tapeTypes";
 
@@ -10,6 +10,9 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
   // Id komórki na którą wskazuje głowica taśmy
   const [head, setHead] = useState<number>(tapeState.head);
+
+  // Predkosc animacji jednego ruchu
+  const animationSpeedRef = useRef(animateMs);
 
   // Taśma z załadowanym inputem ale bez wykonania żadnego ruchu
   let defaultTape : Map<number, TapeSymbol> = tapeState.tape;
@@ -58,6 +61,9 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
   const [simulation , setSimulation] = useState<Simulation>({
     steps: [],
     isEmpty: false,
+    startingState: "start",
+    acceptingState: "acc",
+    rejectingState: "rej"
   });
 
   //load debug simulation data
@@ -106,6 +112,17 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
       head: 1,
     };
 
+    let simStep5Tape : Tape = new Map<number, string>([
+      [0 , "1"],
+      [1 , "3"],
+      [2 , "2"],
+    ])
+
+    const simStep5TapeBefore : TapeState = {
+      tape: simStep5Tape,
+      head: 1,
+    };
+
     let simStep1 : SimulationStep = {
       tapeIndex : 0,
       action : "RIGHT", 
@@ -146,11 +163,24 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
       tapeBefore : simStep4TapeBefore,
     }
 
-    let newSteps : Array<SimulationStep> = Array(simStep1, simStep2, simStep3, simStep4);
+    let simStep5 : SimulationStep = {
+      tapeIndex : 0,
+      action : "STAY", 
+      readChar : null,
+      writtenChar : null,
+      stateBefore : "q3",
+      stateAfter : null,
+      tapeBefore : simStep5TapeBefore,
+    }
+
+    let newSteps : Array<SimulationStep> = Array(simStep1, simStep2, simStep3, simStep4, simStep5);
 
     let newSimulation : Simulation = {
       steps: newSteps,
       isEmpty: false,
+      startingState: "q0",
+      acceptingState: "q3",
+      rejectingState: "q4"
     }
 
     setSimulation(newSimulation);
@@ -187,51 +217,68 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
     trackRef.current?.getBoundingClientRect();
   };
 
+  function isEndingStep(step: number){
+    return step === simulation.steps.length - 1;
+  }
 
+  //receives value in (0,1) and converts it to ms with chosen formula
+  function setAnimationSpeed(x : number){
+    animationSpeedRef.current = 1600 - 1600 * x;
+  }
+
+  
+  function setCurrentState(){
+     const currentStep = stepRef.current;
+     if( currentStep>=simulation.steps.length) return;
+     stateRef.current = simulation.steps[currentStep].stateBefore;
+  }
+
+  function setNextStep(){
+    const currentStep = stepRef.current;
+    if(currentStep === simulation.steps.length -1) return;
+    stepRef.current+=1;
+  }
+
+  function setPrevStep(){
+    const currentStep = stepRef.current;
+    if(currentStep === 0) return;
+    stepRef.current-=1;
+  }
 
   const startStep = (dir: -1 | 0 | 1) => {
 
     const currentStep = stepRef.current;
-    
-    if(currentStep >= simulation.steps.length){
-      return;
-    }
 
-    setTapeValues(prev => {
-      const newMap = new Map(simulation.steps[currentStep].tapeBefore.tape);
-      newMap.set(head, simulation.steps[currentStep].writtenChar);    
-      return newMap;
-    });
-    
     if (phase !== "idle") return;
     
-    if(dir === 0){
-
-      if(currentStep === simulation.steps.length - 1){
-        stateRef.current = simulation.steps[currentStep].stateAfter;
-      }else{
-        stateRef.current = simulation.steps[currentStep+1].stateBefore;
-      }
-      
-      stepRef.current = currentStep + 1;
-      if (stepRef.current >= simulation.steps.length) {
-        setIsPlaying(false);
-      }
+    if(currentStep >= simulation.steps.length){
+      setIsPlaying(false);
       return;
-
-
-     
     }
 
+    if(!isEndingStep(currentStep)){
+      setTapeValues(prev => {
+        const newMap = new Map(simulation.steps[currentStep].tapeBefore.tape);
+        newMap.set(head, simulation.steps[currentStep].writtenChar);    
+        return newMap;
+      });
+    }
+    
+
     dirRef.current = dir;
+    stepDirRef.current = 1;
+    if(dir === 0){  
+      setNextStep();
+      setCurrentState();
+      return;
+    }
+
+    
     setPhase("anim");
     setIsAnimating(true);
     setNoTransition(false);
-    stepDirRef.current = 1;
     forceReflow();                   
     setOffsetPx(-dir * cellPx);       // transition
-
-    console.log("2");
   };
 
   const reverseStep = (dir : -1 | 0 | 1) => {
@@ -280,7 +327,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
   const doNextSimulationStep = () => {
     if(stepRef.current >= simulation.steps.length){
-      console.log("size error");
+      
       return;
     }
 
@@ -320,6 +367,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
   
     setHead((h) => h + dirRef.current);
     stepRef.current += stepDirRef.current;
+    const currentStep = stepRef.current;
     
     setIsAnimating(false);
 
@@ -340,17 +388,16 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
     if(stepDirRef.current === -1){
         setTapeValues(prev => {
-        const newMap = new Map(simulation.steps[stepRef.current].tapeBefore.tape);    
+        const newMap = new Map(simulation.steps[currentStep].tapeBefore.tape);    
         return newMap;
       });
     }
 
-
     stepDirRef.current = 0;
-    if(stepRef.current >= simulation.steps.length - 1){
-        stateRef.current = simulation.steps[stepRef.current].stateAfter;
+    if(currentStep >= simulation.steps.length - 1 && simulation.steps[currentStep].stateAfter!=null){
+        stateRef.current = simulation.steps[currentStep].stateAfter;
       }else{
-        stateRef.current = simulation.steps[stepRef.current+1].stateBefore;
+        stateRef.current = simulation.steps[currentStep+1].stateBefore;
       }
 
     console.log("3");
@@ -373,7 +420,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
   const trackStyle: React.CSSProperties = {
     transform: `translate3d(${baseOffset + offsetPx}px, 0, 0)`,
-    transition: noTransition ? "none" : `transform ${animateMs}ms ease`,
+    transition: noTransition ? "none" : `transform ${animationSpeedRef.current}ms ease`,
     willChange: "transform",
   };
 
@@ -428,6 +475,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
     setOffsetPx(0);
     setHead(tapeState.head);
     stepRef.current = 0;
+    stateRef.current = simulation.startingState;
     setTapeValues(
       defaultTape
     );
@@ -473,37 +521,62 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
             {cells}
           </div>
         </div>
-
-        <div className="tape-controls">
-          <button onClick={doPrevSimulationStep} disabled={phase !== "idle"}>
-            ◀︎
-          </button>
-          <span className="tape-head-index">head: {head}</span>
-          <button onClick={doNextSimulationStep} disabled={phase !== "idle"}>
-            ▶︎
-          </button>
-        </div>
       </div>
 
-      <div className="simulation-controls">
-        <input className="JumpToInput" type="number" min={0} max={simulation==null? 0 : simulation.steps.length} placeholder="Jump to" onChange={(e)=>{jumpToRef.current=parseInt(e.target.value)}}></input>
-        <button className="simulation-controls-button" onClick={playSimulation}>
-          <PlayIcon />
-        </button>
-        <button className="simulation-controls-button" onClick={pauseSimulation}>
-          <PauseIcon />
-        </button>
-        <button className="simulation-controls-button" onClick={resetSimulation}>
-          <StopIcon />
-        </button>
-        <button className="simulation-controls-button" onClick={pauseSimulation}>
-          <PlayPauseIcon />
-        </button>
+      <div className="SimulationControls">
+        <div className="JumpToControls">
+          <input className="JumpToInput" type="number" min={0} 
+           max={simulation==null? 0 : simulation.steps.length} 
+           placeholder="step"
+            onChange={(e)=>{jumpToRef.current=parseInt(e.target.value)}}>
+          </input>
 
-        <div className="simulation-jump">
-          <button className="simulation-controls-button simulation-jump-button" onClick={()=>{if(jumpToRef.current) jumpToSimulation(jumpToRef.current)}}>
-            <ForwardIcon />
+          <button className="simulation-controls-button simulation-jump-button" onClick={()=>{if(jumpToRef.current!=null) jumpToSimulation(jumpToRef.current)}}>
+            Jump
           </button>
+
+        </div>
+
+        <div className="FlowControls">
+
+          <button className="ToStartButton SimulationControlsButton" onClick={()=>jumpToSimulation(0)}>
+            <ChevronDoubleLeftIcon/>
+          </button>
+
+          <button className="StepBackButton SimulationControlsButton" onClick={doPrevSimulationStep}>
+            <ChevronLeftIcon/>
+          </button>
+        
+
+
+          <button className="PlayButton SimulationControlsButton" onClick={playSimulation}>
+            <PlayIcon />
+          </button>
+
+          <button className="PauseButton SimulationControlsButton" onClick={pauseSimulation}>
+            <PauseIcon />
+          </button>
+
+          <button className="StopButton SimulationControlsButton" onClick={resetSimulation}>
+            <StopIcon />
+          </button>
+
+          <button className="StepForwardButton SimulationControlsButton" onClick={doNextSimulationStep}>
+            <ChevronRightIcon/>
+          </button>
+        
+          <button className="ToStartButton SimulationControlsButton" onClick={()=>jumpToSimulation(simulation.steps.length-1)}>
+            <ChevronDoubleRightIcon/>
+          </button>
+        </div>
+
+        <div className="SpeedControls">
+          <input type="range" min="0.01" max="0.99" step="0.01" onChange={(e)=>{setAnimationSpeed(parseFloat(e.target.value))}}></input>
+        </div>
+       
+        
+        <div className="simulation-jump">
+          
         </div>
       </div>
     </div>
