@@ -83,6 +83,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   const handleAnimEnd = useCallback(() => {
   setIsAnimating(false);
+  console.log("animation: ", isAnimating);
   }, []);
 
     const [tapeInput , setTapeInput] = useState<TapeInput>(
@@ -278,7 +279,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       }
     }
     const newAnimationType: AnimationType = stepDirToAnimationType(currentStepDir);
-
+    console.log("about to move");
     setIsAnimating(true);
     setTapeInput((prev)=>{return{
         tapeState: currentTapeState,
@@ -334,15 +335,18 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     stepRef.current-=1;
   }
 
-
-    useEffect(() => {
-    if (!isPlaying) return;
-    if (phase === "idle") {
-
-      
-    
+  useEffect(() => {
+    console.log("sigma: ", isPlaying, isAnimating)
+    if (!isPlaying || isAnimating) return;
+    if(stepRef.current >= simulation.steps.length) {
+      setIsPlaying(false);
+      return;
     }
-  }, [isPlaying, phase]); 
+    stepDirRef.current = 1;
+    updateTape();
+    stepRef.current+=1;
+      
+  }, [isPlaying, isAnimating]); 
 
 
   const doNextSimulationStep = () => {

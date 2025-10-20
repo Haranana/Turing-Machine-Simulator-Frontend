@@ -94,18 +94,22 @@ export const TapeComponent = ({tapeInput}: Props) => {
 
   const startStep = () => {
 
-    console.log(tapeInput);
+    console.log("moving rn");
 
     const dir = dirRef.current;
     const animationType = animationTypeRef.current;
-    if (phase !== "idle" || tapeInput.writtenChar == null) return;
+    if(phase !== "idle") console.log("phase is not idle wth???");
+    if (phase !== "idle" || tapeInput.writtenChar == null){ 
+      return;
+    }
+    
 
     if(animationType!=="reverse"){
         setTapeValues(prev => {
             const newMap = new Map(tapeInput.tapeState.tape);
             
             newMap.set(head, tapeInput.writtenChar);  
-            console.log(head, "|", tapeInput.writtenChar)  
+            //console.log(head, "|", tapeInput.writtenChar)  
             return newMap;
         });
 
@@ -126,36 +130,31 @@ export const TapeComponent = ({tapeInput}: Props) => {
   };
 
 
-  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
+const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
+  if (e.target !== trackRef.current) return;
+  if (e.propertyName !== "transform") return;
+  if (phase !== "anim") return;
 
-    if (e.target !== trackRef.current) return;
-    if (e.propertyName !== "transform") return;
-    if (phase !== "anim") return;
+  setHead(h => h + dirRef.current);
+  setIsAnimating(false);
+  setPhase("snap");
+  setNoTransition(true);
 
-  
-    setHead((h) => h + dirRef.current);
-    setIsAnimating(false);
-    setPhase("snap");
-    setNoTransition(true);
+  requestAnimationFrame(() => {
+    setOffsetPx(0);
+    forceReflow();
+
     requestAnimationFrame(() => {
-      setOffsetPx(0);
-      forceReflow();
+      setNoTransition(false);
+      setPhase("idle");
 
-      requestAnimationFrame(() => {
-        setNoTransition(false);
-        setPhase("idle");
-      });
+      if (animationTypeRef.current === "reverse") {
+        setTapeValues(new Map(tapeInput.tapeState.tape));
+      }
+      tapeInput.callAfterAnimation();
     });
-
-    if(animationTypeRef.current === "reverse"){
-            setTapeValues(prev => {
-            const newMap = new Map(tapeInput.tapeState.tape);
-            return newMap;
-        });
-    }
-
-    tapeInput.callAfterAnimation();
-  };
+  });
+};
 
 
   const trackStyle: React.CSSProperties = {
