@@ -98,29 +98,55 @@ export const TapeComponent = ({tapeInput}: Props) => {
 
     const dir = dirRef.current;
     const animationType = animationTypeRef.current;
+
+     if (animationType === "jump") {
+    // wyłącz transition, natychmiast przestaw wszystko
+    setNoTransition(true);
+    // jeśli byliśmy w animacji, zatrzymaj ją „na sztywno”
+    setIsAnimating(false);
+    setPhase("idle"); // od razu przechodzimy na idle
+
+    // zresetuj transform
+    forceReflow(); // <- opcjonalnie: najpierw odczyt layoutu
+    setOffsetPx(0);
+
+    // wgraj taśmę i head
+    setTapeValues(new Map(tapeInput.tapeState.tape));
+    setHead(tapeInput.tapeState.head);
+
+    // przywróć możliwość transition w kolejnej klatce
+    requestAnimationFrame(() => {
+      setNoTransition(false);
+      tapeInput.callAfterAnimation();
+    });
+    return;
+  }
+  
     if(phase !== "idle") console.log("phase is not idle wth???");
-    if (phase !== "idle" || tapeInput.writtenChar == null){ 
+    if (phase !== "idle"){ 
       return;
     }
     
-
-    if(animationType!=="reverse"){
+    if(animationType==="normal" ){
         setTapeValues(prev => {
             const newMap = new Map(tapeInput.tapeState.tape);
             
-            newMap.set(head, tapeInput.writtenChar);  
+            if(tapeInput.writtenChar!=null) newMap.set(head, tapeInput.writtenChar);  
+            return newMap;
+        });
+
+    }else if(animationType==="none"){
+       setTapeValues(prev => {
+            const newMap = new Map(tapeInput.tapeState.tape);
+            
+            if(tapeInput.writtenChar!=null) newMap.set(head, tapeInput.writtenChar);  
             //console.log(head, "|", tapeInput.writtenChar)  
             return newMap;
         });
 
-        
-        if(animationType === "none" || dir===0){
-          
-          tapeInput.callAfterAnimation();
+        tapeInput.callAfterAnimation();
           return;  
-        }
-
-    }   
+    }
 
     setPhase("anim");
     setIsAnimating(true);

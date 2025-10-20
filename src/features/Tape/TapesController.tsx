@@ -249,10 +249,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   }
 
 
-
-
   function updateTape(tapeId: number = 0){
-
 
     const currentStep = stepRef.current;
     const currentStepDir = stepDirRef.current;
@@ -429,19 +426,27 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   };
 
   const resetSimulation = () => {
-    setIsSimulationLoaded(false);
-    setIsPlaying(false);
-    setIsAnimating(false);
-    setNoTransition(true);
-    setOffsetPx(0);
-    setHead(tapeState.head);
-    stepRef.current = 0;
-    stateRef.current = simulation.startingState;
-    setTapeValues(
-      defaultTape
-    );
-    setPhase("idle");
-    requestAnimationFrame(() => setNoTransition(false));
+
+     setIsPlaying(false);
+  setIsAnimating(false);
+  stepRef.current = 0;
+  stepDirRef.current = 0;
+  stateRef.current = simulation.startingState; // lub tapeState.startingState jeśli trzymasz gdzie indziej
+
+  // wyślij do dziecka „skok” bez animacji
+  setTapeInput({
+    tapeState: {
+      head: 0, // albo tapeState.head jeśli tak chcesz
+      tape: new Map(defaultTape), // KOPIA!
+    },
+    writtenChar: null,
+    action: null,
+    animationType: "jump",
+    radius,
+    cellPx,
+    animateMs: animationSpeedRef.current,
+    callAfterAnimation: handleAnimEnd,
+  });
   };
 
   const jumpToSimulation = (step: number) => {

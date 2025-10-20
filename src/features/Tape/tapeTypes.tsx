@@ -50,5 +50,5 @@ export interface TapeInput {
 
 export type Phase = "idle" | "anim" | "snap";
 
-export type AnimationType = "normal" | "reverse" | "none"
+export type AnimationType = "normal" | "reverse" | "none" | "jump"
 
