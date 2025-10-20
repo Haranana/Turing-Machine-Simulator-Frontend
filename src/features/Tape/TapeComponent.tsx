@@ -7,17 +7,19 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape, TapeState, TapeInput, AnimationType, TransitionAction } from "./tapeTypes";
 
 
-export const TapeComponent = ({ tapeState, writtenChar, animationType, action, radius = 10, cellPx = 80, animateMs = 800}: TapeInput) => {
+type Props = { tapeInput: TapeInput };
+
+export const TapeComponent = ({tapeInput}: Props) => {
 
  // Id komórki na którą wskazuje głowica taśmy
-  const [head, setHead] = useState<number>(tapeState.head);
+  const [head, setHead] = useState<number>(tapeInput.tapeState.head);
 
   // Predkosc animacji jednego ruchu
-  const animationSpeedRef = useRef(animateMs);
+  const animationSpeedRef = useRef(tapeInput.animateMs);
 
   // Taśma używana w symilacji
   const [tapeValues, setTapeValues] = useState<Map<number, TapeSymbol>>(
-    tapeState.tape
+    tapeInput.tapeState.tape
   );
 
   // Przesunięcie wizualne taśmy (px). 0 oznacza “wyrównane”.
@@ -43,9 +45,9 @@ export const TapeComponent = ({ tapeState, writtenChar, animationType, action, r
    const trackRef = useRef<HTMLDivElement | null>(null);
 
   const BUFFER = 1;
-  const baseOffset = -BUFFER * cellPx;
-  const from = head - radius - BUFFER;
-  const to = head + radius + BUFFER;
+  const baseOffset = -BUFFER * tapeInput.cellPx;
+  const from = head - tapeInput.radius - BUFFER;
+  const to = head + tapeInput.radius + BUFFER;
 
   const cells = useMemo(() => {
     const list = [];
@@ -55,7 +57,7 @@ export const TapeComponent = ({ tapeState, writtenChar, animationType, action, r
         <div
           key={i}
           className={`tape-cell ${i === head ? "tape-cell-head" : ""}`}
-          style={{ width: `${cellPx}px`, height: `${cellPx}px`, flex: `0 0 ${cellPx}px` }}
+          style={{ width: `${tapeInput.cellPx}px`, height: `${tapeInput.cellPx}px`, flex: `0 0 ${tapeInput.cellPx}px` }}
           title={`i=${i}`}
         >
           {value ?? " "}
@@ -63,13 +65,13 @@ export const TapeComponent = ({ tapeState, writtenChar, animationType, action, r
       );
     }
     return list;
-  }, [from, to, head, tapeState.tape, writtenChar, animationType, action, radius, cellPx, animateMs]);
+  }, [from, to, head, tapeValues, tapeInput]);
 
   useEffect(()=>{
-    dirRef.current = transActionToNumber(action);
-    animationTypeRef.current = animationType;
+    dirRef.current = transActionToNumber(tapeInput.action);
+    animationTypeRef.current = tapeInput.animationType;
     startStep();
-  }, [tapeState, writtenChar, animationType, action])
+  }, [tapeInput])
 
  
 
@@ -92,20 +94,26 @@ export const TapeComponent = ({ tapeState, writtenChar, animationType, action, r
 
   const startStep = () => {
 
+    console.log(tapeInput);
+
     const dir = dirRef.current;
     const animationType = animationTypeRef.current;
-    if (phase !== "idle") return;
-
+    if (phase !== "idle" || tapeInput.writtenChar == null) return;
 
     if(animationType!=="reverse"){
         setTapeValues(prev => {
-            const newMap = new Map(tapeState.tape);
-            newMap.set(head, writtenChar);    
+            const newMap = new Map(tapeInput.tapeState.tape);
+            
+            newMap.set(head, tapeInput.writtenChar);  
+            console.log(head, "|", tapeInput.writtenChar)  
             return newMap;
         });
 
+        
         if(animationType === "none" || dir===0){
-            return;
+          
+          tapeInput.callAfterAnimation();
+          return;  
         }
 
     }   
@@ -114,7 +122,7 @@ export const TapeComponent = ({ tapeState, writtenChar, animationType, action, r
     setIsAnimating(true);
     setNoTransition(false);
     forceReflow();                   
-    setOffsetPx(-dir * cellPx);       // transition
+    setOffsetPx(-dir * tapeInput.cellPx);       // transition
   };
 
 
@@ -141,11 +149,12 @@ export const TapeComponent = ({ tapeState, writtenChar, animationType, action, r
 
     if(animationTypeRef.current === "reverse"){
             setTapeValues(prev => {
-            const newMap = new Map(tapeState.tape);
-            newMap.set(head, writtenChar);    
+            const newMap = new Map(tapeInput.tapeState.tape);
             return newMap;
         });
     }
+
+    tapeInput.callAfterAnimation();
   };
 
 
@@ -156,8 +165,8 @@ export const TapeComponent = ({ tapeState, writtenChar, animationType, action, r
   };
 
   const viewportStyle: React.CSSProperties = {
-    width: `${(2 * radius + 1) * cellPx}px`,
-    height: `${cellPx + 2 * 8}px`,
+    width: `${(2 * tapeInput.radius + 1) * tapeInput.cellPx}px`,
+    height: `${tapeInput.cellPx + 2 * 8}px`,
   };
 
   return (

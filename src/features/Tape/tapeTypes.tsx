@@ -42,10 +42,10 @@ export interface TapeInput {
   writtenChar : string | null;
   action : TransitionAction | null; //null in case of jumping to specific step 
   animationType: AnimationType;
-  radius?: number;
-  cellPx?: number;
-  animateMs?: number;
-
+  radius: number;
+  cellPx: number;
+  animateMs: number;
+  callAfterAnimation: ()=>void;
 }
 
 export type Phase = "idle" | "anim" | "snap";

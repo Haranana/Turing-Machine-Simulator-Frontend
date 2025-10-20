@@ -3,8 +3,9 @@ import "./tape.css";
 
 import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon,
    ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronDownIcon, PlusIcon } from "@heroicons/react/24/solid";
-import { useState, useRef, useMemo, useEffect } from "react";
-import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape, TapeState } from "./tapeTypes.tsx";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
+import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape, TapeState, TapeInput, AnimationType } from "./tapeTypes.tsx";
+import {TapeComponent} from "./TapeComponent"
 
 export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
 
@@ -15,6 +16,12 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   // Predkosc animacji jednego ruchu
   const animationSpeedRef = useRef(animateMs);
+
+  // Rozmiar komórki taśmy w px
+  const cellSizeRef = useRef<number>(cellPx);
+
+  //ilość komórek na prawo i lewo od heada w taśmie
+  const tapeRadiusRef = useRef<number>(radius);
 
   // Input taśmy, w przyszłości pewnie będzie zastąpiony listą stringów, dla każdej z taśm
   const tapeInputRef = useRef<string>("");
@@ -73,6 +80,22 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     acceptingState: "acc",
     rejectingState: "rej"
   });
+
+  const handleAnimEnd = useCallback(() => {
+  setIsAnimating(false);
+  }, []);
+
+    const [tapeInput , setTapeInput] = useState<TapeInput>(
+    {tapeState: tapeState,
+      writtenChar: null,
+      action: "STAY",
+      animationType: "none",
+      radius: radius,
+      cellPx: cellPx,
+      animateMs: animateMs,
+      callAfterAnimation: handleAnimEnd
+    }
+  );
 
   //load debug simulation data
   useEffect(()=>{
@@ -224,6 +247,52 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     isInputFieldVisible? setInputFieldVisibility(false) : setInputFieldVisibility(true);
   }
 
+
+
+
+  function updateTape(tapeId: number = 0){
+
+
+    const currentStep = stepRef.current;
+    const currentStepDir = stepDirRef.current;
+    const writtenChar = simulation.steps[currentStep].writtenChar;
+
+    //Jesli robimy krok wstecz to bierzemy akcje z poprzedniego kroku i ja odwracamy
+    let currentAction = currentStepDir === -1? simulation.steps[currentStep-1].action : simulation.steps[currentStep].action;
+    if(currentStepDir === -1){
+      if(currentAction === "LEFT"){
+        currentAction = "RIGHT";
+      }else if(currentAction === "RIGHT"){
+        currentAction = "LEFT";
+      }
+    }
+
+    const currentTapeState = currentStepDir === -1?  simulation.steps[currentStep-1].tapeBefore : simulation.steps[currentStep].tapeBefore;
+
+    const stepDirToAnimationType = (stepDir:number)=> {
+      switch(stepDir){
+        case 0:{ return "none";}
+        case 1:{ return "normal";}
+        case -1:{ return "reverse";}
+        default:{return "none";}
+      }
+    }
+    const newAnimationType: AnimationType = stepDirToAnimationType(currentStepDir);
+
+    setIsAnimating(true);
+    setTapeInput((prev)=>{return{
+        tapeState: currentTapeState,
+        writtenChar: writtenChar, 
+        action : currentAction,
+        animationType: newAnimationType,
+        radius: tapeRadiusRef.current,
+        cellPx: cellSizeRef.current,
+        animateMs: animationSpeedRef.current,
+        callAfterAnimation: handleAnimEnd,
+    }})
+
+  }
+
   //making sure transition is active
   const forceReflow = () => {
     trackRef.current?.getBoundingClientRect();
@@ -265,102 +334,34 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     stepRef.current-=1;
   }
 
-  const startStep = (dir: -1 | 0 | 1) => {
-
-    const currentStep = stepRef.current;
-
-    if (phase !== "idle") return;
-    
-    if(currentStep >= simulation.steps.length){
-      setIsPlaying(false);
-      return;
-    }
-
-    if(!isEndingStep(currentStep)){
-      setTapeValues(prev => {
-        const newMap = new Map(simulation.steps[currentStep].tapeBefore.tape);
-        newMap.set(head, simulation.steps[currentStep].writtenChar);    
-        return newMap;
-      });
-    }
-    
-
-    dirRef.current = dir;
-    stepDirRef.current = 1;
-    if(dir === 0){  
-      setNextStep();
-      setCurrentState();
-      return;
-    }
-
-    
-    setPhase("anim");
-    setIsAnimating(true);
-    setNoTransition(false);
-    forceReflow();                   
-    setOffsetPx(-dir * cellPx);       // transition
-  };
-
-  const reverseStep = (dir : -1 | 0 | 1) => {
-
-    const currentStep = stepRef.current;
-
-    if(currentStep === 0){
-      return;
-    }
-
-    console.log("move: ", dir);
-    if(dir === 0){
-      stepRef.current-=1;
-      stateRef.current = simulation.steps[stepRef.current].stateBefore;
-      setTapeValues(prev => {
-      const newMap = new Map(simulation.steps[stepRef.current].tapeBefore.tape);    
-      return newMap;
-      });
-      return;
-
-    }
-    
-    dirRef.current = dir;
-    setPhase("anim");
-    setIsAnimating(true);
-    setNoTransition(false);
-    stepDirRef.current = -1;
-    forceReflow();                   
-    setOffsetPx(-dir * cellPx);       // transition
-  }
 
     useEffect(() => {
     if (!isPlaying) return;
     if (phase === "idle") {
 
-      if(stepRef.current >= simulation.steps.length){
-        setIsPlaying(false);
-      }else{
-        console.log("1");
-        const stepDir : -1 | 0 | 1 = transActionToNumber();
-        startStep(stepDir);
-      }
+      
     
     }
   }, [isPlaying, phase]); 
 
-  const doNextSimulationStep = () => {
-    if(stepRef.current >= simulation.steps.length){
-      
-      return;
-    }
 
+  const doNextSimulationStep = () => {
+    if(stepRef.current >= simulation.steps.length) return;
+    if(isAnimating) return;
     setIsPlaying(false);
-    
-    const stepDir : -1 | 0 | 1 = transActionToNumber();
-    startStep(stepDir);
+
+    stepDirRef.current = 1;
+
+    updateTape();
+    stepRef.current+=1;
   }
 
   const doPrevSimulationStep = () => {
     if(stepRef.current === 0) return;
-
+    if(isAnimating) return;
     setIsPlaying(false);
+
+    stepDirRef.current = -1;
 
     let stepDir : -1 | 0 | 1 = transActionToNumber(stepRef.current-1);
     if(stepDir===-1){
@@ -368,60 +369,10 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     }else if (stepDir===1){
       stepDir = -1;
     }
-    
-    reverseStep(stepDir);
+    updateTape();
+    stepRef.current-=1;
+
   }
-
-  
-  const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
-
-    if(stepRef.current >= simulation.steps.length){
-      console.log("size error");
-      return;
-    }
-
-    if (e.target !== trackRef.current) return;
-    if (e.propertyName !== "transform") return;
-    if (phase !== "anim") return;
-
-  
-    setHead((h) => h + dirRef.current);
-    stepRef.current += stepDirRef.current;
-    const currentStep = stepRef.current;
-    
-    setIsAnimating(false);
-
-    setPhase("snap");
-    setNoTransition(true);
-
-    // offset = 0, return without transition
-    requestAnimationFrame(() => {
-      setOffsetPx(0);
-      forceReflow();
-
-      // set trans to true and set phase to idle
-      requestAnimationFrame(() => {
-        setNoTransition(false);
-        setPhase("idle");
-      });
-    });
-
-    if(stepDirRef.current === -1){
-        setTapeValues(prev => {
-        const newMap = new Map(simulation.steps[currentStep].tapeBefore.tape);    
-        return newMap;
-      });
-    }
-
-    stepDirRef.current = 0;
-    if(currentStep >= simulation.steps.length - 1 && simulation.steps[currentStep].stateAfter!=null){
-        stateRef.current = simulation.steps[currentStep].stateAfter;
-      }else{
-        stateRef.current = simulation.steps[currentStep+1].stateBefore;
-      }
-
-    console.log("3");
-  };
 
   // translate transaction action (move Left, move right etc.) of given step from simulation to number (-1, 0, 1)
   // by default it translates current step
@@ -435,18 +386,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
             return +1;
         }
     };
-
-
-  const trackStyle: React.CSSProperties = {
-    transform: `translate3d(${baseOffset + offsetPx}px, 0, 0)`,
-    transition: noTransition ? "none" : `transform ${animationSpeedRef.current}ms ease`,
-    willChange: "transform",
-  };
-
-  const viewportStyle: React.CSSProperties = {
-    width: `${(2 * radius + 1) * cellPx}px`,
-    height: `${cellPx + 2 * 8}px`,
-  };
 
   const clearTape = () => {
     setTapeValues(prev => {
@@ -468,8 +407,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       return newMap;
     });
   }
-
-
 
   const returnHeadToStart = () => {
     setHead(0);
@@ -521,6 +458,11 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     stepRef.current = step;
   };
 
+    const viewportStyle: React.CSSProperties = {
+    width: `${(2 * radius + 1) * cellPx}px`,
+    height: `${cellPx + 2 * 8}px`,
+  };
+
   return (
     <div className="simulation-interface">
       {/* shows current state, steps, and output */}
@@ -532,7 +474,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
       <div className="tape-wrapper">
         <div className="tape-viewport" style={viewportStyle}>
-            <Tape></Tape>
+            <TapeComponent tapeInput={tapeInput} />
         </div>
         <div className="TapeActions">
           <button className="TapeActionsButton ShowTapeInputButton" onClick={toggleInputFieldVisibility}>

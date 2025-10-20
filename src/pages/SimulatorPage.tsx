@@ -1,5 +1,6 @@
 import './page.css';
 import type { TapeState, TapeSymbol } from "../features/Tape/tapeTypes.tsx"
+import { TapesController } from '../features/Tape/TapesController.tsx';
 
 function prepData(){
     const tapeMockInput: TapeState = {
@@ -23,7 +24,7 @@ function prepData(){
 export default  function SimulatorPage() {
     return(
         <div className="page">
-            <TapeView tapeState={prepData()}></TapeView>
+            <TapesController tapeState={prepData()}></TapesController>
         </div>
     );
 }
