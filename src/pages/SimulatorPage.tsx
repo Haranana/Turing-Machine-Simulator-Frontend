@@ -1,5 +1,4 @@
 import './page.css';
-import {TapeView} from "../features/Tape/Tape.tsx"
 import type { TapeState, TapeSymbol } from "../features/Tape/tapeTypes.tsx"
 
 function prepData(){

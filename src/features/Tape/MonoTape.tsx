@@ -6,7 +6,6 @@ import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon,
 import { useState, useRef, useMemo, useEffect } from "react";
 import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape, TapeState } from "./tapeTypes";
 
-
 export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
 
   // Id komórki na którą wskazuje głowica taśmy

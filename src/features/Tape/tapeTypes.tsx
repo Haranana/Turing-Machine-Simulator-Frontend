@@ -37,4 +37,18 @@ export interface TapeViewInput {
   animateMs?: number;
 }
 
+export interface TapeInput {
+  tapeState: TapeState;
+  writtenChar : string | null;
+  action : TransitionAction | null; //null in case of jumping to specific step 
+  animationType: AnimationType;
+  radius?: number;
+  cellPx?: number;
+  animateMs?: number;
+
+}
+
 export type Phase = "idle" | "anim" | "snap";
+
+export type AnimationType = "normal" | "reverse" | "none"
+
