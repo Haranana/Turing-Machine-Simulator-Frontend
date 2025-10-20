@@ -113,6 +113,74 @@
   border-radius: 5px;
 }
 
+
+
+.SimulationControlsButton.DisabledButton{
+  background-color: var(--color-primary-1);
+  cursor: default;
+}
+
+.SimulationControlsButton:hover{
+   background-color: var(--color-primary-1);
+}
+
+
+
+.TapeActions{
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  width: 100%;
+}
+
+.TapeActionsButton{
+      min-width: 25px;
+  min-height: 25px;
+  color: white;
+  background-color: var(--color-primary-2);
+  margin: 1px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+}
+
+.TapeActionsButton.DisabledButton{
+    background-color: var(--color-primary-1);
+  cursor: default;
+}
+
+.TapeActionsButton:hover{
+  background-color: var(--color-primary-1);
+}
+
+.InputContainer {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 250ms ease, opacity 200ms ease;
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+}
+
+.InputContainer.InputContainerVisible{
+  max-height: 1000px;
+  opacity: 1;
+  box-sizing: border-box;
+}
+
 .simulation-controls-button:hover{
    background-color: var(--color-primary-1);
+}
+
+.LoadSimulationButton{
+  background-color: var(--color-primary-2);
+    cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  margin-top: 20px;
+  width: 15%;
+  min-height: 50px;
 }

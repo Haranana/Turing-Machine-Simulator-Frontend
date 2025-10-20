@@ -1,7 +1,8 @@
 import "./tape.css";
 
 
-import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon, ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from "@heroicons/react/24/solid";
+import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon,
+   ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronDownIcon, PlusIcon } from "@heroicons/react/24/solid";
 import { useState, useRef, useMemo, useEffect } from "react";
 import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape, TapeState } from "./tapeTypes";
 
@@ -11,8 +12,13 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
   // Id komórki na którą wskazuje głowica taśmy
   const [head, setHead] = useState<number>(tapeState.head);
 
+  const [isInputFieldVisible , setInputFieldVisibility] = useState<boolean>(false);
+
   // Predkosc animacji jednego ruchu
   const animationSpeedRef = useRef(animateMs);
+
+  // Input taśmy, w przyszłości pewnie będzie zastąpiony listą stringów, dla każdej z taśm
+  const tapeInputRef = useRef<string>("");
 
   // Taśma z załadowanym inputem ale bez wykonania żadnego ruchu
   let defaultTape : Map<number, TapeSymbol> = tapeState.tape;
@@ -27,6 +33,9 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
   // Przesunięcie wizualne taśmy (px). 0 oznacza “wyrównane”.
   const [offsetPx, setOffsetPx] = useState<number>(0);
+
+  // Czy aplikacja otrzymala symulacje z API
+  const [isSimulationLoaded, setIsSimulationLoaded] = useState<boolean>(false);
 
   // Czy aktualnie trwa animacja (dla przycisków).
   const [isAnimating, setIsAnimating] = useState(false);
@@ -212,10 +221,22 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
   const trackRef = useRef<HTMLDivElement | null>(null);
 
+  function toggleInputFieldVisibility(){
+    isInputFieldVisible? setInputFieldVisibility(false) : setInputFieldVisibility(true);
+  }
+
   //making sure transition is active
   const forceReflow = () => {
     trackRef.current?.getBoundingClientRect();
   };
+
+  function loadSimulation(){
+    setIsSimulationLoaded(true);
+  }
+
+  function addTape(){
+    //to be implemented
+  }
 
   function isEndingStep(step: number){
     return step === simulation.steps.length - 1;
@@ -417,7 +438,6 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
     };
 
 
-
   const trackStyle: React.CSSProperties = {
     transform: `translate3d(${baseOffset + offsetPx}px, 0, 0)`,
     transition: noTransition ? "none" : `transform ${animationSpeedRef.current}ms ease`,
@@ -469,6 +489,7 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
   };
 
   const resetSimulation = () => {
+    setIsSimulationLoaded(false);
     setIsPlaying(false);
     setIsAnimating(false);
     setNoTransition(true);
@@ -521,6 +542,18 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
             {cells}
           </div>
         </div>
+        <div className="TapeActions">
+          <button className="TapeActionsButton ShowTapeInputButton" onClick={toggleInputFieldVisibility}>
+            <ChevronDownIcon/>
+          </button>
+          <button className={`TapeActionsButton AddTapeButton ${isSimulationLoaded? "DisabledButton" : ""}`} disabled={isSimulationLoaded} onClick={()=>addTape()} >
+            <PlusIcon></PlusIcon>
+          </button>
+        </div>
+
+        <div className={`InputContainer ${isInputFieldVisible ? "InputContainerVisible" : ""}`}>
+          <input id="TapeInputField" name="TapeInputField" className="TapeInputField" onChange={(e)=>{tapeInputRef.current = e.target.value }}></input>
+        </div>
       </div>
 
       <div className="SimulationControls">
@@ -539,33 +572,32 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
 
         <div className="FlowControls">
 
-          <button className="ToStartButton SimulationControlsButton" onClick={()=>jumpToSimulation(0)}>
+          <button className={`ToStartButton SimulationControlsButton ${!isSimulationLoaded? "DisabledButton" : ""}`} disabled={!isSimulationLoaded} 
+          onClick={()=>jumpToSimulation(0)}>
             <ChevronDoubleLeftIcon/>
           </button>
 
-          <button className="StepBackButton SimulationControlsButton" onClick={doPrevSimulationStep}>
+          <button className={`StepBackButton SimulationControlsButton ${!isSimulationLoaded? "DisabledButton" : ""}`} disabled={!isSimulationLoaded}   onClick={doPrevSimulationStep}>
             <ChevronLeftIcon/>
           </button>
         
-
-
-          <button className="PlayButton SimulationControlsButton" onClick={playSimulation}>
+          <button className={`PlayButton SimulationControlsButton ${!isSimulationLoaded || isPlaying? "DisabledButton" : ""}`} disabled={!isSimulationLoaded}  onClick={playSimulation}>
             <PlayIcon />
           </button>
 
-          <button className="PauseButton SimulationControlsButton" onClick={pauseSimulation}>
+          <button className={`PauseButton SimulationControlsButton ${!isSimulationLoaded || !isPlaying? "DisabledButton" : ""}`} disabled={!isSimulationLoaded} onClick={pauseSimulation}>
             <PauseIcon />
           </button>
 
-          <button className="StopButton SimulationControlsButton" onClick={resetSimulation}>
+          <button className={`StopButton SimulationControlsButton ${!isSimulationLoaded? "DisabledButton" : ""}`} disabled={!isSimulationLoaded} onClick={resetSimulation}>
             <StopIcon />
           </button>
 
-          <button className="StepForwardButton SimulationControlsButton" onClick={doNextSimulationStep}>
+          <button className={`StepForwardButton SimulationControlsButton ${!isSimulationLoaded? "DisabledButton" : ""}`} disabled={!isSimulationLoaded} onClick={doNextSimulationStep}>
             <ChevronRightIcon/>
           </button>
         
-          <button className="ToStartButton SimulationControlsButton" onClick={()=>jumpToSimulation(simulation.steps.length-1)}>
+          <button className={`ToEndButton SimulationControlsButton ${!isSimulationLoaded? "DisabledButton" : ""}`} disabled={!isSimulationLoaded} onClick={()=>jumpToSimulation(simulation.steps.length-1)}>
             <ChevronDoubleRightIcon/>
           </button>
         </div>
@@ -578,6 +610,10 @@ export const TapeView = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 
         <div className="simulation-jump">
           
         </div>
+      </div>
+      <div className="LoadSimulationContainer">
+        <button className={`LoadSimulationButton  ${isSimulationLoaded? "DisabledButton" : ""}`}
+          disabled={isSimulationLoaded} onClick={()=>loadSimulation()}>Load Simulation</button>
       </div>
     </div>
   );
