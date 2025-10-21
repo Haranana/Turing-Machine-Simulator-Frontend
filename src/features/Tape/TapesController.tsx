@@ -250,7 +250,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
 
   function updateTape(tapeId: number = 0){
-
+   
     const currentStep = stepRef.current;
     const currentStepDir = stepDirRef.current;
     const writtenChar = simulation.steps[currentStep].writtenChar;
@@ -310,7 +310,21 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   //receives value in (0,1) and converts it to ms with chosen formula
   function setAnimationSpeed(x : number){
-    animationSpeedRef.current = 1600 - 1600 * x;
+    const newAnimationSpeed = 1600 - 1600 * x;
+    animationSpeedRef.current = newAnimationSpeed;
+
+    /*
+    const currentStep = stepRef.current;
+     setTapeInput((prev)=>{return{
+        tapeState: simulation.steps[currentStep].tapeBefore,
+        writtenChar: null, 
+        action : null,
+        animationType: "none",
+        radius: tapeRadiusRef.current,
+        cellPx: cellSizeRef.current,
+        animateMs: newAnimationSpeed,
+        callAfterAnimation: handleAnimEnd,
+    }})*/
   }
 
   
@@ -333,32 +347,45 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   }
 
   useEffect(() => {
-    console.log("sigma: ", isPlaying, isAnimating)
     if (!isPlaying || isAnimating) return;
-    if(stepRef.current >= simulation.steps.length) {
+     const currentStep = stepRef.current;
+
+    if(currentStep >= simulation.steps.length) {
       setIsPlaying(false);
       return;
     }
+   
     stepDirRef.current = 1;
     updateTape();
-    stepRef.current+=1;
+
+    if(!isEndingStep(currentStep)){
+      stepRef.current=currentStep+1;
+      stateRef.current = simulation.steps[currentStep+1].stateBefore;
+    }else{
+      setIsPlaying(false);
+    }
       
   }, [isPlaying, isAnimating]); 
 
 
   const doNextSimulationStep = () => {
-    if(stepRef.current >= simulation.steps.length) return;
+    const currentStep = stepRef.current;
+    if(currentStep >= simulation.steps.length) return;
     if(isAnimating) return;
     setIsPlaying(false);
 
     stepDirRef.current = 1;
 
     updateTape();
-    stepRef.current+=1;
+    if(!isEndingStep(currentStep)){
+      stepRef.current=currentStep+1;
+      stateRef.current = simulation.steps[currentStep+1].stateBefore;
+    }
   }
 
   const doPrevSimulationStep = () => {
-    if(stepRef.current === 0) return;
+    const currentStep = stepRef.current;
+    if(currentStep === 0) return;
     if(isAnimating) return;
     setIsPlaying(false);
 
@@ -371,7 +398,8 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       stepDir = -1;
     }
     updateTape();
-    stepRef.current-=1;
+    stepRef.current=currentStep-1;
+    stateRef.current = simulation.steps[currentStep-1].stateBefore;
 
   }
 
@@ -427,17 +455,16 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   const resetSimulation = () => {
 
-     setIsPlaying(false);
+  setIsPlaying(false);
   setIsAnimating(false);
   stepRef.current = 0;
   stepDirRef.current = 0;
-  stateRef.current = simulation.startingState; // lub tapeState.startingState jeśli trzymasz gdzie indziej
+  stateRef.current = simulation.startingState;
 
-  // wyślij do dziecka „skok” bez animacji
   setTapeInput({
     tapeState: {
-      head: 0, // albo tapeState.head jeśli tak chcesz
-      tape: new Map(defaultTape), // KOPIA!
+      head: 0, 
+      tape: new Map(defaultTape), 
     },
     writtenChar: null,
     action: null,
@@ -450,21 +477,21 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   };
 
   const jumpToSimulation = (step: number) => {
-    if(step < 0 || step >= simulation.steps.length) return;
-
-    pauseSimulation();
-
-    setTapeValues(prev => {
-      const newMap = new Map(simulation.steps[step].tapeBefore.tape); 
-      return newMap;
-    });
-
-    setHead(prev=>{
-      const newHead = simulation.steps[step].tapeBefore.head;
-      return newHead;
-    });
-
+    setIsPlaying(false);
+    setIsAnimating(false);
     stepRef.current = step;
+    stateRef.current = simulation.steps[step].stateBefore;
+    
+    setTapeInput({
+      tapeState: simulation.steps[step].tapeBefore,
+      writtenChar: null,
+      action: null,
+      animationType: "jump",
+      radius: tapeRadiusRef.current,
+      cellPx: cellSizeRef.current,
+      animateMs: animationSpeedRef.current,
+      callAfterAnimation: handleAnimEnd,
+    });
   };
 
     const viewportStyle: React.CSSProperties = {

@@ -70,6 +70,8 @@ export const TapeComponent = ({tapeInput}: Props) => {
   useEffect(()=>{
     dirRef.current = transActionToNumber(tapeInput.action);
     animationTypeRef.current = tapeInput.animationType;
+    animationSpeedRef.current = tapeInput.animateMs;
+    
     startStep();
   }, [tapeInput])
 
@@ -94,37 +96,40 @@ export const TapeComponent = ({tapeInput}: Props) => {
 
   const startStep = () => {
 
-    console.log("moving rn");
+    console.log(tapeInput);
 
     const dir = dirRef.current;
     const animationType = animationTypeRef.current;
 
+    if(animationType === "none") return;
+
      if (animationType === "jump") {
-    // wyłącz transition, natychmiast przestaw wszystko
     setNoTransition(true);
-    // jeśli byliśmy w animacji, zatrzymaj ją „na sztywno”
     setIsAnimating(false);
-    setPhase("idle"); // od razu przechodzimy na idle
-
-    // zresetuj transform
-    forceReflow(); // <- opcjonalnie: najpierw odczyt layoutu
+    setPhase("idle");
+    forceReflow(); 
     setOffsetPx(0);
-
-    // wgraj taśmę i head
     setTapeValues(new Map(tapeInput.tapeState.tape));
     setHead(tapeInput.tapeState.head);
-
-    // przywróć możliwość transition w kolejnej klatce
     requestAnimationFrame(() => {
       setNoTransition(false);
       tapeInput.callAfterAnimation();
     });
     return;
   }
-  
-    if(phase !== "idle") console.log("phase is not idle wth???");
+
     if (phase !== "idle"){ 
       return;
+    }
+
+    if(animationType==="reverse" && dir===0){
+      setTapeValues(prev => {
+            const newMap = new Map(tapeInput.tapeState.tape);
+            return newMap;
+        });
+
+        tapeInput.callAfterAnimation();
+        return;  
     }
     
     if(animationType==="normal" ){
@@ -135,12 +140,16 @@ export const TapeComponent = ({tapeInput}: Props) => {
             return newMap;
         });
 
+        if(dir===0){
+          tapeInput.callAfterAnimation();
+          return;  
+        }
+
     }else if(animationType==="none"){
        setTapeValues(prev => {
             const newMap = new Map(tapeInput.tapeState.tape);
             
             if(tapeInput.writtenChar!=null) newMap.set(head, tapeInput.writtenChar);  
-            //console.log(head, "|", tapeInput.writtenChar)  
             return newMap;
         });
 
@@ -175,7 +184,12 @@ const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
       setPhase("idle");
 
       if (animationTypeRef.current === "reverse") {
-        setTapeValues(new Map(tapeInput.tapeState.tape));
+        console.log("before tape")
+         setTapeValues(prev => {
+            const newMap = new Map(tapeInput.tapeState.tape);
+
+            return newMap;
+        });
       }
       tapeInput.callAfterAnimation();
     });
