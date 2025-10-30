@@ -6,8 +6,21 @@ import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon,
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape, TapeState, TapeInput, AnimationType } from "./tapeTypes.tsx";
 import {TapeComponent} from "./TapeComponent"
+import {createDto , buildSimulationExport, sendSimulation} from "../../dtos/dto.ts"
+import { useSimulationProgram } from "../GlobalData/simulationProgram.tsx"
+import { array, z } from "zod";
+import { useSimulationAliases } from "../GlobalData/simulationAliases.tsx";
+import {useSimulationInput} from "../GlobalData/simulationInput.tsx"
+
 
 export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
+
+  //const { sep1, sep2, left, stay, right} = useSimulationAliases();
+  const {hasErrors} = useSimulationProgram();
+
+  const [simulationLoading, setSimulationLoading] = useState(false);
+
+  const {setSimulationInput} = useSimulationInput();
 
   // Id komórki na którą wskazuje głowica taśmy
   const [head, setHead] = useState<number>(tapeState.head);
@@ -248,6 +261,11 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     isInputFieldVisible? setInputFieldVisibility(false) : setInputFieldVisibility(true);
   }
 
+  function onTapeInputChange(newInput: string){
+    tapeInputRef.current = newInput;
+    setSimulationInput(newInput);
+  }
+
 
   function updateTape(tapeId: number = 0){
    
@@ -296,8 +314,15 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     trackRef.current?.getBoundingClientRect();
   };
 
-  function loadSimulation(){
-    setIsSimulationLoaded(true);
+  async function loadSimulation(){
+
+    const simulationExport = buildSimulationExport();
+    try{
+      const simulationData = await sendSimulation(simulationExport);
+      console.log(simulationData);
+    }catch(err){
+      console.log("Simulation Error, please try again");
+    }
   }
 
   function addTape(){
@@ -522,7 +547,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
         </div>
 
         <div className={`InputContainer ${isInputFieldVisible ? "InputContainerVisible" : ""}`}>
-          <input id="TapeInputField" name="TapeInputField" className="TapeInputField" onChange={(e)=>{tapeInputRef.current = e.target.value }}></input>
+          <input id="TapeInputField" name="TapeInputField" className="TapeInputField" onChange={(e)=>{onTapeInputChange(e.target.value)}}></input>
         </div>
       </div>
 

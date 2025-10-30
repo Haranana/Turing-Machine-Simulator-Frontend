@@ -3,6 +3,15 @@ export type State = string;
 
 export type TransitionAction = "LEFT" | "STAY" | "RIGHT";
 
+export type SimulationExport = {
+  initialState : string,
+  acceptState : string,
+  rejectState : string,
+  program : string[],
+  separator : string,
+  input : string,
+}
+
 export type SimulationStep = {
     tapeIndex : number,
     action : TransitionAction, 

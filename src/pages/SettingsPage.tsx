@@ -1,7 +1,7 @@
 import './page.css';
 import './setting-page.css'
-import {useSimulationAliases} from '../features/SimulationAliases/simulationAliases'
-import type {AliasesFields} from '../features/SimulationAliases/simulationAliases'
+import {useSimulationAliases} from '../features/GlobalData/simulationAliases'
+import type {AliasesFields} from '../features/GlobalData/simulationAliases'
 import { useRef } from 'react';
 
 

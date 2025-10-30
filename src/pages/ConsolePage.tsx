@@ -1,10 +1,10 @@
 import { Editor , useMonaco, } from "@monaco-editor/react";
-import {useSimulationAliases} from '../features/SimulationAliases/simulationAliases'
+import {useSimulationAliases} from '../features/GlobalData/simulationAliases'
 import type monaco from 'monaco-editor';
 
 import './page.css';
 import { useEffect, useRef } from "react";
-import { useSimulationProgram } from "../features/SimulationProgram/simulationProgram";
+import { useSimulationProgram } from "../features/GlobalData/simulationProgram";
 
 const LANGUAGE_ID = "tm";
 
@@ -20,7 +20,7 @@ export default function ConsolePage() {
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor|null>(null);
 
     const { sep1, sep2, left, stay, right} = useSimulationAliases();
-    const {codeLines , setField} = useSimulationProgram();
+    const {codeLines , setCodeLines, setHasErrors} = useSimulationProgram();
 
     useEffect(() => {
       if (!monaco) return;
@@ -164,42 +164,40 @@ export default function ConsolePage() {
       });
 
       monaco.editor.setModelMarkers(model, "tm-validator", markers);
-      
+      return markers;
     }
-
-    /*
-    const arr : string[] = ["aaa" , "bbb", "ccc"]; 
-    const code : string = arr.join("\n");
-    */
 
     return(
         <div className="page">
 
             <Editor 
             
-            onMount={(editor, monaco) => { 
+           onMount={(editor, monacoLib) => {
+  editorRef.current = editor;
+  const model = editor.getModel();
+  if (!model) return;
 
+  // Pierwsza walidacja + zapis
+  const markers = validateModel(model, monacoLib);
+  setCodeLines(model.getLinesContent());
+  setHasErrors(markers.length > 0);
 
+  // Jedna subskrypcja na zmiany treści
+  const sub = editor.onDidChangeModelContent(() => {
+    const m = validateModel(model, monacoLib);
+    setCodeLines(model.getLinesContent());
+    setHasErrors(m.length > 0);
+  });
 
-               editorRef.current = editor;
-                const model = editor.getModel();
-                if (!model) return;
-
-                validateModel(model, monaco);
-
-                const sub = editor.onDidChangeModelContent(() => {
-                  validateModel(model, monaco);
-                });
-
-                editor.onDidDispose(() => sub.dispose());
-           }}
+  editor.onDidDispose(() => sub.dispose());
+}}
 
            onChange={()=>{
               if(!editorRef.current) return;
               const editor = editorRef.current;
               const model = editor.getModel();
               if (!model) return;
-              setField( model.getLinesContent())
+              setCodeLines( model.getLinesContent())
            }}
             
             className="code-editor" 
