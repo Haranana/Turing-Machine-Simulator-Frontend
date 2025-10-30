@@ -7,12 +7,20 @@ import {useSimulationInput} from "../features/GlobalData/simulationInput.tsx"
 import { useSpecialStates } from "../features/GlobalData/specialStates.tsx";
 
 function localCodeToGlobal(codeLines: string[] , left:string, right:string, stay:string){
+
+   // codeLines[0].replace(new RegExp(left + '$'), 'LEFT').replace(new RegExp(right + '$'), 'RIGHT').replace(new RegExp(stay + '$'), 'STAY');
+
+    return codeLines.map(line=>
+        line.replace(new RegExp(left + '$'), 'LEFT').replace(new RegExp(right + '$'), 'RIGHT').replace(new RegExp(stay + '$'), 'STAY')
+    );
+
+    /*
     return codeLines.map(line => 
         line
         .replaceAll(left , "LEFT")
         .replaceAll(right , "RIGHT")
         .replaceAll(stay , "STAY")
-    );
+    );*/
 }
 
 const SendSimulationDtoSchema = z.object({
@@ -28,7 +36,7 @@ type SendSimulationDto = z.infer<typeof SendSimulationDtoSchema>;
 
 export async function sendSimulation(obj: SimulationExport) {
 
-   // 1) Walidacja bez wyjątków
+
   const result = SendSimulationDtoSchema.safeParse(obj);
   if (!result.success) {
     const issues = result.error.issues.map(i => `${i.path.join(".")}: ${i.message}`);
@@ -39,7 +47,7 @@ export async function sendSimulation(obj: SimulationExport) {
 
   const payload = JSON.stringify(dto);
 
-  const res = await fetch("/api/simulation", {
+  const res = await fetch("http://localhost:9090/api/simulations", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: payload,

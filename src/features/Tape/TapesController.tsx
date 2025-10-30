@@ -6,7 +6,7 @@ import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon,
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape, TapeState, TapeInput, AnimationType } from "./tapeTypes.tsx";
 import {TapeComponent} from "./TapeComponent"
-import {createDto , buildSimulationExport, sendSimulation} from "../../dtos/dto.ts"
+import { buildSimulationExport, sendSimulation} from "../../dtos/dto.ts"
 import { useSimulationProgram } from "../GlobalData/simulationProgram.tsx"
 import { array, z } from "zod";
 import { useSimulationAliases } from "../GlobalData/simulationAliases.tsx";
