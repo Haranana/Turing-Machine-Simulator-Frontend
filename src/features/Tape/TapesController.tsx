@@ -7,16 +7,20 @@ import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape, TapeState, TapeInput, AnimationType } from "./tapeTypes.tsx";
 import {TapeComponent} from "./TapeComponent"
 import { buildSimulationExport, sendSimulation} from "../../dtos/dto.ts"
+import type {ReceiveSimulationDto, SimulationStepDto} from "../../dtos/dto.ts" 
 import { useSimulationProgram } from "../GlobalData/simulationProgram.tsx"
 import { array, z } from "zod";
 import { useSimulationAliases } from "../GlobalData/simulationAliases.tsx";
 import {useSimulationInput} from "../GlobalData/simulationInput.tsx"
+import { useSpecialStates } from "../GlobalData/specialStates.tsx";
 
 
 export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
 
   //const { sep1, sep2, left, stay, right} = useSimulationAliases();
   const {hasErrors} = useSimulationProgram();
+
+  const { initialState, acceptState, rejectState } = useSpecialStates();
 
   const [simulationLoading, setSimulationLoading] = useState(false);
 
@@ -320,9 +324,48 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     try{
       const simulationData = await sendSimulation(simulationExport);
       console.log(simulationData);
+      SchemaToSimulation(simulationData);
+      setIsSimulationLoaded(true);
     }catch(err){
       console.log("Simulation Error, please try again");
+      setIsSimulationLoaded(false);
     }
+  }
+
+  function SchemaToSimulation(schema: ReceiveSimulationDto){
+
+    const firstTapeSteps = schema.steps[0];
+
+    let simulationSteps : Array<SimulationStep> = [];
+    firstTapeSteps.forEach(step => {
+
+      const tapeState: Map<number, string | null> = step.tapeBefore.tape;
+      const head : number = step.tapeBefore.head;
+
+      simulationSteps.push({
+        tapeIndex: 0,
+        action: step.transitionAction,
+        readChar: step.readChar,
+        writtenChar: step.writtenChar,
+        stateBefore: step.stateBefore,
+        stateAfter: step.stateAfter,
+        tapeBefore: {
+          tape: tapeState,
+          head: head,
+        }  
+      });
+    });
+
+    let newSimulation : Simulation = {
+      steps: simulationSteps,
+      isEmpty: false,
+      startingState: initialState,
+      acceptingState: acceptState,
+      rejectingState: rejectState,
+    }
+
+    setSimulation(newSimulation);
+    stateRef.current = newSimulation.steps[0].stateBefore;
   }
 
   function addTape(){

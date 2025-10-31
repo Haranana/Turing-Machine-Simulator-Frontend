@@ -34,6 +34,37 @@ const SendSimulationDtoSchema = z.object({
 
 type SendSimulationDto = z.infer<typeof SendSimulationDtoSchema>;
 
+const numericKey = z.string().regex(/^-?\d+$/);
+
+
+const TapeStateSchema = z.object({
+  head: z.number(),
+  tape: z
+    .record(numericKey, z.string())
+    .transform(obj => new Map(Object.entries(obj).map(([k, v]) => [Number(k), v]))),
+});
+type TapeState = z.infer<typeof TapeStateSchema>;
+
+const StateNameSchema = z.object({ name: z.string() }).transform(s => s.name);
+
+const TransitionActionSchema = z.enum(["LEFT", "RIGHT", "STAY"]); 
+
+const SimulationStepSchema = z.object({
+  tapeIndex: z.number(),
+  transitionAction: TransitionActionSchema,
+  readChar: z.string().min(1).max(1),
+  writtenChar: z.string().min(1).max(1),
+  stateBefore: StateNameSchema,         
+  stateAfter: StateNameSchema,          
+  tapeBefore: TapeStateSchema,          
+});
+export type SimulationStepDto = z.infer<typeof SimulationStepSchema>;
+
+export const CreatedSimulationSchema = z.object({
+  steps: z.array(z.array(SimulationStepSchema)),
+});
+export type ReceiveSimulationDto = z.infer<typeof CreatedSimulationSchema>;
+
 export async function sendSimulation(obj: SimulationExport) {
 
 
@@ -53,16 +84,16 @@ export async function sendSimulation(obj: SimulationExport) {
     body: payload,
   });
 
-  const text = await res.text();
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status} ${res.statusText}\n${text}`);
+   if (!res.ok) {
+    throw new Error(`HTTP ${res.status} ${res.statusText}\n${res.text}`);
   }
 
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text; 
-  }
+  
+
+   const response = await res.json();
+   console.log(response);
+  return CreatedSimulationSchema.parse(response); 
+
 }
 
 
