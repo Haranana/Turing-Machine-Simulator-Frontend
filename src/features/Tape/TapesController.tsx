@@ -4,7 +4,7 @@ import "./tape.css";
 import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon,
    ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronDownIcon, PlusIcon } from "@heroicons/react/24/solid";
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
-import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape, TapeState, TapeInput, AnimationType } from "./tapeTypes.tsx";
+import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape, TapeState, TapeInput, AnimationType, SimulationExport } from "./tapeTypes.tsx";
 import {TapeComponent} from "./TapeComponent"
 import { buildSimulationExport, sendSimulation} from "../../dtos/dto.ts"
 import type {ReceiveSimulationDto, SimulationStepDto} from "../../dtos/dto.ts" 
@@ -320,7 +320,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   async function loadSimulation(){
 
-    const simulationExport = buildSimulationExport();
+    const simulationExport : SimulationExport = buildSimulationExport();
     try{
       const simulationData = await sendSimulation(simulationExport);
       console.log(simulationData);

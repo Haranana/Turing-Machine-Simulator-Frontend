@@ -8,10 +8,11 @@ import { useRef } from 'react';
 
 export default  function SettingsPage() {
 
-    const { sep1, sep2, left, stay, right, setAll} = useSimulationAliases()
+    const { sep1, sep2, blank, left, stay, right, setAll} = useSimulationAliases()
 
     const sep1Ref = useRef<HTMLInputElement>(null);
     const sep2Ref = useRef<HTMLInputElement>(null);
+    const blankRef = useRef<HTMLInputElement>(null);
     const leftRef = useRef<HTMLInputElement>(null);
     const stayRef = useRef<HTMLInputElement>(null);
     const rightRef = useRef<HTMLInputElement>(null);
@@ -23,6 +24,9 @@ export default  function SettingsPage() {
 
         let sep2RefValue = sep2Ref.current?.value;
         sep2RefValue = sep2RefValue === undefined? sep2 : sep2RefValue as string;
+
+        let blankRefValue = blankRef.current?.value;
+        blankRefValue = blankRefValue === undefined? blank : blankRefValue as string;
 
         let leftRefValue = leftRef.current?.value;
         leftRefValue = leftRefValue === undefined? left : leftRefValue as string;
@@ -39,6 +43,7 @@ export default  function SettingsPage() {
         const newValues : AliasesFields = {
             sep1: sep1RefValue,
             sep2: sep2RefValue,
+            blank: blankRefValue,
             left: leftRefValue,
             stay: stayRefValue,
             right: rightRefValue,
@@ -65,6 +70,11 @@ export default  function SettingsPage() {
                     <div className='settings-text-field-row'>
                         <label className="settings-text-field-label" htmlFor='sep2-alias'>Separator 2:</label>
                         <input ref={sep2Ref} className="settings-text-field sep2-text-field" type="text" name="sep2-alias" maxLength={10}  id="sep2-alias" defaultValue={sep2}/>
+                    </div>
+
+                    <div className='settings-text-field-row'>
+                        <label className="settings-text-field-label" htmlFor='blank-alias'>Blank:</label>
+                        <input ref={blankRef} className="settings-text-field blank-text-field" type="text" name="blank-alias" maxLength={10}  id="blank-alias" defaultValue={blank}/>
                     </div>
 
                     <div className='settings-text-field-row'>

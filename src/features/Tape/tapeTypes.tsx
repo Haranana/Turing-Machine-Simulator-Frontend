@@ -9,6 +9,7 @@ export type SimulationExport = {
   rejectState : string,
   program : string[],
   separator : string,
+  blank: string,
   input : string,
 }
 

@@ -7,20 +7,9 @@ import {useSimulationInput} from "../features/GlobalData/simulationInput.tsx"
 import { useSpecialStates } from "../features/GlobalData/specialStates.tsx";
 
 function localCodeToGlobal(codeLines: string[] , left:string, right:string, stay:string){
-
-   // codeLines[0].replace(new RegExp(left + '$'), 'LEFT').replace(new RegExp(right + '$'), 'RIGHT').replace(new RegExp(stay + '$'), 'STAY');
-
     return codeLines.map(line=>
         line.replace(new RegExp(left + '$'), 'LEFT').replace(new RegExp(right + '$'), 'RIGHT').replace(new RegExp(stay + '$'), 'STAY')
     );
-
-    /*
-    return codeLines.map(line => 
-        line
-        .replaceAll(left , "LEFT")
-        .replaceAll(right , "RIGHT")
-        .replaceAll(stay , "STAY")
-    );*/
 }
 
 const SendSimulationDtoSchema = z.object({
@@ -29,6 +18,7 @@ const SendSimulationDtoSchema = z.object({
   rejectState : z.string(),
   program     : z.array(z.string()),
   separator   : z.string(),
+  blank       : z.string(),
   input       : z.string(),
 });
 
@@ -65,9 +55,17 @@ export const CreatedSimulationSchema = z.object({
 });
 export type ReceiveSimulationDto = z.infer<typeof CreatedSimulationSchema>;
 
+export function buildSimulationExport(){
+  const { codeLines } = useSimulationProgram.getState();
+  const { sep1, blank, left, right, stay } = useSimulationAliases.getState();
+  const { input } = useSimulationInput.getState();
+  const { initialState, acceptState, rejectState } = useSpecialStates.getState();
+
+  const program = localCodeToGlobal(codeLines, left, right, stay);
+  return { initialState, acceptState, rejectState, program, separator: sep1, blank, input };
+}
+
 export async function sendSimulation(obj: SimulationExport) {
-
-
   const result = SendSimulationDtoSchema.safeParse(obj);
   if (!result.success) {
     const issues = result.error.issues.map(i => `${i.path.join(".")}: ${i.message}`);
@@ -88,24 +86,14 @@ export async function sendSimulation(obj: SimulationExport) {
     throw new Error(`HTTP ${res.status} ${res.statusText}\n${res.text}`);
   }
 
-  
-
-   const response = await res.json();
-   console.log(response);
+  const response = await res.json();
+  console.log(response);
   return CreatedSimulationSchema.parse(response); 
 
 }
 
 
-export function buildSimulationExport(){
-  const { codeLines } = useSimulationProgram.getState();
-  const { sep1, left, right, stay } = useSimulationAliases.getState();
-  const { input } = useSimulationInput.getState();
-  const { initialState, acceptState, rejectState } = useSpecialStates.getState();
 
-  const program = localCodeToGlobal(codeLines, left, right, stay);
-  return { initialState, acceptState, rejectState, program, separator: sep1, input };
-}
 
 
 
