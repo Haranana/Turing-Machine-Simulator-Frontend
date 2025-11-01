@@ -11,7 +11,7 @@ import type {ReceiveSimulationDto, SimulationStepDto} from "../../dtos/dto.ts"
 import { useSimulationProgram } from "../GlobalData/simulationProgram.tsx"
 import { array, z } from "zod";
 import { useSimulationAliases } from "../GlobalData/simulationAliases.tsx";
-import {useSimulationInput} from "../GlobalData/simulationInput.tsx"
+import {useSimulationInput, type SimulationInput} from "../GlobalData/simulationInput.tsx"
 import { useSpecialStates } from "../GlobalData/specialStates.tsx";
 
 
@@ -24,7 +24,17 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   const [simulationLoading, setSimulationLoading] = useState(false);
 
-  const {setSimulationInput} = useSimulationInput();
+  const {setSimulationInput, simulationInput} = useSimulationInput();
+
+  // Input taśmy, w przyszłości pewnie będzie zastąpiony listą stringów, dla każdej z taśm
+  // Pole przechowuje wartosc tekstowa z inputu, niekoniecznie jest to zatwierdzony input programu
+  const tapeInputRef = useRef<string>("");
+
+
+    // Taśma używana w symilacji
+  const [tapeValues, setTapeValues] = useState<Map<number, TapeSymbol>>(
+    tapeState.tape
+  );
 
   // Id komórki na którą wskazuje głowica taśmy
   const [head, setHead] = useState<number>(tapeState.head);
@@ -40,16 +50,8 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   //ilość komórek na prawo i lewo od heada w taśmie
   const tapeRadiusRef = useRef<number>(radius);
 
-  // Input taśmy, w przyszłości pewnie będzie zastąpiony listą stringów, dla każdej z taśm
-  const tapeInputRef = useRef<string>("");
-
   // Taśma z załadowanym inputem ale bez wykonania żadnego ruchu
   let defaultTape : Map<number, TapeSymbol> = tapeState.tape;
-
-  // Taśma używana w symilacji
-  const [tapeValues, setTapeValues] = useState<Map<number, TapeSymbol>>(
-    tapeState.tape
-  );
 
   // Krok do którego użytkownik chce skoczyc
   let jumpToRef = useRef<number | null>(null);
@@ -100,10 +102,10 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   const handleAnimEnd = useCallback(() => {
   setIsAnimating(false);
-  console.log("animation: ", isAnimating);
   }, []);
 
-    const [tapeInput , setTapeInput] = useState<TapeInput>(
+  //contains all the data that tape needs to properly function
+  const [tapeData , setTapeData] = useState<TapeInput>(
     {tapeState: tapeState,
       writtenChar: null,
       action: "STAY",
@@ -115,133 +117,13 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     }
   );
 
-  //load debug simulation data
-  useEffect(()=>{
-    let simStep1Tape : Tape = new Map<number, string>([
-      [0 , "0"],
-      [1 , "0"],
-      [2 , "1"],
-    ])
-
-    const simStep1TapeBefore : TapeState = {
-      tape: simStep1Tape,
-      head: 0,
-    };
-
-    let simStep2Tape : Tape = new Map<number, string>([
-      [0 , "1"],
-      [1 , "0"],
-      [2 , "1"],
-    ])
-
-    const simStep2TapeBefore : TapeState = {
-      tape: simStep2Tape,
-      head: 1,
-    };
-
-    let simStep3Tape : Tape = new Map<number, string>([
-      [0 , "1"],
-      [1 , "1"],
-      [2 , "1"],
-    ])
-
-    const simStep3TapeBefore : TapeState = {
-      tape: simStep3Tape,
-      head: 2,
-    };
-
-    let simStep4Tape : Tape = new Map<number, string>([
-      [0 , "1"],
-      [1 , "1"],
-      [2 , "2"],
-    ])
-
-    const simStep4TapeBefore : TapeState = {
-      tape: simStep4Tape,
-      head: 1,
-    };
-
-    let simStep5Tape : Tape = new Map<number, string>([
-      [0 , "1"],
-      [1 , "3"],
-      [2 , "2"],
-    ])
-
-    const simStep5TapeBefore : TapeState = {
-      tape: simStep5Tape,
-      head: 1,
-    };
-
-    let simStep1 : SimulationStep = {
-      tapeIndex : 0,
-      action : "RIGHT", 
-      readChar : "0",
-      writtenChar : "1",
-      stateBefore : "q0",
-      stateAfter : "q1",
-      tapeBefore : simStep1TapeBefore,
-    }
-
-    let simStep2 : SimulationStep = {
-      tapeIndex : 0,
-      action : "RIGHT", 
-      readChar : "0",
-      writtenChar : "1",
-      stateBefore : "q1",
-      stateAfter : "q1",
-      tapeBefore : simStep2TapeBefore,
-    }
-
-    let simStep3 : SimulationStep = {
-      tapeIndex : 0,
-      action : "LEFT", 
-      readChar : "0",
-      writtenChar : "2",
-      stateBefore : "q1",
-      stateAfter : "q2",
-      tapeBefore : simStep3TapeBefore,
-    }
-
-    let simStep4 : SimulationStep = {
-      tapeIndex : 0,
-      action : "STAY", 
-      readChar : "1",
-      writtenChar : "3",
-      stateBefore : "q2",
-      stateAfter : "q3",
-      tapeBefore : simStep4TapeBefore,
-    }
-
-    let simStep5 : SimulationStep = {
-      tapeIndex : 0,
-      action : "STAY", 
-      readChar : null,
-      writtenChar : null,
-      stateBefore : "q3",
-      stateAfter : null,
-      tapeBefore : simStep5TapeBefore,
-    }
-
-    let newSteps : Array<SimulationStep> = Array(simStep1, simStep2, simStep3, simStep4, simStep5);
-
-    let newSimulation : Simulation = {
-      steps: newSteps,
-      isEmpty: false,
-      startingState: "q0",
-      acceptingState: "q3",
-      rejectingState: "q4"
-    }
-
-    setSimulation(newSimulation);
-    stateRef.current = newSimulation.steps[0].stateBefore;
-  }, []);
-
   const BUFFER = 1;
   const baseOffset = -BUFFER * cellPx;
   const from = head - radius - BUFFER;
   const to = head + radius + BUFFER;
 
   const cells = useMemo(() => {
+
     const list = [];
     for (let i = from; i <= to; i++) {
       const value: TapeSymbol | undefined = tapeValues.get(i);
@@ -265,10 +147,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     isInputFieldVisible? setInputFieldVisibility(false) : setInputFieldVisibility(true);
   }
 
-  function onTapeInputChange(newInput: string){
-    tapeInputRef.current = newInput;
-    setSimulationInput(newInput);
-  }
 
 
   function updateTape(tapeId: number = 0){
@@ -298,9 +176,8 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       }
     }
     const newAnimationType: AnimationType = stepDirToAnimationType(currentStepDir);
-    console.log("about to move");
     setIsAnimating(true);
-    setTapeInput((prev)=>{return{
+    setTapeData((prev)=>{return{
         tapeState: currentTapeState,
         writtenChar: writtenChar, 
         action : currentAction,
@@ -323,7 +200,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     const simulationExport : SimulationExport = buildSimulationExport();
     try{
       const simulationData = await sendSimulation(simulationExport);
-      console.log(simulationData);
       SchemaToSimulation(simulationData);
       setIsSimulationLoaded(true);
     }catch(err){
@@ -380,19 +256,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   function setAnimationSpeed(x : number){
     const newAnimationSpeed = 1600 - 1600 * x;
     animationSpeedRef.current = newAnimationSpeed;
-
-    /*
-    const currentStep = stepRef.current;
-     setTapeInput((prev)=>{return{
-        tapeState: simulation.steps[currentStep].tapeBefore,
-        writtenChar: null, 
-        action : null,
-        animationType: "none",
-        radius: tapeRadiusRef.current,
-        cellPx: cellSizeRef.current,
-        animateMs: newAnimationSpeed,
-        callAfterAnimation: handleAnimEnd,
-    }})*/
   }
 
   
@@ -494,8 +357,9 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     });
   }
 
-  const writeInputOnTape = (input: string) => {
-    const inputArray : string[] = input.split('');
+  const writeInputOnTape = (newInput: string) => {
+    
+    const inputArray : string[] = newInput.split('');
     setTapeValues(() => {
       const newMap = new Map<number, TapeSymbol>();
       for(let i: number = 0; i < inputArray.length; i++){
@@ -505,12 +369,32 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     });
   }
 
-  const returnHeadToStart = () => {
-    setHead(0);
+  
+  function placeInputOnTape(newInput: string){
+    let inputCopy : string = newInput.trim();
+    let newTapeValues: Map<number , string> = new Map<number, string>();
+    for(let i: number = 0; i<inputCopy.length; i++){
+      newTapeValues.set(i , inputCopy.charAt(i));
+    }
+    
+    setTapeData((prev)=>{return{
+        tapeState: {
+          tape : newTapeValues,
+          head : 0
+        },
+        writtenChar: null, 
+        action : null,
+        animationType: "jump",
+        radius,
+        cellPx,
+        animateMs: animationSpeedRef.current,
+        callAfterAnimation: handleAnimEnd,
+    }})
   }
 
-  const restartSimulation = () => {
-
+  function enterInput(){
+    setSimulationInput(tapeInputRef.current);
+    placeInputOnTape(tapeInputRef.current);
   }
 
   const playSimulation = () => {
@@ -521,27 +405,31 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     setIsPlaying(false);
   };
 
+  function onTapeInputChange(newInput: string){
+    tapeInputRef.current = newInput;
+  }
+
   const resetSimulation = () => {
 
-  setIsPlaying(false);
-  setIsAnimating(false);
-  stepRef.current = 0;
-  stepDirRef.current = 0;
-  stateRef.current = simulation.startingState;
+    setIsPlaying(false);
+    setIsAnimating(false);
+    stepRef.current = 0;
+    stepDirRef.current = 0;
+    stateRef.current = simulation.startingState;
 
-  setTapeInput({
-    tapeState: {
-      head: 0, 
-      tape: new Map(defaultTape), 
-    },
-    writtenChar: null,
-    action: null,
-    animationType: "jump",
-    radius,
-    cellPx,
-    animateMs: animationSpeedRef.current,
-    callAfterAnimation: handleAnimEnd,
-  });
+    setTapeData({
+      tapeState: {
+        head: 0, 
+        tape: new Map(defaultTape), 
+      },
+      writtenChar: null,
+      action: null,
+      animationType: "jump",
+      radius,
+      cellPx,
+      animateMs: animationSpeedRef.current,
+      callAfterAnimation: handleAnimEnd,
+    });
   };
 
   const jumpToSimulation = (step: number) => {
@@ -550,7 +438,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     stepRef.current = step;
     stateRef.current = simulation.steps[step].stateBefore;
     
-    setTapeInput({
+    setTapeData({
       tapeState: simulation.steps[step].tapeBefore,
       writtenChar: null,
       action: null,
@@ -578,7 +466,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
       <div className="tape-wrapper">
         <div className="tape-viewport" style={viewportStyle}>
-            <TapeComponent tapeInput={tapeInput} />
+            <TapeComponent tapeInput={tapeData} />
         </div>
         <div className="TapeActions">
           <button className="TapeActionsButton ShowTapeInputButton" onClick={toggleInputFieldVisibility}>
@@ -591,6 +479,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
         <div className={`InputContainer ${isInputFieldVisible ? "InputContainerVisible" : ""}`}>
           <input id="TapeInputField" name="TapeInputField" className="TapeInputField" onChange={(e)=>{onTapeInputChange(e.target.value)}}></input>
+          <button className={`EnterInputButton ${!isSimulationLoaded? "DisabledButton" : ""}`}  onClick={()=>enterInput()}></button>
         </div>
       </div>
 

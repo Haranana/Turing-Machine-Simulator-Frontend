@@ -58,15 +58,17 @@ export type ReceiveSimulationDto = z.infer<typeof CreatedSimulationSchema>;
 export function buildSimulationExport(){
   const { codeLines } = useSimulationProgram.getState();
   const { sep1, blank, left, right, stay } = useSimulationAliases.getState();
-  const { input } = useSimulationInput.getState();
+  const { simulationInput } = useSimulationInput.getState();
   const { initialState, acceptState, rejectState } = useSpecialStates.getState();
 
   const program = localCodeToGlobal(codeLines, left, right, stay);
-  return { initialState, acceptState, rejectState, program, separator: sep1, blank, input };
+  return { initialState, acceptState, rejectState, program, separator: sep1, blank, input:simulationInput };
 }
 
 export async function sendSimulation(obj: SimulationExport) {
   const result = SendSimulationDtoSchema.safeParse(obj);
+  console.log("result: ", result);
+  console.log("parsing obj: " , obj);
   if (!result.success) {
     const issues = result.error.issues.map(i => `${i.path.join(".")}: ${i.message}`);
     throw new Error("Walidacja nieudana:\n" + issues.join("\n"));
@@ -76,6 +78,7 @@ export async function sendSimulation(obj: SimulationExport) {
 
   const payload = JSON.stringify(dto);
 
+  console.log("sent: ", payload);
   const res = await fetch("http://localhost:9090/api/simulations", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -87,7 +90,7 @@ export async function sendSimulation(obj: SimulationExport) {
   }
 
   const response = await res.json();
-  console.log(response);
+  console.log("response: ", response);
   return CreatedSimulationSchema.parse(response); 
 
 }
