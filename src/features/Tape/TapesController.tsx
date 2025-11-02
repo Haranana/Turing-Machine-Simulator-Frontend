@@ -78,9 +78,9 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   const [simulation , setSimulation] = useState<Simulation>({
     steps: [],
     isEmpty: false,
-    startingState: "start",
-    acceptingState: "acc",
-    rejectingState: "rej"
+    startingState: initialState,
+    acceptingState: acceptState,
+    rejectingState: rejectState
   });
 
   const handleAnimEnd = useCallback(() => {
@@ -342,6 +342,12 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   const resetSimulation = () => {
 
+    setIsSimulationLoaded(false);
+    setSimulation({steps: [],
+    isEmpty: false,
+    startingState: initialState,
+    acceptingState: acceptState,
+    rejectingState: rejectState});
     setIsPlaying(false);
     setIsAnimating(false);
     stepRef.current = 0;
@@ -389,40 +395,48 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   return (
     <div className="simulation-interface">
       {/* shows current state, steps, and output */}
-      <div className="simulation-data">
+      <div className="SimulationData">
         <p>State: {stateRef.current}</p>
         <p>Output: {outputRef.current}</p>
         <p>Step: {stepRef.current ?? ""}</p>
       </div>
 
-      <div className="tape-wrapper">
-        <div className="tape-viewport" style={viewportStyle}>
+      <div className="TapeWrapper">
+        <div className="TapeViewport" style={viewportStyle}>
             <TapeComponent tapeInput={tapeData} />
         </div>
         <div className="TapeActions">
           <button className="TapeActionsButton ShowTapeInputButton" onClick={toggleInputFieldVisibility}>
             <ChevronDownIcon/>
           </button>
-          <button className={`TapeActionsButton AddTapeButton ${isSimulationLoaded? "DisabledButton" : ""}`} disabled={isSimulationLoaded} onClick={()=>addTape()} >
+          <button className={`TapeActionsButton tooltip extraTooltipPadding AddTapeButton ${isSimulationLoaded? "DisabledButton" : ""}`} disabled={isSimulationLoaded} onClick={()=>addTape()} 
+            data-tooltip={isSimulationLoaded? "Cannot add tape when Simulation is loaded" : "Add tape"}>
             <PlusIcon></PlusIcon>
           </button>
         </div>
 
-        <div className={`InputContainer ${isInputFieldVisible ? "InputContainerVisible" : ""}`}>
+        <div className={`InputContainer  ${isInputFieldVisible ? "InputContainerVisible" : ""}`}>
           <input id="TapeInputField" name="TapeInputField" className="TapeInputField" onChange={(e)=>{onTapeInputChange(e.target.value)}}></input>
-          <button className={`EnterInputButton ${!isSimulationLoaded? "DisabledButton" : ""}`}  onClick={()=>enterInput()}></button>
+          <button className={`EnterInputButton SimulationControlsButton  tooltip extraTooltipPadding ${isSimulationLoaded? "DisabledButton" : ""}`}  onClick={()=>enterInput()}
+          disabled={isSimulationLoaded}
+            data-tooltip={isSimulationLoaded? "Cannot enter input when simulation is loaded" : "Enter input"}>
+            Enter</button>
         </div>
       </div>
 
       <div className="SimulationControls">
         <div className="JumpToControls">
           <input className="JumpToInput" type="number" min={0} 
-           max={simulation==null? 0 : simulation.steps.length} 
-           placeholder="step"
-            onChange={(e)=>{jumpToRef.current=parseInt(e.target.value)}}>
+           max={Math.max(0, simulation.steps.length-1)} 
+           placeholder="step" id="JumpToInput" name="JumpToInput"
+            onChange={(e)=>{
+              e.target.value = (Math.min(parseInt(e.target.value), Math.max(0, simulation.steps.length-1))).toString();
+              jumpToRef.current=parseInt(e.target.value)}}
+              >
           </input>
 
-          <button className="simulation-controls-button simulation-jump-button" onClick={()=>{if(jumpToRef.current!=null) jumpToSimulation(jumpToRef.current)}}>
+          <button className={`SimulationControlsButton tooltip TapeActionsButton  ${!isSimulationLoaded? "DisabledButton" : ""}`} onClick={()=>{if(jumpToRef.current!=null) jumpToSimulation(jumpToRef.current)}}
+            disabled = {!isSimulationLoaded} data-tooltip={!isSimulationLoaded? "Simulation not loaded" : "Jump to given step"}>
             Jump
           </button>
 
@@ -430,48 +444,54 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
         <div className="FlowControls">
 
-          <button className={`ToStartButton SimulationControlsButton ${!isSimulationLoaded? "DisabledButton" : ""}`} disabled={!isSimulationLoaded} 
-          onClick={()=>jumpToSimulation(0)}>
+          <button className={`ToStartButton tooltip SimulationControlsButton ${!isSimulationLoaded || (stepRef.current === 0)? "DisabledButton" : ""}`} disabled={!isSimulationLoaded || (stepRef.current === 0)} 
+          onClick={()=>jumpToSimulation(0)} data-tooltip={!isSimulationLoaded? "Simulation not loaded" : (stepRef.current === 0)? "Already at the start" :  "Jump to start"} >
             <ChevronDoubleLeftIcon/>
           </button>
 
-          <button className={`StepBackButton SimulationControlsButton ${!isSimulationLoaded? "DisabledButton" : ""}`} disabled={!isSimulationLoaded}   onClick={doPrevSimulationStep}>
+          <button className={`StepBackButton tooltip SimulationControlsButton ${!isSimulationLoaded || (stepRef.current === 0)? "DisabledButton" : ""}`} disabled={!isSimulationLoaded || (stepRef.current === 0)}   onClick={doPrevSimulationStep}
+          data-tooltip={!isSimulationLoaded? "Simulation not loaded" : (stepRef.current === 0)? "Cannot step backward" :  "Previous step"}>
             <ChevronLeftIcon/>
           </button>
         
-          <button className={`PlayButton SimulationControlsButton ${!isSimulationLoaded || isPlaying? "DisabledButton" : ""}`} disabled={!isSimulationLoaded}  onClick={playSimulation}>
+          <button className={`PlayButton tooltip SimulationControlsButton ${!isSimulationLoaded || isPlaying? "DisabledButton" : ""}`} disabled={!isSimulationLoaded || isPlaying}  onClick={playSimulation}
+          data-tooltip={!isSimulationLoaded? "Simulation not loaded" : (isPlaying)? "Already playing" :  "Play simulation"}>
             <PlayIcon />
           </button>
 
-          <button className={`PauseButton SimulationControlsButton ${!isSimulationLoaded || !isPlaying? "DisabledButton" : ""}`} disabled={!isSimulationLoaded} onClick={pauseSimulation}>
+          <button className={`PauseButton tooltip SimulationControlsButton ${!isSimulationLoaded || !isPlaying? "DisabledButton" : ""}`} disabled={!isSimulationLoaded || !isPlaying} onClick={pauseSimulation}
+          data-tooltip={!isSimulationLoaded? "Simulation not loaded" : (!isPlaying)? "Simulation not playing" :  "Pause simulation"}>
             <PauseIcon />
           </button>
 
-          <button className={`StopButton SimulationControlsButton ${!isSimulationLoaded? "DisabledButton" : ""}`} disabled={!isSimulationLoaded} onClick={resetSimulation}>
+          <button className={`StopButton tooltip SimulationControlsButton ${!isSimulationLoaded? "DisabledButton" : ""}`} disabled={!isSimulationLoaded} onClick={resetSimulation}
+          data-tooltip={!isSimulationLoaded? "Simulation not loaded" :  "Discard simulation"}>
             <StopIcon />
           </button>
 
-          <button className={`StepForwardButton SimulationControlsButton ${!isSimulationLoaded? "DisabledButton" : ""}`} disabled={!isSimulationLoaded} onClick={doNextSimulationStep}>
+          <button className={`StepForwardButton tooltip SimulationControlsButton ${!isSimulationLoaded || (stepRef.current === simulation.steps.length-1)? "DisabledButton" : ""}`} 
+          disabled={!isSimulationLoaded || (stepRef.current === simulation.steps.length-1)} onClick={doNextSimulationStep}
+          data-tooltip={!isSimulationLoaded? "Simulation not loaded" : (stepRef.current === simulation.steps.length-1)? "Cannot step forward" :  "Next step"}>
             <ChevronRightIcon/>
           </button>
         
-          <button className={`ToEndButton SimulationControlsButton ${!isSimulationLoaded? "DisabledButton" : ""}`} disabled={!isSimulationLoaded} onClick={()=>jumpToSimulation(simulation.steps.length-1)}>
+          <button className={`ToEndButton tooltip SimulationControlsButton ${!isSimulationLoaded || (stepRef.current === simulation.steps.length-1)? "DisabledButton" : ""}`} disabled={!isSimulationLoaded || (stepRef.current === simulation.steps.length-1)} onClick={()=>jumpToSimulation(simulation.steps.length-1)}
+            data-tooltip={!isSimulationLoaded? "Simulation not loaded" : (stepRef.current === simulation.steps.length-1)? "Already at the end" :  "Jump to the end"} >
             <ChevronDoubleRightIcon/>
           </button>
         </div>
 
         <div className="SpeedControls">
+          <p className="SimulationData">Animation speed: </p>
           <input type="range" min="0.01" max="0.99" step="0.01" onChange={(e)=>{setAnimationSpeed(parseFloat(e.target.value))}}></input>
         </div>
        
-        
-        <div className="simulation-jump">
-          
-        </div>
       </div>
       <div className="LoadSimulationContainer">
-        <button className={`LoadSimulationButton  ${isSimulationLoaded? "DisabledButton" : ""}`}
-          disabled={isSimulationLoaded} onClick={()=>loadSimulation()}>Load Simulation</button>
+        <button className={`LoadSimulationButton ${isSimulationLoaded || hasErrors? "tooltip DisabledButton" : ""}`} 
+        data-tooltip={isSimulationLoaded? "Discrad this simulation before loading new one" : hasErrors? "Resolve code errors before loading simulation" : "Unidentified error has occured"}
+          disabled={isSimulationLoaded} onClick={()=>loadSimulation()}>Load Simulation
+        </button>
       </div>
     </div>
   );

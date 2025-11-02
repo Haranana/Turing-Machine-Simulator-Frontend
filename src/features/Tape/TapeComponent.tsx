@@ -56,7 +56,7 @@ export const TapeComponent = ({tapeInput}: Props) => {
       list.push(
         <div
           key={i}
-          className={`tape-cell ${i === head ? "tape-cell-head" : ""}`}
+          className={`TapeCell ${i === head ? "TapeCellHead" : ""}`}
           style={{ width: `${tapeInput.cellPx}px`, height: `${tapeInput.cellPx}px`, flex: `0 0 ${tapeInput.cellPx}px` }}
           title={`i=${i}`}
         >
@@ -209,7 +209,7 @@ const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
   };
 
   return (
-    <div className="tape-track" ref={trackRef} style={trackStyle} onTransitionEnd={handleTransitionEnd}>
+    <div className="TapeTrack" ref={trackRef} style={trackStyle} onTransitionEnd={handleTransitionEnd}>
             {cells}
     </div>
   );
