@@ -6,7 +6,7 @@ export type SpecialStates = {
     acceptState: string;
     rejectState: string;
 
-    setFields: (iState : string , aState : string , rState: string) => void;
+    setSpecialStates: (iState : string , aState : string , rState: string) => void;
     setInitialState: (value : string) => void;
     setAcceptState: (value : string) => void;
     setRejectState: (value : string) => void;
@@ -20,7 +20,7 @@ export const useSpecialStates = (create<SpecialStates>)()(
                 acceptState: "ACCEPT",
                 rejectState: "REJECT",
 
-                setFields: (iState , aState, rState)=>{
+                setSpecialStates: (iState , aState, rState)=>{
                     set({
                         initialState: iState,
                         acceptState: aState,

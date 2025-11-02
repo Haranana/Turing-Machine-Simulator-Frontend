@@ -1,0 +1,80 @@
+.SettingsSegment{
+    display: flex;
+    flex-direction: row;
+    margin-top: 8vh;
+    margin-bottom: 4vh;
+}
+
+.SegmentFirstColumn{
+    padding-top: 0;
+    width: 40%;
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+.SegmentTitle{
+    font-family: var(--font-main);
+    font-size: 2.5rem;
+    margin: 0;
+}
+
+.SegmentDescription{
+    font-size: 1.2rem;
+    font-family: var(--font-main);
+}
+
+.SegmentSecondColumn{
+    flex: 1;
+    margin-top: 5vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.SettingsTextFieldRow{
+    margin-top: 1vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.SettingsTextFieldLabel{
+    width: 14vw;
+    font-family: var(--font-main);
+}
+
+.SettingsTextField{
+    flex: 1;
+    border: none;
+}
+
+.SettingsTextField:focus-within{
+    outline: none;  
+}
+
+.SaveSettings{
+    margin-top: 2vh;
+    width: 5vw;
+    height: 3vw;
+    margin-left: 75%;
+    border: none;
+    font-family: var(--font-main);
+    background-color: var(--color-primary-2);
+    color: var(--color-white);
+    cursor: pointer;
+    font-size: 1.1rem;
+    border-radius: 9999999px;
+}
+
+.SaveSettings:hover{
+    background-color: var(--color-primary-1);
+}
+
+.SaveSettings.DisabledButton{
+    background-color: var(--color-primary-1);
+    cursor: default;
+}
+
+.LineSeparator{
+    color: black;
+    width: 80%;
+}

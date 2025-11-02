@@ -175,22 +175,3 @@
   cursor: default;
 }
 
-.tooltip { position: relative; }
-.tooltip:hover::after, .tooltip:focus::after {
-  content: attr(data-tooltip);
-  position: absolute; 
-  left: 50%; 
-  bottom: -60%;
-  transform: translate(-50%, 3px);
-  background: #111; 
-  color: #fff; 
-  padding: 4px 6px; 
-  border-radius: 4px;
-  white-space: nowrap; 
-  font-size: 12px; 
-  z-index: 10;
-}
-
-.tooltip.extraTooltipPadding:hover::after, .tooltip.extraTooltipPadding:focus::after{
-  transform: translate(-50%, 8px);
-}

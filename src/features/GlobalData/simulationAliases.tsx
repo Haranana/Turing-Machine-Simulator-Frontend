@@ -11,10 +11,10 @@ export type AliasesFields = {
 }
 
 export type SimulationAliases = AliasesFields & {
-  setAll: (values:AliasesFields) => void;
+  setSimulationAliases: (values:AliasesFields) => void;
 
   //keyof so k is string in union: "sep1" | "sep2" | "left" | "stay" | "right"
-  setField: (k: keyof AliasesFields, v: string) => void;
+  setSimulationAlias: (k: keyof AliasesFields, v: string) => void;
 }
 
 export const useSimulationAliases = create<SimulationAliases>()(
@@ -27,7 +27,7 @@ export const useSimulationAliases = create<SimulationAliases>()(
     stay: "S",
     right: "R",
 
-    setAll: (vals) => {
+    setSimulationAliases: (vals) => {
         set({
         sep1: vals.sep1,
         sep2: vals.sep2,
@@ -38,7 +38,7 @@ export const useSimulationAliases = create<SimulationAliases>()(
         });
     },
 
-    setField: (k, v) => {
+    setSimulationAlias: (k, v) => {
         set( {[k] : v}); 
     },
     

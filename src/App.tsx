@@ -9,13 +9,15 @@ import { Routes, Route } from 'react-router-dom'
 import { useState } from 'react'
 import Layout from "./Layout";
 import LoginPage from './pages/LoginPage'
-
+import { Toaster } from 'react-hot-toast';
+import './index.css'
 
 export default  function App() {
 
 const [logged, setLogged] = useState(false);
 
 return (
+  <>
     <div className="content">
         <Routes>
           <Route path = "/" element={<Layout/>}>
@@ -31,5 +33,22 @@ return (
           <Route path="*" element={<h1>Not found</h1>} />
         </Routes>
     </div>
+    <Toaster
+        position="top-right"
+        toastOptions={{
+        className: 'Toast',
+        style: {
+          background: 'var(--color-bg-2)',
+          color: 'var(--color-text-dark)',
+          borderRadius: '10px',
+          padding: '10px 12px',
+          boxShadow: '0 8px 24px rgba(0,0,0,.25)',
+        },
+        duration: 3000,
+        success: { className: 'Toast Toast--success' },
+        error:   { className: 'Toast Toast--error' },
+      }}
+      />
+    </>
   );
 }
