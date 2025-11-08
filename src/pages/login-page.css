@@ -10,7 +10,7 @@
     align-items: center;
     
 
-    
+
     padding-top: 7vh;
     font-family: var(--font-main);
 
@@ -38,6 +38,11 @@
     box-sizing: border-box;
     padding-left: 1em;
     font-family: var(--font-main);
+    
+}
+
+.login-text-field:focus {
+  outline: solid 2px var(--color-primary-3);
 }
 
 .login-text-field::placeholder{
@@ -108,11 +113,30 @@
     margin-bottom: 1vh;
     border-radius:9999px;
     border: none;
-    background-color: var(--color-primary-3);
+    background-color: var(--color-primary-2);
     color: var(--color-text-light);
     font-family: var(--font-main);
 
     transition: 0.3s ease;
+}
+
+.login-button.DisabledButton{
+        background-color: var(--color-primary-1);
+    cursor: default;
+}
+
+.login-button.DisabledButton:hover{
+            background-color: var(--color-primary-1);
+    cursor: default;
+}
+
+.login-button.SignUpButton{
+    width: 10vw;
+}
+
+.login-button.SignUpButton.DisabledButton{
+    background-color: var(--color-primary-1);
+    cursor: default;
 }
 
 .login-button:hover{

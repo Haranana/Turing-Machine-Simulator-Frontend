@@ -2,7 +2,9 @@
 import SimulatorPage from './pages/SimulatorPage'
 import ConsolePage from './pages/ConsolePage'
 import AccountPage from './pages/AccountPage'
-
+import { AuthProvider
+ } from './auth/AuthContext'
+import { BrowserRouter } from 'react-router-dom'
 import SettingsPage from './pages/SettingsPage'
 import SignUpPage from './pages/SignUpPage'
 import { Routes, Route } from 'react-router-dom'
@@ -11,28 +13,32 @@ import Layout from "./Layout";
 import LoginPage from './pages/LoginPage'
 import { Toaster } from 'react-hot-toast';
 import './index.css'
+import ProtectedRoute from './auth/ProtectedRoute'
 
 export default  function App() {
 
-const [logged, setLogged] = useState(false);
-
 return (
   <>
-    <div className="content">
-        <Routes>
-          <Route path = "/" element={<Layout/>}>
-            <Route index element={<SimulatorPage />} />
-            <Route path="index" element={<SimulatorPage />} />
-            <Route path="console" element={<ConsolePage />} />
-            <Route path="account" element={logged? <AccountPage /> : <LoginPage/>} />
-            <Route path="signup" element={<SignUpPage/>} />
-            <Route path="settings" element={<SettingsPage />} />
+      <div className="content">
+          <Routes>
+            <Route path = "/" element={<Layout/>}>
+              <Route index element={<SimulatorPage />} />
+              <Route path="index" element={<SimulatorPage />} />
+              <Route path="console" element={<ConsolePage />} />
+            
+              <Route element={<ProtectedRoute/>}>
+                <Route path="account" element={<AccountPage/>} />
+              </Route>
 
-          </Route>
+            <Route path="login" element={<LoginPage/>}/>
+              <Route path="signup" element={<SignUpPage/>} />
+              <Route path="settings" element={<SettingsPage />} />
 
-          <Route path="*" element={<h1>Not found</h1>} />
-        </Routes>
-    </div>
+            </Route>
+
+            <Route path="*" element={<h1>Not found</h1>} />
+          </Routes>
+      </div>
     <Toaster
         position="top-right"
         toastOptions={{
