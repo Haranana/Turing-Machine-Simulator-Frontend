@@ -5,6 +5,7 @@ import { useAuth } from "../auth/AuthContext";
 import {EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid"
 import { useState } from "react";
 
+
 export default function LoginPage(){
 
     const [passwordVisible, setPasswordVisible] = useState(false);
@@ -14,7 +15,6 @@ export default function LoginPage(){
     const [errorMessage ,setErrorMessage] = useState<string | null>(null);
     const {login} = useAuth();
     const navigate = useNavigate();
-
 
      async function handleSubmit(e: React.MouseEvent){
 
@@ -42,7 +42,7 @@ export default function LoginPage(){
             };
 
             login(data.accessToken, data.tokenType, data.expiresInSeconds);
-            navigate("/app", { replace: true });
+            navigate("/account", { replace: true });
             } catch (e: any) {
                 setErrorMessage(e?.message ?? "Błąd sieci.");
             } 
