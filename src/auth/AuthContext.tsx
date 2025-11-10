@@ -12,26 +12,34 @@ type AuthState = {
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
-  const [tokenType, setTokenType] = useState<string | null>(null);
-  const [expiresAt, setExpiresAt] = useState<number | null>(null);
-
-  useEffect(() => {
-    const raw = localStorage.getItem("auth");
-    if (!raw) return;
+  const [token, setToken] = useState<string | null>(() => {
     try {
+      const raw = localStorage.getItem("auth");
+      if (!raw) return null;
       const parsed = JSON.parse(raw) as { token: string; tokenType: string; expiresAt: number };
-      if (parsed.expiresAt && Date.now() < parsed.expiresAt) {
-        setToken(parsed.token);
-        setTokenType(parsed.tokenType);
-        setExpiresAt(parsed.expiresAt);
-      } else {
-        localStorage.removeItem("auth");
-      }
+      if (parsed.expiresAt && Date.now() < parsed.expiresAt) return parsed.token;
+      localStorage.removeItem("auth");
+      return null;
     } catch {
       localStorage.removeItem("auth");
+      return null;
     }
-  }, []);
+  });
+
+  const [tokenType, setTokenType] = useState<string | null>(() => {
+    const raw = localStorage.getItem("auth");
+    try { return raw ? (JSON.parse(raw).tokenType as string ?? null) : null; } catch { return null; }
+  });
+
+  const [expiresAt, setExpiresAt] = useState<number | null>(() => {
+    const raw = localStorage.getItem("auth");
+    try {
+      const exp = raw ? (JSON.parse(raw).expiresAt as number) : null;
+      return exp && Date.now() < exp ? exp : null;
+    } catch {
+      return null;
+    }
+  });
 
   const login = (t: string, typ: string, ttlSec: number) => {
     const exp = Date.now() + ttlSec * 1000;

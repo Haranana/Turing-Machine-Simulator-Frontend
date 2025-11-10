@@ -3,7 +3,6 @@ import {useSpecialStates} from "../../features/GlobalData/specialStates"
 import { useSimulationAliases } from "../../features/GlobalData/simulationAliases";
 import { useContext, useState } from "react";
 import { AccountDataContext } from "./AccountDataContext";
-import type { AccountData } from "./AccountDataContext";
 import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { useApiFetch } from "../../api/util";
 
@@ -28,7 +27,7 @@ export default function SaveTuringMachine(){
     }
 
     async function handleSubmit(e: React.MouseEvent){
-        e.preventDefault();
+        //e.preventDefault();
         const sendBody = {
             name: newTuringMachineName,
             description: newTuringMachineDescription,
@@ -39,6 +38,9 @@ export default function SaveTuringMachine(){
             blank: blank,
             sep1: sep1,
             sep2: sep2,
+            moveRight: right,
+            moveLeft: left,
+            moveStay: stay,
             tapesAmount: 1,
                 };
         try{

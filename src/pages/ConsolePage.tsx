@@ -11,9 +11,6 @@ const LANGUAGE_ID = "tm";
 
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-
-
-
 export default function ConsolePage() {
 
     const monaco = useMonaco();
@@ -44,7 +41,6 @@ export default function ConsolePage() {
     });
 
     
-
     monaco.editor.setTheme("tm-theme");
 
       monaco.languages.register({ id: LANGUAGE_ID });
@@ -172,25 +168,26 @@ export default function ConsolePage() {
 
             <Editor 
             
-           onMount={(editor, monacoLib) => {
-  editorRef.current = editor;
-  const model = editor.getModel();
-  if (!model) return;
+          onMount={(editor, monacoLib) => {
+            console.log(codeLines);
+            editorRef.current = editor;
+            const model = editor.getModel();
+            if (!model) return;
 
-  // Pierwsza walidacja + zapis
-  const markers = validateModel(model, monacoLib);
-  setCodeLines(model.getLinesContent());
-  setHasErrors(markers.length > 0);
+            // Pierwsza walidacja + zapis
+            const markers = validateModel(model, monacoLib);
+            setCodeLines(model.getLinesContent());
+            setHasErrors(markers.length > 0);
 
-  // Jedna subskrypcja na zmiany treści
-  const sub = editor.onDidChangeModelContent(() => {
-    const m = validateModel(model, monacoLib);
-    setCodeLines(model.getLinesContent());
-    setHasErrors(m.length > 0);
-  });
+            // Jedna subskrypcja na zmiany treści
+            const sub = editor.onDidChangeModelContent(() => {
+              const m = validateModel(model, monacoLib);
+              setCodeLines(model.getLinesContent());
+              setHasErrors(m.length > 0);
+            });
 
-  editor.onDidDispose(() => sub.dispose());
-}}
+              editor.onDidDispose(() => sub.dispose());
+            }}
 
            onChange={()=>{
               if(!editorRef.current) return;
@@ -198,18 +195,18 @@ export default function ConsolePage() {
               const model = editor.getModel();
               if (!model) return;
               setCodeLines( model.getLinesContent())
-           }}
+          }}
             
-            className="code-editor" 
-             defaultLanguage={LANGUAGE_ID}
-             value = {codeLines.join("\n")}
-             height="90vh"
-             width="90vw"
-             theme="tm-theme"
-             options={{
-                fontSize: 24,
-            }}
-             />
+          className="code-editor" 
+          defaultLanguage={LANGUAGE_ID}
+          value = {codeLines.join("\n")}
+          height="90vh"
+          width="90vw"
+          theme="tm-theme"
+          options={{
+          fontSize: 24,
+          }}
+          />
         </div>
     );
 }

@@ -10,7 +10,7 @@ export function useApiFetch() {
     const headers = new Headers(init.headers);
     if (token) headers.set("Authorization", `${tokenType ?? "Bearer"} ${token}`);
     const res = await fetch(input, { ...init, headers });
-    if (res.status === 401) logout();
+    //if (res.status === 401) logout();
     return res;
   }, [token, tokenType, logout]);
 }

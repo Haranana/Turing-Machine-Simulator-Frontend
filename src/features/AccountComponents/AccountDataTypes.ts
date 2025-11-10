@@ -13,6 +13,9 @@ export type TuringMachineGetDto = {
     blank: string;
     sep1: string;
     sep2: string;
+    moveRight: string;
+    moveLeft: string;
+    moveStay: string;
 
     tapesAmount: number;
 
