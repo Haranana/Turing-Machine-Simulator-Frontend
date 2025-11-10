@@ -29,27 +29,26 @@ export default function SaveTuringMachine(){
 
     async function handleSubmit(e: React.MouseEvent){
         e.preventDefault();
-        const sendBody = {name: newTuringMachineName,
-                    description: newTuringMachineDescription,
-                    program: codeLines.join("\n"),
-                    initialState: initialState,
-                    acceptState: acceptState,
-                    rejectState: rejectState,
-                    blank: blank,
-                    sep1: sep1,
-                    sep2: sep2,
-                    tapesAmount: 1,
+        const sendBody = {
+            name: newTuringMachineName,
+            description: newTuringMachineDescription,
+            program: codeLines.join("\n"),
+            initialState: initialState,
+            acceptState: acceptState,
+            rejectState: rejectState,
+            blank: blank,
+            sep1: sep1,
+            sep2: sep2,
+            tapesAmount: 1,
                 };
-
-        console.log(sendBody);
-        /*
         try{
+            console.log(`sent: ${sendBody} | location: http://localhost:9090/api/tm`);
             const res = await apiFetch("http://localhost:9090/api/tm" , {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
+                body: JSON.stringify(
                     sendBody
-                } )
+                )
             });
             if(res.status == 200 || res.status == 201){
                 console.log("machine saved succefully: ", res.status);
@@ -58,7 +57,7 @@ export default function SaveTuringMachine(){
             }
         }catch(e: any){
             console.log("exception while saving machine has occured: ", e);
-        }*/
+        }
     }
 
     return <div className="AccountPageSubpage SaveTuringMachineSubpage">
