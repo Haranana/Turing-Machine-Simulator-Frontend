@@ -1,18 +1,16 @@
 import './page.css';
 import './AccountPage.css'
-import { useSimulationProgram } from "../features/GlobalData/simulationProgram.tsx"
-import {useSpecialStates} from "../features/GlobalData/specialStates.tsx"
-import { useSimulationAliases } from "../features/GlobalData/simulationAliases.tsx";
 import { useApiFetch } from '../api/util.ts';
 import { useAuth } from '../auth/AuthContext.tsx';
 import { useEffect, useState } from 'react';
 import EditProfile from '../features/AccountComponents/EditProfile.tsx';
 import LoadTuringMachine from '../features/AccountComponents/LoadTuringMachine.tsx';
 import SaveTuringMachine from '../features/AccountComponents/SaveTuringMachine.tsx';
-import { ChevronDownIcon, ChevronUpIcon, ArrowRightStartOnRectangleIcon } from "@heroicons/react/16/solid";
-import { createContext, useContext } from 'react';
-import {AccountDataContext } from '../features/AccountComponents/AccountDataContext.ts';
 import type { AccountData } from '../features/AccountComponents/AccountDataContext.ts';
+import { toast } from 'react-hot-toast';
+import { AccountDataContext } from '../features/AccountComponents/AccountDataContext.ts';
+import { ArrowRightStartOnRectangleIcon , ChevronUpIcon , ChevronDownIcon } from '@heroicons/react/24/solid';
+
 export default  function AccountPage() {
 
     const [currentSubPage, setCurrentSubPage] = useState<"load" | "save" | "edit">("save");
@@ -33,17 +31,13 @@ export default  function AccountPage() {
             try {
                 const res = await apiFetch("http://localhost:9090/api/account", {method: "GET"})
                 if (res.status == 200 ) {
-                    console.log("Succesfuly got user")
                     const data = (await res.json()) as AccountData;
-                    //setAccountData({id: data.id, email:data.email, status: data.status, createdAt: data.createdAt});
                     setAccountData(data);
-                    console.log(data);
                 }else{
-                    console.log("Error when fetching user data from API: ", res.status, " | ", res.text
-                    );
+                    toast.error(`user data couldn't be loaded, \n${res.status} ${res.statusText}\n${res.text}`);        
                 }
             }catch(e: any){
-                console.log("Caught exception when trying to fetch user data");
+                toast.error(`user data couldn't be loaded`);
             }
         };
         run().catch(console.error);

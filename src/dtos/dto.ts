@@ -5,6 +5,7 @@ import { useSimulationProgram } from "../features/GlobalData/simulationProgram.t
 import { useSimulationAliases } from "../features/GlobalData/simulationAliases.tsx";
 import {useSimulationInput} from "../features/GlobalData/simulationInput.tsx"
 import { useSpecialStates } from "../features/GlobalData/specialStates.tsx";
+import { toast } from 'react-hot-toast';
 
 function localCodeToGlobal(codeLines: string[] , sep1:string, left:string, right:string, stay:string, tapesAmount: number){
   const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -106,7 +107,7 @@ export async function sendSimulation(obj: SimulationExport) {
   console.log("parsing obj: " , obj);
   if (!result.success) {
     const issues = result.error.issues.map(i => `${i.path.join(".")}: ${i.message}`);
-    throw new Error("Walidacja nieudana:\n" + issues.join("\n"));
+    throw new Error("Validation failed:\n" + issues.join("\n"));
   }
 
   const dto : SendSimulationDto = result.data;
@@ -121,11 +122,12 @@ export async function sendSimulation(obj: SimulationExport) {
   });
 
    if (!res.ok) {
+    toast.error(`Simulation couldn't be loaded\n${res.status} ${res.statusText}\n${res.text}`);
     throw new Error(`HTTP ${res.status} ${res.statusText}\n${res.text}`);
   }
 
   const response = await res.json();
-  console.log("response: ", response);
+  //console.log("response: ", response);
   return CreatedSimulationSchema.parse(response); 
 
 }

@@ -2,7 +2,7 @@ import "./tape.css";
 
 
 import { PlayIcon, PauseIcon, StopIcon,
-   ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronDownIcon, PlusIcon } from "@heroicons/react/24/solid";
+   ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronDownIcon, PlusIcon, MinusIcon } from "@heroicons/react/24/solid";
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import type { Simulation ,TapeSymbol, TapeViewInput, SimulationStep, TapeInput, AnimationType, SimulationExport, TransitionAction } from "./tapeTypes.tsx";
 import {TapeComponent} from "./TapeComponent"
@@ -12,6 +12,7 @@ import { useSimulationProgram } from "../GlobalData/simulationProgram.tsx"
 import {useSimulationInput} from "../GlobalData/simulationInput.tsx"
 import { useSpecialStates } from "../GlobalData/specialStates.tsx";
 import { number } from "zod";
+import { toast } from 'react-hot-toast';
 
 
 export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
@@ -172,12 +173,14 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
     const simulationExport : SimulationExport = buildSimulationExport();
     try{
-      console.log("sent to API: ", simulationExport);
+      //console.log("sent to API: ", simulationExport);
       const simulationData = await sendSimulation(simulationExport);
       SchemaToSimulation(simulationData);
       setIsSimulationLoaded(true);
+      toast.success(`Simulation loaded successfully`);
     }catch(err){
-      console.log("Simulation Error, please try again");
+      toast.error(`Error: simulation couldn't be loaded\n${err}`);
+      //console.log("Simulation Error, please try again");
       setIsSimulationLoaded(false);
     }
   }
@@ -274,6 +277,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   }, [tapesAmount]);
 
   function addTape(){
+    if(tapesAmount >= 5) return;
     const newlyAddedId = tapesAmount;
     const realTapesAmount = tapesAmount+1;
     //console.log("local | zurand: " ,tapesAmount, " : ", simulationTapesAmount);
@@ -294,6 +298,17 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       cellPx: cellPx,
       animateMs: animateMs,
       callAfterAnimation: (id: number) => handleAnimEnd(id),}]);
+  }
+
+  function removeTape(){
+    if(tapesAmount<=1) return;
+    const realTapesAmount = tapesAmount-1;
+    setTapesAmount(realTapesAmount);
+    setSimulationTapesAmount(realTapesAmount);
+    
+    setInputFieldVisibility(prev=>prev.slice(0,-1));
+    setIsAnimating(prev=>prev.slice(0,-1));
+    setTapeData(prev=>prev.slice(0,-1));
   }
 
   function isEndingStep(step: number){
@@ -470,47 +485,61 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       </div>
 
       {Array.from({ length: tapesAmount }).map((_, i) => (
-  <div className="TapeWrapper" key={i}>
-    <div className="TapeViewport" style={viewportStyle}>
-      {tapeData[i] ? <TapeComponent tapeInput={tapeData[i]} /> : null}
-    </div>
+        <div className="TapeWrapper" key={i}>
+          <div className="TapeViewport" style={viewportStyle}>
+            {tapeData[i] ? <TapeComponent tapeInput={tapeData[i]} /> : null}
+          </div>
 
-    <div className="TapeActions">
-      <button
-        className="TapeActionsButton ShowTapeInputButton"
-        onClick={() => toggleInputFieldVisibility(i)}
-      >
-        <ChevronDownIcon />
-      </button>
+          <div className="TapeActions">
+        
+            <button
+              className="TapeActionsButton ShowTapeInputButton"
+              onClick={() => toggleInputFieldVisibility(i)}>
+              <ChevronDownIcon />
+            </button>
 
-      <button
-        className={`TapeActionsButton tooltip extraTooltipPadding AddTapeButton ${isSimulationLoaded ? "DisabledButton" : ""}`}
-        disabled={isSimulationLoaded}
-        onClick={addTape}
-        data-tooltip={isSimulationLoaded ? "Cannot add tape when Simulation is loaded" : "Add tape"}
-      >
-        <PlusIcon />
-      </button>
-    </div>
+          {
+          i===tapesAmount-1? 
+          <button
+              className={`TapeActionsButton AddTapeButton ${isSimulationLoaded ? "DisabledButton" : ""}`}
+              disabled={isSimulationLoaded}
+              onClick={addTape}
+              data-tooltip={isSimulationLoaded ? "Cannot add tape when Simulation is loaded" : "Add tape"}>
+              <PlusIcon /></button> :""
+          }
 
-    <div className={`InputContainer ${isInputFieldVisible[i] ? "InputContainerVisible" : ""}`}>
-      <input
-        id={`TapeInputField-${i}`}
-        name={`TapeInputField-${i}`}
-        className="TapeInputField"
-        onChange={(e) => onTapeInputChange(e.target.value, i)}
-      />
-      <button
-        className={`EnterInputButton SimulationControlsButton tooltip extraTooltipPadding ${isSimulationLoaded ? "DisabledButton" : ""}`}
-        onClick={() => enterInput(i)}
-        disabled={isSimulationLoaded}
-        data-tooltip={isSimulationLoaded ? "Cannot enter input when simulation is loaded" : "Enter input"}
-      >
-        Enter
-      </button>
-    </div>
-  </div>
-))}
+          {
+          i===tapesAmount-1? 
+            <button
+              className={`TapeActionsButton  RemoveTapeButton ${isSimulationLoaded ? "DisabledButton" : ""}`}
+              disabled={isSimulationLoaded}
+              onClick={removeTape}
+              data-tooltip={isSimulationLoaded ? "Cannot remove tape when Simulation is loaded" : "Remove tape"}>
+              <MinusIcon />
+            </button>:""
+          }
+          
+
+          </div>
+
+          <div className={`InputContainer ${isInputFieldVisible[i] ? "InputContainerVisible" : ""}`}>
+            <input
+              id={`TapeInputField-${i}`}
+              name={`TapeInputField-${i}`}
+              className="TapeInputField"
+              onChange={(e) => onTapeInputChange(e.target.value, i)}
+            />
+            <button
+              className={`EnterInputButton SimulationControlsButton tooltip extraTooltipPadding ${isSimulationLoaded ? "DisabledButton" : ""}`}
+              onClick={() => enterInput(i)}
+              disabled={isSimulationLoaded}
+              data-tooltip={isSimulationLoaded ? "Cannot enter input when simulation is loaded" : "Enter input"}
+            >
+              Enter
+            </button>
+          </div>
+        </div>
+      ))}
 
       <div className="SimulationControls">
         <div className="JumpToControls">
@@ -582,9 +611,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
           disabled={isSimulationLoaded} onClick={()=>loadSimulation()}>Load Simulation
         </button>
       </div>
-      <button onClick={()=>{setSimulationTapesAmount(1); setTapesAmount(1)}}>Reset</button>
     </div>
-
-    
   );
 };

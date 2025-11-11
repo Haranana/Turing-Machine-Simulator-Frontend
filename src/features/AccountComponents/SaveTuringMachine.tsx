@@ -1,10 +1,12 @@
 import { useSimulationProgram } from "../../features/GlobalData/simulationProgram"
 import {useSpecialStates} from "../../features/GlobalData/specialStates"
 import { useSimulationAliases } from "../../features/GlobalData/simulationAliases";
+import { useSimulationInput } from "../GlobalData/simulationInput";
 import { useContext, useState } from "react";
 import { AccountDataContext } from "./AccountDataContext";
 import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { useApiFetch } from "../../api/util";
+import { toast } from 'react-hot-toast';
 
 
 export default function SaveTuringMachine(){
@@ -16,6 +18,7 @@ export default function SaveTuringMachine(){
     const [newTuringMachineName , setNewTuringMachineName] = useState<string>("");
     const [newTuringMachineDescription , setNewTuringMachineDescription] = useState<string>("");
     const [initialValidationPassed, setInitialValidationPassed] = useState<boolean>(false);
+    const {simulationTapesAmount} = useSimulationInput();
 
     function isAccountDataLoaded(){
         return accountData!=null&& accountData.id != null && accountData.email != null && accountData.status != null && accountData.createdAt != null;
@@ -41,7 +44,7 @@ export default function SaveTuringMachine(){
             moveRight: right,
             moveLeft: left,
             moveStay: stay,
-            tapesAmount: 1,
+            tapesAmount: simulationTapesAmount,
                 };
         try{
             console.log(`sent: ${sendBody} | location: http://localhost:9090/api/tm`);
@@ -53,12 +56,13 @@ export default function SaveTuringMachine(){
                 )
             });
             if(res.status == 200 || res.status == 201){
-                console.log("machine saved succefully: ", res.status);
+                toast.success(`Turing Machine saved successfully`);
             }else{
-                console.log("error while saving machine has occured: ", res.status);
+                toast.error(`Turing Machine couldn't be saved\n${res.status} ${res.statusText}\n${res.text}`);
             }
         }catch(e: any){
-            console.log("exception while saving machine has occured: ", e);
+            toast.error(`Error: Turing Machine couldn't be saved\n${e}`);
+           // console.log("exception while saving machine has occured: ", e);
         }
     }
 

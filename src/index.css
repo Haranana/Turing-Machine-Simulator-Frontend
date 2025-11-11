@@ -53,3 +53,6 @@
   transform: translate(-50%, -8px);
 }
 
+.monaco-editor{
+    --vscode-focusBorder: var(--color-text-dark) !important;
+}

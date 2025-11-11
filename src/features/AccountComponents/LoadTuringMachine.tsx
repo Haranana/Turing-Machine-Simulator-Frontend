@@ -4,6 +4,7 @@ import {  ArrowLongDownIcon, ArrowLongUpIcon } from "@heroicons/react/24/solid";
 import { useApiFetch } from "../../api/util";
 import {type TuringMachineGetDto, type PageableQuery , type Page} from "./AccountDataTypes";
 import TuringMachineToLoad from "./TuringMachineToLoad";
+import { toast } from 'react-hot-toast';
 
 
 export default function LoadTuringMachine(){
@@ -33,10 +34,12 @@ export default function LoadTuringMachine(){
                     //console.log("Machine program: ", page.content[0].program.split("\n"));
                     
                 }else{
-                    console.log("error while getting machine has occured: ", res.status);
+                    //console.log("error while getting machine has occured: ", res.status);
+                    toast.error(`Turing Machine couldn't be loaded\n${res.status} ${res.statusText}\n${res.text}`);
                 }
             }catch(e: any){
-                console.log("exception while getting machine has occured: ", e);
+                //console.log("exception while getting machine has occured: ", e);
+                toast.error(`Error: Turing Machine couldn't be loaded\n${e}`);
             }
         }
         buildTmList();

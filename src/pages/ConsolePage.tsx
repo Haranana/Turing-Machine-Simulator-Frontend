@@ -24,6 +24,10 @@ export default function ConsolePage() {
     return lines.map(l => l.replace(/;\s*$/, ""));
   }
 
+  function addTerminators(lines: string[]) : string[]{
+    return lines.map(l=>l.trimEnd().endsWith(':')? l : l+";");
+  }
+
   useEffect(() => {
     if (!monacoInstance) return;
 
@@ -298,7 +302,7 @@ export default function ConsolePage() {
               monacoLib,
               simulationTapesAmount
             );
-            setCodeLines(model.getLinesContent());
+            setCodeLines(stripTerminators(model.getLinesContent()));
             setHasErrors((m ?? []).length > 0);
           });
 
@@ -309,11 +313,11 @@ export default function ConsolePage() {
           const editor = editorRef.current;
           const model = editor.getModel();
           if (!model) return;
-          setCodeLines(model.getLinesContent());
+          setCodeLines(stripTerminators(model.getLinesContent()));
         }}
         className="code-editor"
         defaultLanguage={LANGUAGE_ID}
-        value={codeLines.join("\n")}
+        value={ addTerminators(codeLines).join("\n")}
         height="90vh"
         width="90vw"
         theme="tm-theme"

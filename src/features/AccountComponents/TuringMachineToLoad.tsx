@@ -1,9 +1,11 @@
 import { useSimulationProgram } from "../../features/GlobalData/simulationProgram"
 import {useSpecialStates} from "../../features/GlobalData/specialStates"
 import { useSimulationAliases } from "../../features/GlobalData/simulationAliases";
+import { useSimulationInput } from "../GlobalData/simulationInput";
 import type { TuringMachineGetDto } from "./AccountDataTypes"
 import { ChevronDownIcon, TrashIcon } from "@heroicons/react/24/solid"
 import { useApiFetch } from "../../api/util";
+import { toast } from 'react-hot-toast';
 type inputProp = {tm: TuringMachineGetDto, handleDeleted: ()=>void}
 
 export default function TuringMachineToLoad(props: inputProp){
@@ -11,6 +13,7 @@ export default function TuringMachineToLoad(props: inputProp){
     const {setCodeLines} = useSimulationProgram();
     const {setSpecialStates } = useSpecialStates();
     const {setSimulationAliases} = useSimulationAliases();
+    const {setSimulationTapesAmount} = useSimulationInput();
     const apiFetch = useApiFetch();
 
     function dateToShowable(date: string){
@@ -32,6 +35,7 @@ export default function TuringMachineToLoad(props: inputProp){
             left: props.tm.moveLeft,
             stay: props.tm.moveStay,
         });
+        setSimulationTapesAmount(props.tm.tapesAmount);
     }
 
     async function deleteTuringMachine(){
@@ -40,12 +44,15 @@ export default function TuringMachineToLoad(props: inputProp){
                 method: "DELETE",
             })
             if(res.status == 200 || res.status == 204){
-                console.log("tm deleted succesfully: ", res.status);
+                //console.log("tm deleted succesfully: ", res.status);
+                toast.success("Turing Machine deleted successfully");
             }else{
-                console.log("tm couldn't be deleted: ", res.status );
+                //console.log("tm couldn't be deleted: ", res.status );
+                toast.error(`Turing Machine couldn't be deleted\n${res.status} ${res.statusText}\n${res.text}`);
             }
         }catch(e: any){
-            console.log("Exception has occured when deleting tm");
+            //console.log("Exception has occured when deleting tm");
+            toast.error(`Error: Turing Machine couldn't be deleted\n${e}`);
         }
         props.handleDeleted();
     }
