@@ -1,10 +1,8 @@
 import "./tape.css";
 
 
-import { PlayIcon, PauseIcon, StopIcon, PlayPauseIcon, ForwardIcon,
-   ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronDownIcon, PlusIcon } from "@heroicons/react/24/solid";
 import { useState, useRef, useMemo, useEffect } from "react";
-import type { Simulation ,TapeSymbol, TapeViewInput, Phase, SimulationStep , Tape, TapeState, TapeInput, AnimationType, TransitionAction } from "./tapeTypes";
+import type { TapeSymbol, Phase, TapeInput, AnimationType, TransitionAction } from "./tapeTypes";
 
 
 type Props = { tapeInput: TapeInput };
@@ -113,7 +111,7 @@ export const TapeComponent = ({tapeInput}: Props) => {
     setHead(tapeInput.tapeState.head);
     requestAnimationFrame(() => {
       setNoTransition(false);
-      tapeInput.callAfterAnimation();
+      tapeInput.callAfterAnimation(tapeInput.tapeId);
     });
     return;
   }
@@ -128,7 +126,7 @@ export const TapeComponent = ({tapeInput}: Props) => {
             return newMap;
         });
 
-        tapeInput.callAfterAnimation();
+        tapeInput.callAfterAnimation(tapeInput.tapeId);
         return;  
     }
     
@@ -141,7 +139,7 @@ export const TapeComponent = ({tapeInput}: Props) => {
         });
 
         if(dir===0){
-          tapeInput.callAfterAnimation();
+          tapeInput.callAfterAnimation(tapeInput.tapeId);
           return;  
         }
 
@@ -153,7 +151,7 @@ export const TapeComponent = ({tapeInput}: Props) => {
             return newMap;
         });
 
-        tapeInput.callAfterAnimation();
+        tapeInput.callAfterAnimation(tapeInput.tapeId);
           return;  
     }
 
@@ -191,7 +189,7 @@ const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
             return newMap;
         });
       }
-      tapeInput.callAfterAnimation();
+      tapeInput.callAfterAnimation(tapeInput.tapeId);
     });
   });
 };

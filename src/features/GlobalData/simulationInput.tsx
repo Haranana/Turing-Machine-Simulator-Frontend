@@ -2,19 +2,22 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type SimulationInput = {
-  simulationInput: string,
+  simulationInput: string[],
+  tapesAmount: number
 
-  setSimulationInput : (value: string) => void,
+  setSimulationInput : (value: string[], tapesAm: number) => void,
 }
 
 export const useSimulationInput = create<SimulationInput>()(
     persist(
     (set)=>({
-    simulationInput: "",
+    simulationInput: [""],
+    tapesAmount: 1,
 
-    setSimulationInput: (value)=>{
+    setSimulationInput: (value, tapesAm)=>{
         set({
-            simulationInput: value
+            simulationInput: value,
+            tapesAmount: tapesAm
         })
     },
     

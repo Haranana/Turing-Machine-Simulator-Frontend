@@ -10,7 +10,8 @@ export type SimulationExport = {
   program : string[],
   separator : string,
   blank: string,
-  input : string,
+  input : string[],
+  tapesAmount: number,
 }
 
 export type SimulationStep = {
@@ -24,11 +25,10 @@ export type SimulationStep = {
 };
 
 export type Simulation = {
-    steps : SimulationStep[];
+    steps : SimulationStep[][];
     startingState : State,
     acceptingState: State,
     rejectingState: State,
-    isEmpty : boolean,
 }
 
 export type TapeSymbol = string | null;          // usually a single char
@@ -48,6 +48,7 @@ export interface TapeViewInput {
 }
 
 export interface TapeInput {
+  tapeId: number
   tapeState: TapeState;
   writtenChar : string | null;
   action : TransitionAction | null; //null in case of jumping to specific step 
@@ -55,7 +56,7 @@ export interface TapeInput {
   radius: number;
   cellPx: number;
   animateMs: number;
-  callAfterAnimation: ()=>void;
+  callAfterAnimation: (id: number)=>void;
 }
 
 export type Phase = "idle" | "anim" | "snap";

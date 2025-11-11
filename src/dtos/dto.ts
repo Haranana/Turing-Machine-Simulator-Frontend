@@ -58,11 +58,11 @@ export type ReceiveSimulationDto = z.infer<typeof CreatedSimulationSchema>;
 export function buildSimulationExport(){
   const { codeLines } = useSimulationProgram.getState();
   const { sep1, blank, left, right, stay } = useSimulationAliases.getState();
-  const { simulationInput } = useSimulationInput.getState();
+  const { simulationInput, tapesAmount } = useSimulationInput.getState();
   const { initialState, acceptState, rejectState } = useSpecialStates.getState();
 
   const program = localCodeToGlobal(codeLines, left, right, stay);
-  return { initialState, acceptState, rejectState, program, separator: sep1, blank, input:simulationInput };
+  return { initialState, acceptState, rejectState, program, separator: sep1, blank, input:simulationInput, tapesAmount:tapesAmount };
 }
 
 export async function sendSimulation(obj: SimulationExport) {
