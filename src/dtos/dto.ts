@@ -6,10 +6,34 @@ import { useSimulationAliases } from "../features/GlobalData/simulationAliases.t
 import {useSimulationInput} from "../features/GlobalData/simulationInput.tsx"
 import { useSpecialStates } from "../features/GlobalData/specialStates.tsx";
 
-function localCodeToGlobal(codeLines: string[] , left:string, right:string, stay:string){
-    return codeLines.map(line=>
-        line.replace(new RegExp(left + '$'), 'LEFT').replace(new RegExp(right + '$'), 'RIGHT').replace(new RegExp(stay + '$'), 'STAY')
-    );
+function localCodeToGlobal(codeLines: string[] , sep1:string, left:string, right:string, stay:string, tapesAmount: number){
+  const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const sep1Re = new RegExp(`\\s*${esc(sep1)}\\s*`);
+  const mapMove = (tok: string) => {
+    const t = tok.trim();
+    if (t === "LEFT" || t === "RIGHT" || t === "STAY") return t;
+    if (t === left)  return "LEFT";
+    if (t === right) return "RIGHT";
+    if (t === stay)  return "STAY";
+    return t; 
+  };
+
+  return codeLines.map((line) => {
+    const m = line.match(/\/\/.*$/);
+    const comment = m ? m[0] : "";
+    const code = m ? line.slice(0, m.index) : line;
+
+    const tokens = code.split(sep1Re);
+    if (tokens.length === 0) return line;
+    
+    const N = Math.min(tapesAmount, tokens.length);
+    for (let i = tokens.length - N; i < tokens.length; i++) {
+      if (i >= 0) tokens[i] = mapMove(tokens[i]);
+    }
+
+    const rebuilt = tokens.join(` ${sep1} `);
+    return rebuilt + comment;
+  });
 }
 
 const SendSimulationDtoSchema = z.object({
@@ -17,15 +41,16 @@ const SendSimulationDtoSchema = z.object({
   acceptState : z.string(),
   rejectState : z.string(),
   program     : z.array(z.string()),
-  separator   : z.string(),
+  sep1   : z.string(),
+  sep2:  z.string(),
   blank       : z.string(),
-  input       : z.string(),
+  input       : z.array(z.string()),
+  tapesAmount : z.number(),
 });
 
 type SendSimulationDto = z.infer<typeof SendSimulationDtoSchema>;
 
 const numericKey = z.string().regex(/^-?\d+$/);
-
 
 const TapeStateSchema = z.object({
   head: z.number(),
@@ -55,14 +80,24 @@ export const CreatedSimulationSchema = z.object({
 });
 export type ReceiveSimulationDto = z.infer<typeof CreatedSimulationSchema>;
 
-export function buildSimulationExport(){
+export function buildSimulationExport(): SimulationExport{
   const { codeLines } = useSimulationProgram.getState();
-  const { sep1, blank, left, right, stay } = useSimulationAliases.getState();
-  const { simulationInput, tapesAmount } = useSimulationInput.getState();
+  const { sep1, sep2, blank, left, right, stay } = useSimulationAliases.getState();
+  const { simulationInput, simulationTapesAmount } = useSimulationInput.getState();
   const { initialState, acceptState, rejectState } = useSpecialStates.getState();
 
-  const program = localCodeToGlobal(codeLines, left, right, stay);
-  return { initialState, acceptState, rejectState, program, separator: sep1, blank, input:simulationInput, tapesAmount:tapesAmount };
+  const program = localCodeToGlobal(codeLines,sep1, left, right, stay, simulationTapesAmount);
+  return { 
+      initialState: initialState,
+      acceptState: acceptState,
+      rejectState: rejectState,
+      program: program,
+      sep1: sep1,
+      sep2: sep2,
+      blank: blank,
+      input:simulationInput,
+      tapesAmount:simulationTapesAmount
+    };
 }
 
 export async function sendSimulation(obj: SimulationExport) {

@@ -21,7 +21,7 @@ export const useSimulationAliases = create<SimulationAliases>()(
     persist(
     (set)=>({
     sep1: ",",
-    sep2: ",",
+    sep2: "=>",
     blank: "_",
     left: "L",
     stay: "S",

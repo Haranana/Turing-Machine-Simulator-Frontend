@@ -3,21 +3,35 @@ import { persist } from "zustand/middleware";
 
 export type SimulationInput = {
   simulationInput: string[],
-  tapesAmount: number
+  simulationTapesAmount: number
 
-  setSimulationInput : (value: string[], tapesAm: number) => void,
+  setSimulationInputData : (value: string[], tapesAm: number) => void,
+  setSimulationInput : (value: string[]) => void,
+  setSimulationTapesAmount : (value: number) => void,
 }
 
 export const useSimulationInput = create<SimulationInput>()(
     persist(
     (set)=>({
     simulationInput: [""],
-    tapesAmount: 1,
+    simulationTapesAmount: 1,
 
-    setSimulationInput: (value, tapesAm)=>{
+    setSimulationInputData: (value, tapesAm)=>{
         set({
             simulationInput: value,
-            tapesAmount: tapesAm
+            simulationTapesAmount: tapesAm
+        })
+    },
+
+    setSimulationInput: (value)=>{
+        set({
+            simulationInput: value,
+        })
+    },
+
+    setSimulationTapesAmount: (value)=>{
+        set({
+            simulationTapesAmount: value
         })
     },
     

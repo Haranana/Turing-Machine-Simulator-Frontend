@@ -47,7 +47,7 @@ export default  function SettingsPage() {
         let rightRefValue = rightRef.current?.value;
         rightRefValue = rightRefValue === undefined? right : rightRefValue as string;
 
-        sep2RefValue = sep1RefValue // ! currently API only accepts 1 separator, change when API is updated
+        //sep2RefValue = sep1RefValue // ! currently API only accepts 1 separator, change when API is updated
 
         let initialRefValue = initialRef.current?.value;
         initialRefValue = initialRefValue === undefined? initialState : initialRefValue as string;
