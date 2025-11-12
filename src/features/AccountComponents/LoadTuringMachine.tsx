@@ -1,10 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AccountDataContext } from "./AccountDataContext";
 import {  ArrowLongDownIcon, ArrowLongUpIcon } from "@heroicons/react/24/solid";
 import { useApiFetch } from "../../api/util";
 import {type TuringMachineGetDto, type PageableQuery , type Page} from "./AccountDataTypes";
 import TuringMachineToLoad from "./TuringMachineToLoad";
 import { toast } from 'react-hot-toast';
+import Modal from "../Modal/Modal";
 
 
 export default function LoadTuringMachine(){
@@ -17,6 +18,8 @@ export default function LoadTuringMachine(){
     const [TuringMachinesData, setTuringMachinesData] = useState<Page<TuringMachineGetDto> | null>(null);
     const [listReloadNeeded, setListReloadNeeded] = useState<number>(0);
 
+
+    const tmToDeleteNameRef = useRef<String | null>(null);
     useEffect(()=>{
         
         const buildTmList = async () => {
@@ -110,6 +113,9 @@ export default function LoadTuringMachine(){
         :
         "Account data not loaded :("
         }
+
+        {/* <button onClick={()=>{tmToDeleteNameRef.current = TuringMachinesData?.content.at(0)?.name?? "Turing machine";  setDeleteTmModalOpen(true);}}>
+        Test Modal</button>*/}
 
     </div>
 }

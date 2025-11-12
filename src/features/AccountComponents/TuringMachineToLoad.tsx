@@ -6,6 +6,8 @@ import type { TuringMachineGetDto } from "./AccountDataTypes"
 import { ChevronDownIcon, TrashIcon } from "@heroicons/react/24/solid"
 import { useApiFetch } from "../../api/util";
 import { toast } from 'react-hot-toast';
+import Modal from "../Modal/Modal";
+import { useState } from "react";
 type inputProp = {tm: TuringMachineGetDto, handleDeleted: ()=>void}
 
 export default function TuringMachineToLoad(props: inputProp){
@@ -15,6 +17,8 @@ export default function TuringMachineToLoad(props: inputProp){
     const {setSimulationAliases} = useSimulationAliases();
     const {setSimulationTapesAmount} = useSimulationInput();
     const apiFetch = useApiFetch();
+
+    const [isDeleteTmModalOpen, setDeleteTmModalOpen] = useState<boolean>(false);
 
     function dateToShowable(date: string){
         const DateTime: string[] = date.split("T");
@@ -57,25 +61,37 @@ export default function TuringMachineToLoad(props: inputProp){
         props.handleDeleted();
     }
 
-    return <div className="TuringMachineRow">
-        <div className="TmRowShowWrapper TmRowButtonWrapper" >
-            <button className="TmRowShowButton TmRowButton"><ChevronDownIcon ></ChevronDownIcon></button>
+    return <>
+        <div className="TuringMachineRow">
+            <div className="TmRowShowWrapper TmRowButtonWrapper" >
+                <button className="TmRowShowButton TmRowButton"><ChevronDownIcon ></ChevronDownIcon></button>
+            </div>
+            <div className="TmRowNameWrapper TmRowTextWrapper">
+                <span className="TmRowName TmRowTextField">{props.tm.name}</span>
+            </div>
+            <div className="TmRowDescWrapper TmRowTextWrapper">
+                <span className="TmRowDesc TmRowTextField">{props.tm.description}</span>
+            </div>
+            <div className="TmRowUpdateWrapper TmRowTextWrapper">
+                <span className="TmRowUpdatedDate TmRowTextField">{dateToShowable(props.tm.updatedAt)}</span>
+            </div>
+            {/*<span className="TmRowCreatedDate TmRowTextField">{props.tm.createdAt}</span>*/}
+            <div className="TmRowLoadWrapper TmRowButtonWrapper">
+                <button className="TmRowLoadButton TmRowButton" onClick={()=>{onLoadTuringMachine()}}>Load</button>
+            </div>
+            <div className="TmRowDeleteWrapper TmRowButtonWrapper">
+                <button className="TmRowDeleteButton TmRowButton" onClick={()=>{setDeleteTmModalOpen(true)}}><TrashIcon></TrashIcon></button>
+            </div>
         </div>
-        <div className="TmRowNameWrapper TmRowTextWrapper">
-            <span className="TmRowName TmRowTextField">{props.tm.name}</span>
-        </div>
-        <div className="TmRowDescWrapper TmRowTextWrapper">
-            <span className="TmRowDesc TmRowTextField">{props.tm.description}</span>
-        </div>
-        <div className="TmRowUpdateWrapper TmRowTextWrapper">
-            <span className="TmRowUpdatedDate TmRowTextField">{dateToShowable(props.tm.updatedAt)}</span>
-        </div>
-        {/*<span className="TmRowCreatedDate TmRowTextField">{props.tm.createdAt}</span>*/}
-        <div className="TmRowLoadWrapper TmRowButtonWrapper">
-            <button className="TmRowLoadButton TmRowButton" onClick={()=>{onLoadTuringMachine()}}>Load</button>
-        </div>
-        <div className="TmRowDeleteWrapper TmRowButtonWrapper">
-            <button className="TmRowDeleteButton TmRowButton" onClick={()=>{deleteTuringMachine()}}><TrashIcon></TrashIcon></button>
-        </div>
-    </div>
+        <Modal open={isDeleteTmModalOpen} onClose={()=>{setDeleteTmModalOpen(false)}}>
+                <div className="DeleteTmModalTextWrapper">
+                    <h2>Delete {props.tm.name} ?</h2>
+                    <p>Deleting Turing machine is irreversible, please confirm you really mean it.</p>
+                </div>
+                <div className="DeleteTmModalButtonsWrapper">
+                    <button className="ModalButton DeleteTmModalButton DeleteTmModalDeleteButton" onClick={()=>{deleteTuringMachine(); setDeleteTmModalOpen(false);}}>Delete</button>
+                    <button className="ModalButton DeleteTmModalButton DeleteTmModalCancelButton" onClick={()=>{setDeleteTmModalOpen(false)}}>Cancel</button>
+                </div>
+        </Modal>
+    </>
 }

@@ -48,9 +48,9 @@ export default  function AccountPage() {
         <div className="page AccountPageWrapper">
                 <div className='AccountPageDashboard'>
                     
-                        <button className={`AccountDashboardButton ${currentSubPage=="load"? "SelectedDashboardButton" : "" }`} onClick={()=>setCurrentSubPage("load")}>Load{currentSubPage=="load"? <ChevronUpIcon/> : <ChevronDownIcon/> }</button>
+                        <button className={`AccountDashboardButton ${currentSubPage=="load"? "SelectedDashboardButton" : "" }`} onClick={()=>setCurrentSubPage("load")}>Manage{currentSubPage=="load"? <ChevronUpIcon/> : <ChevronDownIcon/> }</button>
                         <button className={`AccountDashboardButton ${currentSubPage=="save"? "SelectedDashboardButton" : "" }`} onClick={()=>setCurrentSubPage("save")}>Save {currentSubPage=="save"? <ChevronUpIcon/> : <ChevronDownIcon/> }</button>
-                        <button className={`AccountDashboardButton ${currentSubPage=="edit"? "SelectedDashboardButton" : "" }`} onClick={()=>setCurrentSubPage("edit")}>Edit {currentSubPage=="edit"? <ChevronUpIcon/> : <ChevronDownIcon/> }</button>
+                        <button className={`AccountDashboardButton ${currentSubPage=="edit"? "SelectedDashboardButton" : "" }`} onClick={()=>setCurrentSubPage("edit")}>Account {currentSubPage=="edit"? <ChevronUpIcon/> : <ChevronDownIcon/> }</button>
                     
                      <button className='AccountDashboardButton LogoutButton'onClick={()=>logout()}><ArrowRightStartOnRectangleIcon/></button>
                 </div>
