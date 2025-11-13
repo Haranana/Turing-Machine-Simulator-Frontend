@@ -3,7 +3,7 @@ import "./tape.css";
 
 import { useState, useRef, useMemo, useEffect } from "react";
 import type { TapeSymbol, Phase, TapeInput, AnimationType, TransitionAction } from "./tapeTypes";
-
+import { useSimulationAliases } from "../GlobalData/simulationAliases";
 
 type Props = { tapeInput: TapeInput };
 
@@ -11,6 +11,8 @@ export const TapeComponent = ({tapeInput}: Props) => {
 
  // Id komórki na którą wskazuje głowica taśmy
   const [head, setHead] = useState<number>(tapeInput.tapeState.head);
+
+   const {blank} = useSimulationAliases();
 
   // Predkosc animacji jednego ruchu
   const animationSpeedRef = useRef(tapeInput.animateMs);
@@ -58,7 +60,8 @@ export const TapeComponent = ({tapeInput}: Props) => {
           style={{ width: `${tapeInput.cellPx}px`, height: `${tapeInput.cellPx}px`, flex: `0 0 ${tapeInput.cellPx}px` }}
           title={`i=${i}`}
         >
-          {value ?? " "}
+          { (value == undefined || value === blank) ? "" : value}
+          {/*{value ?? " "}*/}
         </div>
       );
     }

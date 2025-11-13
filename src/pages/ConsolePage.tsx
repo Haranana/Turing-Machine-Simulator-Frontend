@@ -25,7 +25,7 @@ export default function ConsolePage() {
   }
 
   function addTerminators(lines: string[]) : string[]{
-    return lines.map(l=>l.trimEnd().endsWith(';')? l : l+";");
+    return lines.map(l=> (l.trimEnd().endsWith(';') || l.trim().length == 0 || l.trim().startsWith("//"))? l : l+";");
   }
 
   useEffect(() => {
@@ -42,13 +42,11 @@ export default function ConsolePage() {
         { token: "string", foreground: "23d18b" }, // States
         { token: "variable", foreground: "3b8eea" }, // Read and written symbol
         { token: "delimiter", foreground: "a31515" },
-        { token: "invalid", foreground: "fc0303" }, // q1,a,q2,b,S
+        { token: "invalid", foreground: "fc0303" }, 
       ],
       colors: {},
     });
     monacoInstance.editor.setTheme("tm-theme");
-
-    // Language + tokens
     monacoInstance.languages.register({ id: LANGUAGE_ID });
 
     const reComment = /\/\/.*/;
@@ -69,7 +67,7 @@ export default function ConsolePage() {
       tokenizer: {
         root: [
           [reComment, "comment"],
-          [reState, "string", "afterCurrentState"], // STATE_BEFORE
+          [reState, "string", "afterCurrentState"], 
         ],
 
         whitespace: [
@@ -79,7 +77,6 @@ export default function ConsolePage() {
 
         newline: [[/\r?\n/, "", "@popall"]],
 
-        // STATE_BEFORE , READS...
         afterCurrentState: [
           [reTerm, { token: "delimiter", next: "@popall" }],
           { include: "@newline" },
@@ -87,7 +84,6 @@ export default function ConsolePage() {
           [reSep1, "delimiter", "expectsReads"],
         ],
 
-        // READS LIST: sym (sep1 sym)* ... until SEP2
         expectsReads: [
           [reTerm, { token: "delimiter", next: "@popall" }],
           { include: "@newline" },
@@ -99,19 +95,17 @@ export default function ConsolePage() {
           [reTerm, { token: "delimiter", next: "@popall" }],
           { include: "@newline" },
           { include: "@whitespace" },
-          [reSep1, "delimiter", "expectsReads"], // kolejny read
-          [reSep2, "constant", "afterSep2"], // koniec reads → SEP2
+          [reSep1, "delimiter", "expectsReads"],
+          [reSep2, "constant", "afterSep2"], 
         ],
 
-        // SEP2 STATE_AFTER
         afterSep2: [
           [reTerm, { token: "delimiter", next: "@popall" }],
           { include: "@newline" },
           { include: "@whitespace" },
-          [reState, "string", "afterNextState"], // STATE_AFTER
+          [reState, "string", "afterNextState"], 
         ],
 
-        // STATE_AFTER , WRITES...
         afterNextState: [
           [reTerm, { token: "delimiter", next: "@popall" }],
           { include: "@newline" },
@@ -119,7 +113,6 @@ export default function ConsolePage() {
           [reSep1, "delimiter", "expectsWrites"],
         ],
 
-        // WRITES LIST: sym (sep1 sym)* ... ale gdy po sep1 zaczyna się akcja → przełącz na moves
         expectsWrites: [
           [reTerm, { token: "delimiter", next: "@popall" }],
           { include: "@newline" },
@@ -134,16 +127,15 @@ export default function ConsolePage() {
           [reSep1, "delimiter", "afterWritesSep1"],
         ],
 
-        // Po sep1: albo zaczyna się move (action), albo kolejny write (symbol)
+       
         afterWritesSep1: [
           [reTerm, { token: "delimiter", next: "@popall" }],
           { include: "@newline" },
           { include: "@whitespace" },
-          [reAction, "function", "maybeMoreMoves"], // start MOVES
-          [reSymbol, "variable", "maybeMoreWrites"], // nadal WRITES
+          [reAction, "function", "maybeMoreMoves"], 
+          [reSymbol, "variable", "maybeMoreWrites"], 
         ],
 
-        // MOVES LIST: action (sep1 action)*
         expectsMoves: [
           [reTerm, { token: "delimiter", next: "@popall" }],
           { include: "@newline" },
@@ -177,20 +169,17 @@ export default function ConsolePage() {
     const listN = (x: string) =>
       `\\s*${x}\\s*(?:${s1}\\s*${x}\\s*){${Math.max(tapesAmount - 1, 0)}}`;
 
-    // pełny wzorzec linii:
-    // stateBefore s1 [reads] s2 stateAfter s1 [writes] s1 [moves]
+
     const re = new RegExp(
   `^\\s*` +
     `(?<stateBefore>(?:(?!${s1}|\\n).)+)` +
     `\\s*${s1}` +
     `(?<reads>${listN(sym)})` +
     `\\s*${s2}\\s*` +
-    `(?<stateAfter>(?:(?!${s1}|\\n).)+)` +
-    `\\s*${s1}` +
+    `(?<stateAfter>(?:(?!${s1}|\\n).)+)` + `\\s*${s1}` +
     `(?<writes>${listN(sym)})` +
     `\\s*${s1}` +
-    `(?<moves>${listN(act)})` +
-    `\\s*;\\s*$`
+    `(?<moves>${listN(act)})` +`\\s*;\\s*$`
 );
 
     lines.forEach((rawLine, i) => {
@@ -201,7 +190,7 @@ export default function ConsolePage() {
       if (!m) {
         markers.push({
           severity: monacoLib.MarkerSeverity.Error,
-          message: `Niepoprawna składnia lub niewłaściwa liczba pól (oczekiwano ${tapesAmount} r/w/m).`,
+          message: `Incorrect syntax`,
           startLineNumber: i + 1,
           startColumn: 1,
           endLineNumber: i + 1,
@@ -210,7 +199,6 @@ export default function ConsolePage() {
         return;
       }
 
-      // Rozbij „listy” po sep1 i sprawdź liczbę elementów + długość symboli
       const splitBySep1 = (s: string) =>
         s
           .split(new RegExp(`\\s*${s1}\\s*`))
@@ -221,52 +209,6 @@ export default function ConsolePage() {
       const writesRaw = splitBySep1(m.groups!.writes);
       const movesRaw = splitBySep1(m.groups!.moves);
 
-      if (
-        readsRaw.length !== tapesAmount ||
-        writesRaw.length !== tapesAmount ||
-        movesRaw.length !== tapesAmount
-      ) {
-        markers.push({
-          severity: monacoLib.MarkerSeverity.Error,
-          message: `Liczba elementów (r/w/m) musi wynosić dokładnie ${tapesAmount}.`,
-          startLineNumber: i + 1,
-          startColumn: 1,
-          endLineNumber: i + 1,
-          endColumn: rawLine.length + 1,
-        });
-        return;
-      }
-
-      // symbole muszą być 1-znakowe
-      const badSymIdx = [...readsRaw, ...writesRaw].findIndex(
-        (s) => s.length !== 1
-      );
-      if (badSymIdx !== -1) {
-        markers.push({
-          severity: monacoLib.MarkerSeverity.Error,
-          message: "Symbole r/w muszą mieć dokładnie 1 znak.",
-          startLineNumber: i + 1,
-          startColumn: 1,
-          endLineNumber: i + 1,
-          endColumn: rawLine.length + 1,
-        });
-        return;
-      }
-
-      // ruchy muszą odpowiadać aliasom
-      const moveOk = new RegExp(`^${act}$`);
-      const badMove = movesRaw.find((mv) => !moveOk.test(mv));
-      if (badMove) {
-        markers.push({
-          severity: monacoLib.MarkerSeverity.Error,
-          message: `Nieprawidłowy ruch '${badMove}'. Dozwolone: ${left}, ${stay}, ${right}.`,
-          startLineNumber: i + 1,
-          startColumn: 1,
-          endLineNumber: i + 1,
-          endColumn: rawLine.length + 1,
-        });
-        return;
-      }
     });
 
     monacoLib.editor.setModelMarkers(model, "tm-validator", markers);

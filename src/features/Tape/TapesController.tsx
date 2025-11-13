@@ -109,6 +109,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   }
 
 
+
   function setAllIsAnimating(value: boolean){
     setIsAnimating(prev=>prev.map(()=>value));
   }
@@ -488,12 +489,33 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     height: `${cellPx + 2 * 8}px`,
   };
 
+  function getCurrentState(){
+    if(simulation==null || simulation.steps == null || simulation.steps[0] == null) return "";
+    else return stepRef.current===simulation.steps[0].length? simulation.steps[0][simulation.steps[0].length-1].stateAfter : stateRef.current
+  }
+
+  function getCurrentOutput(stepId: number){
+    if(simulation==null || simulation.steps == null || simulation.steps[0] == null) return "";
+    const isLastStep = stepId === stepsAmount();
+    if(isLastStep){
+      if(simulation.steps[0][simulation.steps[0].length-1].stateAfter === acceptState){
+        return "Accept";
+      }else if(simulation.steps[0][simulation.steps[0].length-1].stateAfter === rejectState){
+        return "Reject";
+      }else{
+        return "Reject";
+      }
+    }else{
+      return "";
+    }
+  }
+
+
   return (
     <div className="simulation-interface">
-      {/* shows current state, steps, and output */}
       <div className="SimulationData">
-        <p>State: {stepRef.current===simulation.steps[0].length? simulation.steps[0][simulation.steps[0].length-1].stateAfter : stateRef.current}</p>
-        <p>Output: {outputRef.current}</p>
+        <p>State: {getCurrentState()}</p>
+        {<p>Output: {getCurrentOutput(stepRef.current)}</p>}
         <p>Step: {stepRef.current ?? ""}</p>
       </div>
 
@@ -605,9 +627,9 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
             <ChevronRightIcon/>
           </button>
         
-          <button className={`ToEndButton tooltip SimulationControlsButton ${!isSimulationLoaded || (stepRef.current === stepsAmount()-1)? "DisabledButton" : ""}`}
-           disabled={!isSimulationLoaded || (stepRef.current === stepsAmount()-1)} onClick={()=>jumpToSimulation(stepsAmount()-1)}
-            data-tooltip={!isSimulationLoaded? "Simulation not loaded" : (stepRef.current === stepsAmount()-1)? "Already at the end" :  "Jump to the end"} >
+          <button className={`ToEndButton tooltip SimulationControlsButton ${!isSimulationLoaded || (stepRef.current >= stepsAmount())? "DisabledButton" : ""}`}
+           disabled={!isSimulationLoaded || (stepRef.current >= stepsAmount())} onClick={()=>jumpToSimulation(stepsAmount()-1)}
+            data-tooltip={!isSimulationLoaded? "Simulation not loaded" : (stepRef.current >= stepsAmount())? "Already at the end" :  "Jump to the end"} >
             <ChevronDoubleRightIcon/>
           </button>
         </div>

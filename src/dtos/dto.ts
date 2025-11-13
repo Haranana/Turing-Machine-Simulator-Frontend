@@ -7,35 +7,49 @@ import {useSimulationInput} from "../features/GlobalData/simulationInput.tsx"
 import { useSpecialStates } from "../features/GlobalData/specialStates.tsx";
 import { toast } from 'react-hot-toast';
 
-function localCodeToGlobal(codeLines: string[] , sep1:string, left:string, right:string, stay:string, tapesAmount: number){
+function localCodeToGlobal(
+  codeLines: string[],
+  sep1: string,
+  left: string,
+  right: string,
+  stay: string,
+  tapesAmount: number
+) {
   const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const sep1Re = new RegExp(`\\s*${esc(sep1)}\\s*`);
   const mapMove = (tok: string) => {
     const t = tok.trim();
     if (t === "LEFT" || t === "RIGHT" || t === "STAY") return t;
-    if (t === left)  return "LEFT";
+    if (t === left) return "LEFT";
     if (t === right) return "RIGHT";
-    if (t === stay)  return "STAY";
-    return t; 
+    if (t === stay) return "STAY";
+    return t;
   };
 
-  return codeLines.map((line) => {
+  return codeLines.reduce<string[]>((acc, line) => {
     const m = line.match(/\/\/.*$/);
-    const comment = m ? m[0] : "";
     const code = m ? line.slice(0, m.index) : line;
 
+    if (code.trim().length === 0) {
+      return acc;
+    }
+
     const tokens = code.split(sep1Re);
-    if (tokens.length === 0) return line;
-    
+    if (tokens.length === 0) {
+      return acc;
+    }
+
     const N = Math.min(tapesAmount, tokens.length);
     for (let i = tokens.length - N; i < tokens.length; i++) {
       if (i >= 0) tokens[i] = mapMove(tokens[i]);
     }
 
     const rebuilt = tokens.join(` ${sep1} `);
-    return rebuilt + comment;
-  });
+    acc.push(rebuilt);
+    return acc;
+  }, []);
 }
+
 
 const SendSimulationDtoSchema = z.object({
   initialState: z.string(),
@@ -122,8 +136,8 @@ export async function sendSimulation(obj: SimulationExport) {
   });
 
    if (!res.ok) {
-    toast.error(`Simulation couldn't be loaded\n${res.status} ${res.statusText}\n${res.text}`);
-    throw new Error(`HTTP ${res.status} ${res.statusText}\n${res.text}`);
+    //toast.error(`Simulation couldn't be loaded\n${res.status} ${res.statusText}`);
+    throw new Error(`HTTP ${res.status} ${res.statusText}`);
   }
 
   const response = await res.json();
