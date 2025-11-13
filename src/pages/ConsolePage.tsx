@@ -25,7 +25,7 @@ export default function ConsolePage() {
   }
 
   function addTerminators(lines: string[]) : string[]{
-    return lines.map(l=>l.trimEnd().endsWith(':')? l : l+";");
+    return lines.map(l=>l.trimEnd().endsWith(';')? l : l+";");
   }
 
   useEffect(() => {
@@ -317,7 +317,7 @@ export default function ConsolePage() {
         }}
         className="code-editor"
         defaultLanguage={LANGUAGE_ID}
-        value={ addTerminators(codeLines).join("\n")}
+        defaultValue={ addTerminators(codeLines).join("\n")}
         height="90vh"
         width="90vw"
         theme="tm-theme"

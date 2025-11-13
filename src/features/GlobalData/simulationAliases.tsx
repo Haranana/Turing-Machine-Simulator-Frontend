@@ -12,8 +12,6 @@ export type AliasesFields = {
 
 export type SimulationAliases = AliasesFields & {
   setSimulationAliases: (values:AliasesFields) => void;
-
-  //keyof so k is string in union: "sep1" | "sep2" | "left" | "stay" | "right"
   setSimulationAlias: (k: keyof AliasesFields, v: string) => void;
 }
 

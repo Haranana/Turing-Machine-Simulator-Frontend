@@ -32,6 +32,49 @@ export type PageableQuery = {
   sort?: SortSpec[]; //ex. [{ property: "createdAt", direction: "desc" }]
 };
 
+export type TuringMachineSaveDto = {
+
+    name : string;
+    description: string;
+    program: string;
+
+    initialState: string;
+    acceptState: string;
+    rejectState: string;
+
+    blank: string;
+    sep1: string;
+    sep2: string;
+    moveRight: string;
+    moveLeft: string;
+    moveStay: string;
+
+    tapesAmount: number;
+}
+
+export type TuringMachineEditDto = {
+    id: number;
+
+    name : string | null ; 
+    description: string | null;
+    program: string | null;
+
+    initialState: string | null;
+    acceptState: string | null;
+    rejectState: string | null;
+
+    blank: string | null;
+    sep1: string | null;
+    sep2: string | null;
+    moveRight: string | null;
+    moveLeft: string | null;
+    moveStay: string | null;
+
+    tapesAmount: number | null;
+}
+
+
+
 export type Page<T> = {
   content: T[];
   number: number;        //current page (starting with 0)
@@ -42,3 +85,8 @@ export type Page<T> = {
   last: boolean;
   empty: boolean;
 };
+
+export type TmNameConfilctErrorBody = {
+  name: string,
+  id: number,
+}

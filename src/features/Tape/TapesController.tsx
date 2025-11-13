@@ -125,49 +125,59 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     setInputFieldVisibility((prev)=>prev.map((v,i)=>i === id ? !v : v));
   }
 
-  function updateTape(){
-   
-    for(let i=0; i<tapesAmount; i++){
+  function updateTape() {
+  for (let i = 0; i < tapesAmount; i++) {
+    const currentStep = stepRef.current;
+    const currentStepDir = stepDirRef.current;
 
-      const currentStep = stepRef.current;
-      const currentStepDir = stepDirRef.current;
-      const writtenChar = simulation.steps[i][currentStep].writtenChar;
+    // skąd czytać krok: przy cofaniu bierz poprzedni
+    const readIndex = currentStepDir === -1 ? currentStep - 1 : currentStep;
 
-      //Jesli robimy krok wstecz to bierzemy akcje z poprzedniego kroku i ja odwracamy
-      let currentAction = currentStepDir === -1? simulation.steps[i][currentStep-1].action : simulation.steps[i][currentStep].action;
-      if(currentStepDir === -1){
-        if(currentAction === "LEFT"){
-          currentAction = "RIGHT";
-        }else if(currentAction === "RIGHT"){
-          currentAction = "LEFT";
-        }
-      }
+    // strażnik na brzegach – nic nie rób, jeśli poza zakresem
+    if (readIndex < 0 || readIndex >= stepsAmount()) continue;
 
-      const currentTapeState = currentStepDir === -1?  simulation.steps[i][currentStep-1].tapeBefore : simulation.steps[i][currentStep].tapeBefore;
+    const stepData = simulation.steps[i][readIndex];
 
-      const stepDirToAnimationType = (stepDir:number)=> {
-        switch(stepDir){
-          case 0:{ return "none";}
-          case 1:{ return "normal";}
-          case -1:{ return "reverse";}
-          default:{return "none";}
-        }
-      }
-      const newAnimationType: AnimationType = stepDirToAnimationType(currentStepDir);
-      setIsAnimating(prev=>prev.map((val,id)=>id===i? true : val));
-      setTapeData(prev=>prev.map((val,id)=>id===i? {
-          tapeId: i,
-          tapeState: currentTapeState,
-          writtenChar: writtenChar, 
-          action : currentAction,
-          animationType: newAnimationType,
-          radius: tapeRadiusRef.current,
-          cellPx: cellSizeRef.current,
-          animateMs: animationSpeedRef.current,
-          callAfterAnimation: handleAnimEnd,
-      } : val));
+    // akcja do animacji (+ ewentualne odwrócenie dla reverse)
+    let currentAction = stepData.action;
+    if (currentStepDir === -1) {
+      if (currentAction === "LEFT") currentAction = "RIGHT";
+      else if (currentAction === "RIGHT") currentAction = "LEFT";
+      // STAY bez zmian
     }
+
+    const writtenChar = stepData.writtenChar;
+    const currentTapeState = stepData.tapeBefore;
+
+    const stepDirToAnimationType = (dir: number): AnimationType => {
+      switch (dir) {
+        case 1: return "normal";
+        case -1: return "reverse";
+        default: return "none";
+      }
+    };
+    const newAnimationType = stepDirToAnimationType(currentStepDir);
+
+    setIsAnimating(prev => prev.map((val, id) => (id === i ? true : val)));
+    setTapeData(prev =>
+      prev.map((val, id) =>
+        id === i
+          ? {
+              tapeId: i,
+              tapeState: currentTapeState,
+              writtenChar,
+              action: currentAction,
+              animationType: newAnimationType,
+              radius: tapeRadiusRef.current,
+              cellPx: cellSizeRef.current,
+              animateMs: animationSpeedRef.current,
+              callAfterAnimation: handleAnimEnd,
+            }
+          : val
+      )
+    );
   }
+}
 
   async function loadSimulation(){
 
@@ -343,6 +353,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       stateRef.current = simulation.steps[0][currentStep+1].stateBefore;
     }else{
       setIsPlaying(false);
+      stepRef.current = currentStep + 1;
     }
       
   }, [isPlaying, isAnimating]); 
@@ -360,6 +371,8 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     if(!isEndingStep(currentStep)){
       stepRef.current=currentStep+1;
       stateRef.current = simulation.steps[0][currentStep+1].stateBefore;
+    }else {
+    stepRef.current = currentStep + 1;
     }
   }
 
@@ -479,7 +492,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     <div className="simulation-interface">
       {/* shows current state, steps, and output */}
       <div className="SimulationData">
-        <p>State: {stateRef.current}</p>
+        <p>State: {stepRef.current===simulation.steps[0].length? simulation.steps[0][simulation.steps[0].length-1].stateAfter : stateRef.current}</p>
         <p>Output: {outputRef.current}</p>
         <p>Step: {stepRef.current ?? ""}</p>
       </div>
@@ -586,9 +599,9 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
             <StopIcon />
           </button>
 
-          <button className={`StepForwardButton tooltip SimulationControlsButton ${!isSimulationLoaded || (stepRef.current === stepsAmount()-1)? "DisabledButton" : ""}`} 
-          disabled={!isSimulationLoaded || (stepRef.current === stepsAmount()-1)} onClick={doNextSimulationStep}
-          data-tooltip={!isSimulationLoaded? "Simulation not loaded" : (stepRef.current === stepsAmount()-1)? "Cannot step forward" :  "Next step"}>
+          <button className={`StepForwardButton tooltip SimulationControlsButton ${!isSimulationLoaded || (stepRef.current >= stepsAmount())? "DisabledButton" : ""}`} 
+          disabled={!isSimulationLoaded || (stepRef.current >=stepsAmount())} onClick={doNextSimulationStep}
+          data-tooltip={!isSimulationLoaded? "Simulation not loaded" : (stepRef.current >= stepsAmount())? "Cannot step forward" :  "Next step"}>
             <ChevronRightIcon/>
           </button>
         

@@ -2,14 +2,20 @@ import { useSimulationProgram } from "../../features/GlobalData/simulationProgra
 import {useSpecialStates} from "../../features/GlobalData/specialStates"
 import { useSimulationAliases } from "../../features/GlobalData/simulationAliases";
 import { useSimulationInput } from "../GlobalData/simulationInput";
+import { useLoadedTmData } from "../GlobalData/loadedTmData";
 import { useContext, useState } from "react";
 import { AccountDataContext } from "./AccountDataContext";
-import { PencilSquareIcon } from "@heroicons/react/24/solid";
+import { ChevronDownIcon, ChevronRightIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
 import { useApiFetch } from "../../api/util";
 import { toast } from 'react-hot-toast';
+import { boolean } from "zod";
+import type { TmNameConfilctErrorBody } from "./AccountDataTypes";
+import Modal from "../Modal/Modal";
+import type { TuringMachineEditDto, TuringMachineSaveDto, TuringMachineGetDto } from "./AccountDataTypes";
 
+type inputProp = {tm: TuringMachineGetDto}
 
-export default function SaveTuringMachine(){
+export default function SaveTuringMachine(props: inputProp){
     const accountData = useContext(AccountDataContext);
     const apiFetch = useApiFetch();
     const {codeLines, setCodeLines} = useSimulationProgram();
@@ -19,6 +25,11 @@ export default function SaveTuringMachine(){
     const [newTuringMachineDescription , setNewTuringMachineDescription] = useState<string>("");
     const [initialValidationPassed, setInitialValidationPassed] = useState<boolean>(false);
     const {simulationTapesAmount} = useSimulationInput();
+    const {loadedTmId} = useLoadedTmData();
+
+    const [isSaveTmModalOpen, setSaveTmModalOpen] = useState<boolean>(false);
+    const [tmToOverwrite, setTmToOverwrite] = useState<{id: number, name: string}|null>(null);
+    const [saveAsDashboardButtonPressed, setSaveAsDashboardButtonPressed] = useState<boolean>(false);
 
     function isAccountDataLoaded(){
         return accountData!=null&& accountData.id != null && accountData.email != null && accountData.status != null && accountData.createdAt != null;
@@ -29,25 +40,26 @@ export default function SaveTuringMachine(){
         accountData.id != null && accountData.email != null && accountData.status != null && accountData.createdAt != null ? setInitialValidationPassed(true) : setInitialValidationPassed(false);
     }
 
-    async function handleSubmit(e: React.MouseEvent){
-        //e.preventDefault();
-        const sendBody = {
-            name: newTuringMachineName,
-            description: newTuringMachineDescription,
-            program: codeLines.join("\n"),
-            initialState: initialState,
-            acceptState: acceptState,
-            rejectState: rejectState,
-            blank: blank,
-            sep1: sep1,
-            sep2: sep2,
-            moveRight: right,
-            moveLeft: left,
-            moveStay: stay,
-            tapesAmount: simulationTapesAmount,
+ 
+
+    async function handleSaveAs(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
+        e.preventDefault();
+         const sendBody = {
+                    name: newTuringMachineName,
+                    description: newTuringMachineDescription,
+                    program: codeLines.join("\n"),
+                    initialState: initialState,
+                    acceptState: acceptState,
+                    rejectState: rejectState,
+                    blank: blank,
+                    sep1: sep1,
+                    sep2: sep2,
+                    moveRight: right,
+                    moveLeft: left,
+                    moveStay: stay,
+                    tapesAmount: simulationTapesAmount,
                 };
         try{
-            console.log(`sent: ${sendBody} | location: http://localhost:9090/api/tm`);
             const res = await apiFetch("http://localhost:9090/api/tm" , {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -57,17 +69,79 @@ export default function SaveTuringMachine(){
             });
             if(res.status == 200 || res.status == 201){
                 toast.success(`Turing Machine saved successfully`);
-            }else{
+            }else if(res.status == 409){
+                const pd = await res.json(); 
+                setTmToOverwrite({ id: pd.existingId, name: pd.name });
+            }
+            else{
                 toast.error(`Turing Machine couldn't be saved\n${res.status} ${res.statusText}\n${res.text}`);
             }
         }catch(e: any){
-            toast.error(`Error: Turing Machine couldn't be saved\n${e}`);
-           // console.log("exception while saving machine has occured: ", e);
+             toast.error(`Turing Machine couldn't be saved\n${e.text}`);
+        }
+
+    }
+
+    async function handleSave(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
+        e.preventDefault()
+        //if tmToOverwrite is not null then we overwrite some tm, otherwise use id of lastly loaded tm
+        //otherwise there's not any tm loaded, so error (just probably route to save as in the future)
+        let tmToSaveId: number = 0;
+        if(tmToOverwrite != null){
+            tmToSaveId = tmToOverwrite.id;
+        }else if(loadedTmId != null){
+            tmToSaveId = loadedTmId;
+        }else{
+              toast.error(`No Turing Machine Loaded\nuse Save as to create new one!`);
+              return;
+        }
+
+        const sendBody : TuringMachineEditDto = {
+            
+                    id: tmToSaveId, 
+                    name: newTuringMachineName,
+                    description: newTuringMachineDescription,
+                    program: codeLines.join("\n"),
+                    initialState: initialState,
+                    acceptState: acceptState,
+                    rejectState: rejectState,
+                    blank: blank,
+                    sep1: sep1,
+                    sep2: sep2,
+                    moveRight: right,
+                    moveLeft: left,
+                    moveStay: stay,
+                    tapesAmount: simulationTapesAmount,
+                };
+        try{
+            const res = await apiFetch("http://localhost:9090/api/tm" , {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(
+                    sendBody
+                )
+            });
+            if(res.status == 200 ){
+                toast.success(`Turing Machine saved successfully`);
+            }
+            else{
+                toast.error(`Turing Machine couldn't be saved\n${res.status} ${res.statusText}\n${res.text}`);
+            }
+        }catch(e: any){
+             toast.error(`Turing Machine couldn't be saved\n${e.text}`);
         }
     }
 
-    return <div className="AccountPageSubpage SaveTuringMachineSubpage">
-        {isAccountDataLoaded()?
+    return <>
+    <div className="AccountPageSubpage SaveTuringMachineSubpage">
+        <div className="SaveTmSubpageDashboard">
+            <button className={`SaveTmDashboardButton SaveTmDashboardSaveAsButton`} onClick={()=>setSaveAsDashboardButtonPressed(!saveAsDashboardButtonPressed)}>
+                Save As
+                {saveAsDashboardButtonPressed? <ChevronRightIcon className="saveTmDashboardIcon"></ChevronRightIcon> : <ChevronDownIcon className="saveTmDashboardIcon"></ChevronDownIcon>}
+            </button>
+            <button className={`SaveTmDashboardButton SaveTmDashboardSaveButton ${loadedTmId==null? "" : "DisabledButton"}`} disabled={loadedTmId==null} onClick={e=>handleSave(e)}>Save </button>
+        </div>
+        {isAccountDataLoaded() && saveAsDashboardButtonPressed?
          <form className="SaveTuringMachineForm">
             <label className="AccountInputFieldLabel">
             <textarea rows={1} className="TmNameInput AccountInputField"
@@ -82,11 +156,27 @@ export default function SaveTuringMachine(){
               maxLength={255}>
             </textarea>
                 </label>
-            <button className={`AccountPageSaveFormButton ${initialValidationPassed? "" : "DisabledButton"}`} disabled={!initialValidationPassed} onClick={handleSubmit}>Save<PencilSquareIcon/></button>
+            <button className={`AccountPageSaveFormButton ${initialValidationPassed? "" : "DisabledButton"}`}
+             disabled={!initialValidationPassed} onClick={e=>handleSaveAs(e)}>Save as<PencilSquareIcon/></button>
         </form>
         :
-        "Account data not loaded :("
+        ""
         }
 
     </div>
+    <Modal open={isSaveTmModalOpen} onClose={()=>{setSaveTmModalOpen(false); setTmToOverwrite(null)}}>
+                    <div className="ModalTextWrapper OverwriteTmModalTextWrapper">
+                        <h2>overwrite {newTuringMachineName} ?</h2>
+                        <p>Turing machine named {newTuringMachineName} already exists, would you like to overwrite it?
+                            You will Not be able to restore old Turing Machine once it's saved over.
+                        </p>
+                    </div>
+                    <div className="ModalButtonsWrapper OverwriteTmModalButtonsWrapper">
+                        <button className="ModalButton OverwriteTmModalButton OverwriteTmModalDeleteButton" 
+                        onClick={(e)=>{handleSave(e);setSaveTmModalOpen(false)}}>Overwrtie</button>
+                        <button className="ModalButton DeleteTmModalButton DeleteTmModalCancelButton" 
+                        onClick={()=>setSaveTmModalOpen(false)}>Cancel</button>
+                    </div>
+    </Modal>
+    </>
 }
