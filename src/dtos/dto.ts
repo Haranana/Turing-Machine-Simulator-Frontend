@@ -95,6 +95,43 @@ export const CreatedSimulationSchema = z.object({
 });
 export type ReceiveSimulationDto = z.infer<typeof CreatedSimulationSchema>;
 
+export const NdTmStepSchema = z.object({
+  tapeIndex: z.number(),        
+  stepId: z.number(),             
+  transitionAction: TransitionActionSchema,
+  readChar: z.string().min(1).max(1),
+  writtenChar: z.string().min(1).max(1),
+  stateBefore: StateNameSchema,         
+  stateAfter: StateNameSchema,          
+  tapeBefore: TapeStateSchema,    
+});
+
+export type NdTmStepDto = z.infer<typeof NdTmStepSchema>;
+
+export const NdTreeNodeSchema = z.object({
+  id: z.number(),
+  edgeIds: z.array(z.number()),
+});
+
+export type NdTreeNodeDto = z.infer<typeof NdTreeNodeSchema>;
+
+export const NdTreeEdgeSchema = z.object({
+  id: z.number(),
+  tapesId: z.number(),
+  steps: z.array(z.array(NdTmStepSchema)), // NdTmStep[][]
+  startNodeId: z.number(),
+  endNodeId: z.number(),
+});
+
+export type NdTreeEdgeDto = z.infer<typeof NdTreeEdgeSchema>;
+
+export const NdTmReturnDtoSchema = z.object({
+  nodeList: z.array(NdTreeNodeSchema),
+  edgeList: z.array(NdTreeEdgeSchema),
+});
+
+export type NdTmReturnDto = z.infer<typeof NdTmReturnDtoSchema>;
+
 export function buildSimulationExport(): SimulationExport{
   const { codeLines } = useSimulationProgram.getState();
   const { sep1, sep2, blank, left, right, stay } = useSimulationAliases.getState();
@@ -145,6 +182,39 @@ export async function sendSimulation(obj: SimulationExport) {
   return CreatedSimulationSchema.parse(response); 
 
 }
+
+export async function sendNdSimulation(obj: SimulationExport) {
+  const result = SendSimulationDtoSchema.safeParse(obj);
+  console.log("result: ", result);
+  console.log("parsing obj: " , obj);
+  if (!result.success) {
+    const issues = result.error.issues.map(i => `${i.path.join(".")}: ${i.message}`);
+    throw new Error("Validation failed:\n" + issues.join("\n"));
+  }
+
+  const dto : SendSimulationDto = result.data;
+
+  const payload = JSON.stringify(dto);
+
+  console.log("sent: ", payload);
+  const res = await fetch("http://localhost:9090/api/simulations/nd", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: payload,
+  });
+
+  console.log(await res.json());
+  if (!res.ok) {
+    //toast.error(`Simulation couldn't be loaded\n${res.status} ${res.statusText}`);
+    throw new Error(`HTTP ${res.status} ${res.statusText}`);
+  }
+
+  const response = await res.json();
+  //console.log("response: ", response);
+  return NdTmReturnDtoSchema.parse(response); 
+  
+}
+
 
 
 

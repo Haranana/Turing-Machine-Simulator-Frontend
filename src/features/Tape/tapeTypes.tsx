@@ -64,3 +64,29 @@ export type Phase = "idle" | "anim" | "snap";
 
 export type AnimationType = "normal" | "reverse" | "none" | "jump" //"none" in case of actions such as changing animation speed when none step should be taken
 
+export interface NdTmStep {
+  tapeIndex: number;
+  stepId: number;
+  transitionAction: TransitionAction;
+  readChar: string;
+  writtenChar: string;
+  state: State;
+}
+
+export interface NdTreeNode {
+  id: number;
+  edgeIds: number[];
+}
+
+export interface NdTreeEdge {
+  id: number;
+  tapesId: number;
+  steps: NdTmStep[][];
+  startNodeId: number;
+  endNodeId: number;
+}
+
+export interface NdTmReturnDto {
+  nodeList: NdTreeNode[];
+  edgeList: NdTreeEdge[];
+}

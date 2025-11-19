@@ -13,9 +13,8 @@ import type { TmNameConfilctErrorBody } from "./AccountDataTypes";
 import Modal from "../Modal/Modal";
 import type { TuringMachineEditDto, TuringMachineSaveDto, TuringMachineGetDto } from "./AccountDataTypes";
 
-type inputProp = {tm: TuringMachineGetDto}
 
-export default function SaveTuringMachine(props: inputProp){
+export default function SaveTuringMachine(){
     const accountData = useContext(AccountDataContext);
     const apiFetch = useApiFetch();
     const {codeLines, setCodeLines} = useSimulationProgram();

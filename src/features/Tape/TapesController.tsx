@@ -6,13 +6,16 @@ import { PlayIcon, PauseIcon, StopIcon,
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import type { Simulation ,TapeSymbol, TapeViewInput, SimulationStep, TapeInput, AnimationType, SimulationExport, TransitionAction } from "./tapeTypes.tsx";
 import {TapeComponent} from "./TapeComponent"
-import { buildSimulationExport, sendSimulation} from "../../dtos/dto.ts"
-import type {ReceiveSimulationDto} from "../../dtos/dto.ts" 
+import { buildSimulationExport, sendSimulation, sendNdSimulation} from "../../dtos/dto.ts"
+import type {NdTmStepDto, ReceiveSimulationDto} from "../../dtos/dto.ts" 
 import { useSimulationProgram } from "../GlobalData/simulationProgram.tsx"
 import {useSimulationInput} from "../GlobalData/simulationInput.tsx"
 import { useSpecialStates } from "../GlobalData/specialStates.tsx";
+import {NdSimulation} from '../Tape/Simulation.ts'
 import { number } from "zod";
 import { toast } from 'react-hot-toast';
+import { tr } from "zod/locales";
+import { ZodError } from "zod";
 
 
 export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
@@ -76,12 +79,15 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   const stepRef = useRef<number>(0);
 
   // simulation state (placeholder)
+  /*
   const [simulation , setSimulation] = useState<Simulation>({
     steps: [],
     startingState: initialState,
     acceptingState: acceptState,
     rejectingState: rejectState
-  });
+  });*/
+
+  const [simulation , setSimulation] = useState<NdSimulation | null>(null);
 
   const handleAnimEnd = useCallback((id: number) => {
     setIsAnimating(prev=>prev.map((v,i)=>i===id? false : v));
@@ -104,10 +110,9 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   //return 0 if simulation is not loaded USE IT!!!
   function stepsAmount(){
-    if(simulation.steps == undefined || simulation == undefined || simulation.steps[0] == undefined) return 0;
-    else return simulation.steps[0].length;
+    if(!isSimulationLoaded || simulation == null  || simulation == undefined ) return 0;
+    else return simulation.length;
   }
-
 
 
   function setAllIsAnimating(value: boolean){
@@ -127,24 +132,26 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   }
 
   function updateTape() {
+
+  if(simulation == null || !isSimulationLoaded) return;
+
+  const currentStep = stepRef.current;
+  const currentStepDir = stepDirRef.current;
+  
+  const readIndex = currentStepDir === -1 ? currentStep - 1 : currentStep;
+  if (readIndex < 0 || readIndex >= stepsAmount()) return;
+
+  const stepsData : NdTmStepDto[] | null = simulation.getSteps(readIndex);
+  if(stepsData == null) return;
+
   for (let i = 0; i < tapesAmount; i++) {
-    const currentStep = stepRef.current;
-    const currentStepDir = stepDirRef.current;
 
-    // skąd czytać krok: przy cofaniu bierz poprzedni
-    const readIndex = currentStepDir === -1 ? currentStep - 1 : currentStep;
-
-    // strażnik na brzegach – nic nie rób, jeśli poza zakresem
-    if (readIndex < 0 || readIndex >= stepsAmount()) continue;
-
-    const stepData = simulation.steps[i][readIndex];
-
-    // akcja do animacji (+ ewentualne odwrócenie dla reverse)
-    let currentAction = stepData.action;
+    const stepData = stepsData[i];
+    let currentAction = stepData.transitionAction;
     if (currentStepDir === -1) {
       if (currentAction === "LEFT") currentAction = "RIGHT";
       else if (currentAction === "RIGHT") currentAction = "LEFT";
-      // STAY bez zmian
+
     }
 
     const writtenChar = stepData.writtenChar;
@@ -196,6 +203,38 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     }
   }
 
+  async function loadNdSimulation(){
+
+        const simulationExport : SimulationExport = buildSimulationExport();
+    try{
+      //console.log("sent to API: ", simulationExport);
+      const simulationData = await sendNdSimulation(simulationExport);
+      //SchemaToSimulation(simulationData);
+      //setIsSimulationLoaded(true);
+      toast.success(`Simulation loaded successfully`);
+    }catch(err){
+       let msg="";
+        if (err instanceof ZodError) {
+          const issues = err.issues
+            .map(i => `${i.path.join(".")}: ${i.message}`)
+            .join("\n");
+          msg += "\n" + issues;
+        } else if (err instanceof Error) {
+          msg += "\n" + err.message;
+        } else {
+          msg += "\n" + String(err);
+        }
+
+      toast.error(`Error: simulation couldn't be loaded\n${msg}`);
+  
+      //console.log("Simulation Error, please try again");
+      setIsSimulationLoaded(false);
+    }
+  }
+
+
+  //TODO CALE PRZEROBIC!!!
+  /*
   function SchemaToSimulation(schema: ReceiveSimulationDto){
 
     console.log("got schema: ", schema);
@@ -236,14 +275,14 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
     setSimulation(newSimulation);
     stateRef.current = newSimulation.steps[0][0].stateBefore;
-  }
+  }*/
 
   const makeDefaultTapeInput = (id: number): TapeInput => ({
     tapeId: id,
     tapeState: { head: 0, tape: new Map(defaultTape) },
     writtenChar: null,
-    action: "STAY" as TransitionAction,        // albo TransitionAction.STAY jeśli to enum
-    animationType: "none" as AnimationType,    // j.w.
+    action: "STAY" as TransitionAction,        
+    animationType: "none" as AnimationType,    
     radius,
     cellPx,
     animateMs,
@@ -351,7 +390,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
     if(!isEndingStep(currentStep)){
       stepRef.current=currentStep+1;
-      stateRef.current = simulation.steps[0][currentStep+1].stateBefore;
+      stateRef.current = simulation?.getStep(currentStep+1 , 0)?.stateBefore ?? stateRef.current;
     }else{
       setIsPlaying(false);
       stepRef.current = currentStep + 1;
@@ -371,7 +410,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     updateTape();
     if(!isEndingStep(currentStep)){
       stepRef.current=currentStep+1;
-      stateRef.current = simulation.steps[0][currentStep+1].stateBefore;
+      stateRef.current = simulation?.getStep(currentStep+1 , 0)?.stateBefore ?? stateRef.current;
     }else {
     stepRef.current = currentStep + 1;
     }
@@ -387,7 +426,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
     updateTape();
     stepRef.current=currentStep-1;
-    stateRef.current = simulation.steps[0][currentStep-1].stateBefore;
+    stateRef.current = simulation?.getStep(currentStep-1 , 0)?.stateBefore ?? stateRef.current;
 
   }
 
@@ -438,15 +477,17 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   const resetSimulation = () => {
 
     setIsSimulationLoaded(false);
+    
     setSimulation({steps: [],
     startingState: initialState,
     acceptingState: acceptState,
     rejectingState: rejectState});
+
     setIsPlaying(false);
     setAllIsAnimating(false);
     stepRef.current = 0;
     stepDirRef.current = 0;
-    stateRef.current = simulation.startingState;
+    stateRef.current = initialState;
 
 
     setTapeData(prev =>
@@ -466,22 +507,70 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   }
 
   const jumpToSimulation = (step: number) => {
-    setIsPlaying(false);
-    setAllIsAnimating(false);
+  if(simulation == null || !isSimulationLoaded) return;
+  setIsPlaying(false);
+  setAllIsAnimating(false);
+
+  const total = stepsAmount();
+  
+
+  if (step < 0) step = 0;
+  if (step > total) step = total;
+
+  if (step < total) {
+    const currentStepData = simulation.getSteps(step);
+    if(currentStepData == null) return;
+
     stepRef.current = step;
-    stateRef.current = simulation.steps[0][step].stateBefore;
-    
-    setTapeData(prev=>prev.map((v,i)=>({
-      tapeState: simulation.steps[i][step].tapeBefore,
-      writtenChar: null,
-      action: null,
-      animationType: "jump",
-      radius: tapeRadiusRef.current,
-      cellPx: cellSizeRef.current,
-      animateMs: animationSpeedRef.current,
-      callAfterAnimation: handleAnimEnd,
-      tapeId: i,
-    })));
+    stateRef.current = currentStepData[0].stateBefore;
+
+    setTapeData(prev =>
+      prev.map((_, i) => ({
+        tapeId: i,
+        tapeState: currentStepData[i].tapeBefore,
+        writtenChar: null,
+        action: null,
+        animationType: "jump",
+        radius: tapeRadiusRef.current,
+        cellPx: cellSizeRef.current,
+        animateMs: animationSpeedRef.current,
+        callAfterAnimation: handleAnimEnd,
+      }))
+    );
+    return;
+  }
+
+
+  const lastIdx = total - 1;
+  if (lastIdx < 0) return; 
+
+  stepRef.current = total;
+
+  stateRef.current = simulation.getStep(lastIdx, 0)?.stateAfter ?? "";
+  
+  setTapeData(prev =>
+    prev.map((_, i) => {
+      const s = simulation.steps[i][lastIdx];
+      const newMap = new Map(s.tapeBefore.tape);
+      if (s.writtenChar != null) newMap.set(s.tapeBefore.head, s.writtenChar);
+
+      let newHead = s.tapeBefore.head;
+      if (s.action === "LEFT") newHead -= 1;
+      else if (s.action === "RIGHT") newHead += 1;
+
+      return {
+        tapeId: i,
+        tapeState: { tape: newMap, head: newHead },
+        writtenChar: null,
+        action: null,
+        animationType: "jump",
+        radius: tapeRadiusRef.current,
+        cellPx: cellSizeRef.current,
+        animateMs: animationSpeedRef.current,
+        callAfterAnimation: handleAnimEnd,
+      };
+    })
+  );
   };
 
   const viewportStyle: React.CSSProperties = {
@@ -579,11 +668,12 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       <div className="SimulationControls">
         <div className="JumpToControls">
           <input className="JumpToInput" type="number" min={0} 
-           max={Math.max(0, stepsAmount()-1)} 
+           max={Math.max(0, stepsAmount())} 
            placeholder="step" id="JumpToInput" name="JumpToInput"
             onChange={(e)=>{
-              e.target.value = (Math.min(parseInt(e.target.value), Math.max(0, stepsAmount()-1))).toString();
-              jumpToRef.current=parseInt(e.target.value)}}
+              e.target.value = (Math.min(parseInt(e.target.value), Math.max(0, stepsAmount()))).toString();
+              jumpToRef.current = parseInt(e.target.value);
+            }}
               >
           </input>
 
@@ -628,7 +718,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
           </button>
         
           <button className={`ToEndButton tooltip SimulationControlsButton ${!isSimulationLoaded || (stepRef.current >= stepsAmount())? "DisabledButton" : ""}`}
-           disabled={!isSimulationLoaded || (stepRef.current >= stepsAmount())} onClick={()=>jumpToSimulation(stepsAmount()-1)}
+           disabled={!isSimulationLoaded || (stepRef.current >= stepsAmount())} onClick={()=>jumpToSimulation(stepsAmount())}
             data-tooltip={!isSimulationLoaded? "Simulation not loaded" : (stepRef.current >= stepsAmount())? "Already at the end" :  "Jump to the end"} >
             <ChevronDoubleRightIcon/>
           </button>
@@ -643,7 +733,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       <div className="LoadSimulationContainer">
         <button className={`LoadSimulationButton ${isSimulationLoaded || hasErrors? "tooltip DisabledButton" : ""}`} 
         data-tooltip={isSimulationLoaded? "Discrad this simulation before loading new one" : hasErrors? "Resolve code errors before loading simulation" : "Unidentified error has occured"}
-          disabled={isSimulationLoaded} onClick={()=>loadSimulation()}>Load Simulation
+          disabled={isSimulationLoaded} onClick={()=>loadNdSimulation()}>Load Simulation
         </button>
       </div>
     </div>

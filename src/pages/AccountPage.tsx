@@ -13,7 +13,7 @@ import { ArrowRightStartOnRectangleIcon , ChevronUpIcon , ChevronDownIcon } from
 
 export default  function AccountPage() {
 
-    const [currentSubPage, setCurrentSubPage] = useState<"load" | "save" | "edit">("save");
+    const [currentSubPage, setCurrentSubPage] = useState<"load" | "save" | "edit">("load");
     const {logout} = useAuth();
     
     const apiFetch = useApiFetch();
