@@ -1,5 +1,5 @@
 import './page.css';
-import type { TapeState, TapeSymbol } from "../features/Tape/tapeTypes.tsx"
+import type { TapeState, TapeSymbol } from "../features/Tape/simulationTypes.tsx"
 import { TapesController } from '../features/Tape/TapesController.tsx';
 
 function prepData(){

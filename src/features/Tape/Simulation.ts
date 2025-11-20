@@ -1,244 +1,127 @@
-import { boolean } from 'zod';
+import { boolean, number } from 'zod';
 import type {ReceiveSimulationDto, NdTmStepDto, NdTreeEdgeDto, NdTreeNodeDto, NdTmReturnDto, NdTreeNodeSchema} from '../../dtos/dto'
+import type { SimulationNode, SimulationNodeMap, SimulationStep } from './simulationTypes';
 
-export type transitionInfo = {
-    stateBefore: string;
-    read: string[];
-    stateAfter: string;
-    write: string[];
-    actions: string[];
-}
-
-export type branchInfo = {
-    edgeId: number;
-    firstTransitionInfo: transitionInfo;
-}
-
-export type nodeInfo = {
-    edges: branchInfo[];
-    isLeaf: boolean
-}
 
 export class NdSimulation{
+
+    nodes: SimulationNodeMap; 
+    path: number[]; //IDs of all nodes on chosen path, does include root
+    branchings: number[]; //IDs of all branchings in simulation, useful for creating tree visual
+    branchChoices: Map<number, number | null> //which branch was chosen for nodes with multiple next nodes, <id of branching node, id of chosen next node>
     
-    nodeList: NdTreeNodeDto[];
-    edgeList: NdTreeEdgeDto[];
-    chosenBranches: Map<number, number | null>;
-    //length: number;
+    constructor(newNodes: SimulationNodeMap){
+       this.nodes = newNodes;
 
-    constructor(dto: NdTmReturnDto){
-        this.nodeList = dto.nodeList;
-        this.edgeList = dto.edgeList;
+       this.path = [];
 
-        this.chosenBranches = new Map();
-        this.nodeList.forEach((v,k)=>{
-             //if there's only one path from node (for example root in deterministic machine), its chosen automatically
-            if(v.edgeIds.length === 1) this.chosenBranches.set(k, v.edgeIds[0]);
-            else this.chosenBranches.set(k, null);
-        });
-
-        //length = this.length();
-    }
-
-    getNodeInfo(id: number) : nodeInfo{
-        
-        const nodeBranches = this.nodeList[id].edgeIds;
-        const isLeaf : boolean = nodeBranches.length === 0? true : false
-        
-        let nodeBranchInfos: branchInfo[] = [];
-
-        if(!isLeaf || nodeBranches.length == 0){    
-            nodeBranches.forEach((branch)=>{
-                let branchRead: string[] = [];
-                let branchWrite: string[] = [];
-                let branchActions: string[] = [];
-                let branchStateBefore: string;
-                let branchStateAfter: string;
-
-                branchStateBefore = this.edgeList[branch].steps[0][0].stateBefore;
-                branchStateAfter = this.edgeList[branch].steps[0][0].stateAfter;
-                this.edgeList[branch].steps.forEach(tape=>{
-                    branchRead.push(tape[0].readChar);
-                    branchWrite.push(tape[0].writtenChar);
-                    branchActions.push(tape[0].transitionAction);
-                });
-
-                const branchFirstTransitionInfo = {
-                    stateBefore: branchStateBefore,
-                    read: branchRead,
-                    stateAfter: branchStateAfter,
-                    write: branchWrite,
-                    actions: branchActions,
-                }
-                const branchId = branch;
-
-                nodeBranchInfos.push({
-                    firstTransitionInfo: branchFirstTransitionInfo,
-                    edgeId: branchId,
-                });
-            });
-        }
-        
-        return {
-            isLeaf: isLeaf,
-            edges: nodeBranchInfos,
-        }
-    }
-
-    useBranch(nodeId: number, branchId: number) : void{
-        this.chosenBranches.set(nodeId, branchId);
-    }
-
-    //returns nextStep of given step and given tape on chosen branches or null
-    nextStepOnBranch(stepId: number, tapeId: number) : NdTmStepDto | null{
-        return this.getStep(stepId, tapeId);
-    }
-
-    //returns nextSteps on all tapes of given step
-    nextStepsOnBranch(stepId: number) : NdTmStepDto[] | null{
-        return this.getSteps(stepId+1);
-    }
-
-    //returns step of given stepId and given tapeId on chosen branches or null
-    //stepId in this context refers to position of step on currently chosen branch
-    getStep(stepId: number, tapeId: number) : NdTmStepDto | null{
-
-        if(this.nodeList.length === 0) return null;
-        let stepCounter = -1;
-        let currentStepEdgeId : number;
-        let currentNode : NdTreeNodeDto = this.nodeList[0] ;
-        let currentEdge : NdTreeEdgeDto | null = null;
-        let atEdge : boolean = false; 
-        while(true){
-
-            if(!atEdge){
-                const nodeId = currentNode.id;
-                if(currentNode.edgeIds.length == 0) return null;
-
-                const chosenBranchId: number | null = this.chosenBranches.get(nodeId) ?? null;
-                if(chosenBranchId == null) return null;
-
-                currentEdge = this.edgeList[chosenBranchId]  
-                stepCounter++;
-                currentStepEdgeId = 0;              
-            }else{
-                if(currentEdge == null) return null;
-                const isLastStepOnEdge = currentStepEdgeId = currentEdge.steps[tapeId].length-1;
-                if(isLastStepOnEdge){
-                    currentNode = this.nodeList[currentEdge.endNodeId];  
-                }else{
-                    if(stepId=== stepCounter){
-                        return currentEdge.steps[tapeId][currentStepEdgeId];
-                    }else{
-                        currentStepEdgeId++;
-                        stepCounter++;
-                    }
-                }
+       this.branchings = [];
+       this.branchChoices = new Map();
+        this.nodes.forEach((v,_)=>{
+            if(v.nextIds.length > 1){
+                this.branchings.push(v.id);
+                this.branchChoices.set(v.id , null);
             }
-        }
+        })
+
+        this.updatePath();
     }
 
-    length() : number {
-        if(this.nodeList.length === 0) return 0;
-        let stepCounter = 0;
-        let currentStepEdgeId : number;
-        let currentNode : NdTreeNodeDto = this.nodeList[0] ;
-        let currentEdge : NdTreeEdgeDto | null = null;
-        let atEdge : boolean = false; 
+    //updates current path based on chosen branches;
+    //assumes that if nodes map is non-empty then it has a root with an id of 0
+    updatePath(){
+        this.path = [];
+        if(this.isEmpty()) return; 
+        
+        let currentNodeId: number = 0;
         while(true){
-            if(!atEdge){ //atNode
-                const nodeId = currentNode.id;
-                if(currentNode.edgeIds.length == 0) return Math.max(stepCounter, 0);
+            const currentNode : SimulationNode | undefined = this.nodes.get(currentNodeId); 
+            if(currentNode == undefined) return; //should never happen in theory but stays here as a safeguard
 
-                const chosenBranchId: number | null = this.chosenBranches.get(nodeId) ?? null;
-                if(chosenBranchId == null) return stepCounter;
-
-                currentEdge = this.edgeList[chosenBranchId]  
-                stepCounter++;
-                currentStepEdgeId = 0;              
-            }else{ //atEdge
-                
-                if(currentEdge == null) return stepCounter;
-                const isLastStepOnEdge = currentStepEdgeId = currentEdge.steps[0].length-1;
-
-                //entering Node
-                if(isLastStepOnEdge){
-                    currentNode = this.nodeList[currentEdge.endNodeId];  
-
-                //Continuing on edge
-                }else{  
-                        currentStepEdgeId++;
-                        stepCounter++;
-                }
-            }
-        }
-    }
-
-    //checks whether given step is last step on the branch
-    //in other words if step exists on branch and the node after him is leaf
-    //if given step is the last step for which simulation can be made (next node is not leaf but its edge is not decided)
-    //then given step is NOT the last
-    isLastStep(step: number): boolean{
-        if(this.isEmpty()) return false;
-
-        let currentEdge = this.chosenBranches.get(this.nodeList[0].id);
-        let stepCounter = 0;
-        while(true){
             
-            isLastInEdge: boolean;
-            isEnding
-        }
-    }
+            this.path.push(currentNode.id);
+            if(currentNode.nextIds.length === 1 ){ //normal node
+                currentNodeId = currentNode.nextIds[0];
+            }else if(currentNode.nextIds.length > 1){ //branching
+                const chosenBranch : number | null | undefined = this.branchChoices.get(currentNode.id);
 
-    //Simulation is considerer empty if it has no node or its root do not have any edge
-    isEmpty(): boolean{
-        return this.nodeList.length === 0 || this.nodeList[0].edgeIds.length === 0;
-    }
-    
-
-    //returns list of steps on all tapes with given id or null if not found/can't reach
-    getSteps(stepId: number) : NdTmStepDto[] | null {
-         if(this.nodeList.length === 0) return null;
-        let stepCounter = -1;
-        let currentStepEdgeId : number;
-        let currentNode : NdTreeNodeDto = this.nodeList[0] ;
-        let currentEdge : NdTreeEdgeDto | null = null;
-        let atEdge : boolean = false; 
-        while(true){
-
-            if(!atEdge){
-                const nodeId = currentNode.id;
-                if(currentNode.edgeIds.length == 0) return null;
-
-                const chosenBranchId: number | null = this.chosenBranches.get(nodeId) ?? null;
-                if(chosenBranchId == null) return null;
-
-                currentEdge = this.edgeList[chosenBranchId]  
-                stepCounter++;
-                currentStepEdgeId = 0;              
-            }else{
-                
-                if(currentEdge == null) return null;
-                const isLastStepOnEdge = currentStepEdgeId = currentEdge.steps[0].length-1;
-                if(isLastStepOnEdge){
-                    currentNode = this.nodeList[currentEdge.endNodeId];  
-
+                if(chosenBranch != null){
+                    currentNodeId = chosenBranch;
                 }else{
-                    if(stepId=== stepCounter){
-                        let result: NdTmStepDto[] = []
-                        for(let i = 0; i<currentEdge.steps.length; i++){
-                            result.push(currentEdge.steps[i][currentStepEdgeId]);
-                        }
-                        return result;
-                    }else{
-                        currentStepEdgeId++;
-                        stepCounter++;
-                    }
+                    break;
                 }
+            }else{ //leaf
+                break
             }
         }
-
     }
+
+    getStep(step: number, tapeId: number) : SimulationStep | null{
+        //actual step id in path array, 1 is added because user should not access the root 
+        //(which is stepless, so node 1 in path array actually stores step 0)
+        const stepId = step + 1;
+
+        if( !(stepId >=1 && stepId < this.path.length)) return null;
+
+        const steps : SimulationStep[] | null = this.nodes.get(this.path[stepId])==null? null : this.nodes.get(this.path[stepId])!.step; 
+        return steps == null? null : steps[tapeId];
+    }
+    
+    getSteps(step : number): SimulationStep[] | null{
+        const stepId = step + 1;
+        if( !(stepId >=1 && stepId < this.path.length)) return null;
+
+        const steps : SimulationStep[] | null = this.nodes.get(this.path[stepId])==null? null : this.nodes.get(this.path[stepId])!.step; 
+        return steps == null? null : steps;
+    }
+
+    getNextStep(step: number, tapeId: number) : SimulationStep | null{
+        const stepId = step + 2;
+        if( !(stepId >=1 && stepId < this.path.length)) return null;
+
+        const steps : SimulationStep[] | null = this.nodes.get(this.path[stepId])==null? null : this.nodes.get(this.path[stepId])!.step; 
+        return steps == null? null : steps[tapeId];
+    }
+
+    getNextSteps(step: number) : SimulationStep[] | null{
+        const stepId = step + 2;
+        if( !(stepId >=1 && stepId < this.path.length)) return null;
+
+        const steps : SimulationStep[] | null = this.nodes.get(this.path[stepId])==null? null : this.nodes.get(this.path[stepId])!.step; 
+        return steps == null? null : steps;
+    }
+
+    getPreviousStep(step: number, tapeId: number): SimulationStep | null{
+        const stepId = step;
+        if( !(stepId >=1 && stepId < this.path.length)) return null;
+
+        const steps : SimulationStep[] | null = this.nodes.get(this.path[stepId])==null? null : this.nodes.get(this.path[stepId])!.step; 
+        return steps == null? null : steps[tapeId];
+    }
+
+    getPreviousSteps(step: number): SimulationStep[] | null{
+        const stepId = step;
+        if( !(stepId >=1 && stepId < this.path.length)) return null;
+
+        const steps : SimulationStep[] | null = this.nodes.get(this.path[stepId])==null? null : this.nodes.get(this.path[stepId])!.step; 
+        return steps == null? null : steps;
+    }
+
+    //assuming API deletes empty root
+    isEmpty(): boolean{
+        return this.nodes.size === 0;
+    }
+
+    //includes root!
+    pathLength(): number{
+        return this.path.length;
+    }
+
+    //includes root!
+    length(): number{
+        return this.nodes.size;
+    }
+    
 }
 
 /*

@@ -1,6 +1,6 @@
 // dto.ts
 import { array, z } from "zod";
-import type { SimulationExport } from "../features/Tape/tapeTypes";
+import { SimulationNodesMapSchema, type SimulationExport } from "../features/Tape/simulationTypes.tsx";
 import { useSimulationProgram } from "../features/GlobalData/simulationProgram.tsx"
 import { useSimulationAliases } from "../features/GlobalData/simulationAliases.tsx";
 import {useSimulationInput} from "../features/GlobalData/simulationInput.tsx"
@@ -215,7 +215,36 @@ export async function sendNdSimulation(obj: SimulationExport) {
   
 }
 
+export async function createSimulationNodesMap(obj: SimulationExport) {
+  const result = SendSimulationDtoSchema.safeParse(obj);
+  console.log("result: ", result);
+  console.log("parsing obj: " , obj);
+  if (!result.success) {
+    const issues = result.error.issues.map(i => `${i.path.join(".")}: ${i.message}`);
+    throw new Error("Validation failed:\n" + issues.join("\n"));
+  }
 
+  const dto : SendSimulationDto = result.data;
+
+  const payload = JSON.stringify(dto);
+
+  console.log("sent: ", payload);
+  const res = await fetch("http://localhost:9090/api/simulations/nd", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: payload,
+  });
+
+  console.log(await res.json());
+  if (!res.ok) {
+    //toast.error(`Simulation couldn't be loaded\n${res.status} ${res.statusText}`);
+    throw new Error(`HTTP ${res.status} ${res.statusText}`);
+  }
+
+  const response = await res.json();
+  return SimulationNodesMapSchema.parse(response); 
+  
+}
 
 
 

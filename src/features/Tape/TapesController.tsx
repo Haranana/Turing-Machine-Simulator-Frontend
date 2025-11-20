@@ -4,7 +4,7 @@ import "./tape.css";
 import { PlayIcon, PauseIcon, StopIcon,
    ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronDownIcon, PlusIcon, MinusIcon } from "@heroicons/react/24/solid";
 import { useState, useRef, useMemo, useEffect, useCallback } from "react";
-import type { Simulation ,TapeSymbol, TapeViewInput, SimulationStep, TapeInput, AnimationType, SimulationExport, TransitionAction } from "./tapeTypes.tsx";
+import type { Simulation ,TapeSymbol, TapeViewInput, SimulationStep, TapeInput, AnimationType, SimulationExport, TransitionAction } from "./simulationTypes.tsx";
 import {TapeComponent} from "./TapeComponent"
 import { buildSimulationExport, sendSimulation, sendNdSimulation} from "../../dtos/dto.ts"
 import type {NdTmStepDto, ReceiveSimulationDto} from "../../dtos/dto.ts" 
@@ -547,16 +547,20 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   stepRef.current = total;
 
   stateRef.current = simulation.getStep(lastIdx, 0)?.stateAfter ?? "";
-  
+  const eachStepData = simulation.getSteps(lastIdx);
+  if(eachStepData == null) return;
+
   setTapeData(prev =>
     prev.map((_, i) => {
-      const s = simulation.steps[i][lastIdx];
+      //const s = simulation.steps[i][lastIdx];
+      const s = eachStepData[i];    
+    
       const newMap = new Map(s.tapeBefore.tape);
       if (s.writtenChar != null) newMap.set(s.tapeBefore.head, s.writtenChar);
 
       let newHead = s.tapeBefore.head;
-      if (s.action === "LEFT") newHead -= 1;
-      else if (s.action === "RIGHT") newHead += 1;
+      if (s.transitionAction === "LEFT") newHead -= 1;
+      else if (s.transitionAction === "RIGHT") newHead += 1;
 
       return {
         tapeId: i,
