@@ -1,7 +1,4 @@
-import { boolean, number } from 'zod';
-import type {ReceiveSimulationDto, NdTmStepDto, NdTreeEdgeDto, NdTreeNodeDto, NdTmReturnDto, NdTreeNodeSchema} from '../../dtos/dto'
 import type { SimulationNode, SimulationNodeMap, SimulationStep } from './simulationTypes';
-
 
 export class NdSimulation{
 
@@ -112,9 +109,21 @@ export class NdSimulation{
         return this.nodes.size === 0;
     }
 
-    //includes root!
+    //deos not include root!, in other words it's equal to amount of actual steps stored inside path
     pathLength(): number{
-        return this.path.length;
+        return Math.max(this.path.length-1 , 0);
+    }
+
+    getLastStep(tapeId: number): SimulationStep | null {
+        if(this.isEmpty()) return null;
+
+        return this.nodes.get(this.path[this.pathLength()])!.step[tapeId];
+    }
+
+    getLastSteps(): SimulationStep[] | null {
+        if(this.isEmpty()) return null;
+
+        return this.nodes.get(this.path[this.pathLength()])!.step;
     }
 
     //includes root!

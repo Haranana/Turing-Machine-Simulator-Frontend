@@ -1,4 +1,4 @@
-import { array, z } from "zod";
+import { z } from "zod";
 
 export type State = string;
 
@@ -16,17 +16,6 @@ export type SimulationExport = {
   tapesAmount: number,
 }
 
-/*
-export type SimulationStep = {
-    tapeIndex : number,
-    action : TransitionAction, 
-    readChar : string | null,
-    writtenChar : string | null,
-    stateBefore : State,
-    stateAfter : State | null,
-    tapeBefore : TapeState,
-};*/
-
 export type Simulation = {
     steps : SimulationStep[][];
     startingState : State,
@@ -34,15 +23,11 @@ export type Simulation = {
     rejectingState: State,
 }
 
-export type TapeSymbol = string | null;          // usually a single char
+export const TapeSymbolSchema = z.string().nullable();
+export type TapeSymbol = z.infer<typeof TapeSymbolSchema>
+//export type TapeSymbol = string | null;          // usually a single char
 
 export type Tape = Map<number, TapeSymbol>;
-
-/*
-export interface TapeState {
-  head: number;
-  tape: Tape; // only non empty ones!
-}*/
 
 export interface TapeViewInput {
   tapeState: TapeState;
@@ -95,7 +80,7 @@ export interface NdTmReturnDto {
   edgeList: NdTreeEdge[];
 }*/
 
-const SendSimulationDtoSchema = z.object({
+export const SendSimulationDtoSchema = z.object({
   initialState: z.string(),
   acceptState : z.string(),
   rejectState : z.string(),
@@ -107,17 +92,17 @@ const SendSimulationDtoSchema = z.object({
   tapesAmount : z.number(),
 });
 
-type SendSimulationDto = z.infer<typeof SendSimulationDtoSchema>;
+export type SendSimulationDto = z.infer<typeof SendSimulationDtoSchema>;
 
 const numericKey = z.string().regex(/^-?\d+$/);
 
 const TapeStateSchema = z.object({
   head: z.number(),
   tape: z
-    .record(numericKey, z.string())
+    .record(numericKey, TapeSymbolSchema)
     .transform(obj => new Map(Object.entries(obj).map(([k, v]) => [Number(k), v]))),
 });
-type TapeState = z.infer<typeof TapeStateSchema>;
+export type TapeState = z.infer<typeof TapeStateSchema>;
 
 const StateNameSchema = z.object({ name: z.string() }).transform(s => s.name);
 
@@ -133,17 +118,6 @@ const SimulationStepSchema = z.object({
   tapeBefore: TapeStateSchema,          
 });
 export type SimulationStep = z.infer<typeof SimulationStepSchema>;
-
-/*
-export type SimulationStep = {
-    tapeIndex : number,
-    action : TransitionAction, 
-    readChar : string | null,
-    writtenChar : string | null,
-    stateBefore : State,
-    stateAfter : State | null,
-    tapeBefore : TapeState,
-};*/
 
 export const CreatedSimulationSchema = z.object({
   steps: z.array(z.array(SimulationStepSchema)),
@@ -195,5 +169,12 @@ export const SimulationNodeSchema = z.object({
 })
 export type SimulationNode = z.infer<typeof SimulationNodeSchema>;
 
-export const SimulationNodesMapSchema = z.map(z.number() , SimulationNodeSchema);
-export type SimulationNodeMap = z.infer<typeof SimulationNodesMapSchema>;
+export const SimulationNodesRecordSchema = z
+  .record(z.string(), SimulationNodeSchema)
+  .transform(obj => {
+    return new Map<number, SimulationNode>(
+      Object.entries(obj).map(([k, v]) => [Number(k), v])
+    );
+  });
+
+export type SimulationNodeMap = z.infer<typeof SimulationNodesRecordSchema>;
