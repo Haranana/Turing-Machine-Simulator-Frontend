@@ -14,6 +14,7 @@ import LoginPage from './pages/LoginPage'
 import { Toaster } from 'react-hot-toast';
 import './index.css'
 import ProtectedRoute from './auth/ProtectedRoute'
+import TreePage from './pages/TreePage'
 
 export default  function App() {
 
@@ -25,6 +26,7 @@ return (
               <Route index element={<SimulatorPage />} />
               <Route path="index" element={<SimulatorPage />} />
               <Route path="console" element={<ConsolePage />} />
+              <Route path="tree" element={<TreePage></TreePage>}/>
             
               <Route element={<ProtectedRoute/>}>
                 <Route path="account" element={<AccountPage/>} />
