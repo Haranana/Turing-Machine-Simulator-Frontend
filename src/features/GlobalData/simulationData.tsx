@@ -4,20 +4,20 @@ import { persist } from "zustand/middleware";
 import { NdSimulation } from "../Tape/Simulation";
 
 export type SimulationData = {
-    simulation: NdSimulation | null;
+    simulationData: SimulationNodeMap | null;
     simulationName: string | null;
 
-    setNdSimulation: (value : NdSimulation) => void;
-    setSimulationName: (value: string) => void;
+    setSimulationData: (value : SimulationNodeMap | null) => void;
+    setSimulationName: (value: string | null) => void;
 }
 
 export const useSimulationData = (create<SimulationData>)()(
     persist(
         (set)=>({
-                simulation: null,
+                simulationData: null,
                 simulationName: null,
-                setNdSimulation: (value)=>{
-                    set({simulation: value})
+                setSimulationData: (value)=>{
+                    set({simulationData: value})
                 },
                 setSimulationName: (value)=>{
                     set({simulationName: value})

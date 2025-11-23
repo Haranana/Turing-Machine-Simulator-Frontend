@@ -11,14 +11,17 @@ import { useSpecialStates } from "../GlobalData/specialStates.tsx";
 import { toast } from 'react-hot-toast';
 import { NdSimulation } from "./Simulation.ts";
 import type { SimulationNodeMap } from "./simulationTypes.tsx";
+import {useSimulationData} from "../GlobalData/simulationData.tsx"
 
 export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
 
   const {hasErrors} = useSimulationProgram();
 
+  const {simulationData, setSimulationData} = useSimulationData();
+
   const { initialState, acceptState, rejectState } = useSpecialStates();
 
-  const {setSimulationInput , setSimulationTapesAmount, simulationTapesAmount} = useSimulationInput();
+  const {simulationInput, setSimulationInput , setSimulationTapesAmount, simulationTapesAmount} = useSimulationInput();
 
   // Input taśmy, w przyszłości pewnie będzie zastąpiony listą stringów, dla każdej z taśm
   // Pole przechowuje wartosc tekstowa z inputu, niekoniecznie jest to zatwierdzony input programu
@@ -113,6 +116,11 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     return simulation.pathLength();
   }
 
+  function isCurrentStepLeaf(){
+    if(simulation == null) return false;
+    return simulation.isLeaf(stepRef.current);
+  }
+
   function setAllIsAnimating(value: boolean){
     setIsAnimating(prev=>prev.map(()=>value));
   }
@@ -193,9 +201,8 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     const simulationExport : SimulationExport = buildSimulationExport();
     try{
       //console.log("sent to API: ", simulationExport);
-      const simulationData : SimulationNodeMap = await sendSimulation(simulationExport);
-      SchemaToSimulation(simulationData);
-
+      const simulationNodeMap : SimulationNodeMap = await sendSimulation(simulationExport);
+      SchemaToSimulation(simulationNodeMap);
       toast.success(`Simulation loaded successfully`);
     }catch(err){
       console.log(err);
@@ -209,9 +216,9 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     stepDirRef.current = 0;
     stateRef.current = initialState;
     outputRef.current = "";
-    setSimulation(new NdSimulation(schema));
-
-    
+    const newSimulation = new NdSimulation(schema);
+    setSimulationData(schema);
+    setSimulation(newSimulation);
   }
 
   const makeDefaultTapeInput = (id: number): TapeInput => ({
@@ -228,13 +235,23 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   //save data to Zustand storage, in future should probably also store inputs and simulation
   useEffect(() => {
-    setTapesAmount(simulationTapesAmount);
+    setTapesAmount(simulationTapesAmount);    
   }, [simulationTapesAmount]);
 
-    //loads data from zustand storage, in future should also probably load inputs and simulation
+    //loads tapes amount data from zustand storage,
   useEffect(()=>{
     setTapesAmount(simulationTapesAmount);
+        tapeInputRef.current = simulationInput;
+    for(let tapeId=0; tapeId < simulationTapesAmount; tapeId++){
+      placeInputOnTape(simulationInput[tapeId], tapeId);
+    }
   },[])
+
+  //loads simulationData from zustand storage
+  useEffect(()=>{
+    if(!simulationData) return;
+    setSimulation(new NdSimulation(simulationData));
+  },[simulationData])
 
 
   //updates states upon new tape creation
@@ -404,6 +421,9 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   const playSimulation = () => {
     setIsPlaying(true);
+    if(simulation){
+      console.log("path: " ,simulation.path);
+    }
   };
 
   const pauseSimulation = () => {
@@ -417,6 +437,8 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   //Discards simulation
   const resetSimulation = () => {
     setSimulation(null);
+    setSimulationData(null);
+    
     stepRef.current = 0;
     stepDirRef.current = 0;
     stateRef.current = initialState;
@@ -474,12 +496,14 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     if(simulation==null) return "";
     const currentStep : number = stepRef.current;
     
-    return currentStep === stepsAmount()? simulation.getLastStep(0)!.stateAfter : stateRef.current;
+    const out = isCurrentStepLeaf()? simulation.getLastStep(0)!.stateAfter : stateRef.current;
+    return out;
+    //return currentStep === stepsAmount()? simulation.getLastStep(0)!.stateAfter : stateRef.current;
   }
 
   function getCurrentOutput(stepId: number){
     if(simulation==null) return "";
-    const isLastStep = stepId === stepsAmount();
+    const isLastStep = isCurrentStepLeaf();
     if(isLastStep){
       if(simulation.getLastStep(0)!.stateAfter === acceptState){
         return "Accept";

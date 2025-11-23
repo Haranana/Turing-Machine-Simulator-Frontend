@@ -120,6 +120,15 @@ export class NdSimulation{
         return this.nodes.get(this.path[this.pathLength()])!.step[tapeId];
     }
 
+    isLeaf(step: number) : boolean{
+        if(this.isEmpty()) return false;
+        const stepId = step + 1;
+        const curNode  = this.nodes.get(this.path[stepId])
+        if(!curNode) return false;
+
+        return curNode.nextIds.length===0? true : false;
+    }
+
     getLastSteps(): SimulationStep[] | null {
         if(this.isEmpty()) return null;
 
