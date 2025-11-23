@@ -1,58 +1,66 @@
+import "./tree.css"
+
 import '@xyflow/react/dist/style.css';
-import { Children, useCallback, useEffect } from "react";
-import { ReactFlow,Background,useNodesState,useEdgesState,type Node,type Edge, MiniMap, type NodeProps
+import { Children, useCallback, useEffect, useState } from "react";
+import { ReactFlow,Background,useNodesState,useEdgesState,type Node,type Edge, MiniMap, type NodeProps, type NodeTypes, Handle, Position
 } from "@xyflow/react";
 import { type SimulationNode , type SimulationNodeMap } from '../features/Tape/simulationTypes';
 import ELK, { type ElkLayoutArguments, type LayoutOptions } from "elkjs/lib/elk.bundled.js";
 import { useSimulationData } from '../features/GlobalData/simulationData';
+import { useSpecialStates } from '../features/GlobalData/specialStates';
+
+import { NdSimulation } from '../features/Tape/Simulation';
 
 const elk  = new ELK();
 
-const baseNodes = [
-  { id: "1", label: "Root" },
-  { id: "2", label: "Child A" },
-  { id: "3", label: "Child B" },
-];
-
-const baseEdges = [
-  { id: "e1-2", source: "1", target: "2" },
-  { id: "e1-3", source: "1", target: "3" },
-];
-
-const nodeTypes = {
+const nodeTypes : NodeTypes = {
   simNode: SimulationNodeComponent,
 };
 
-export type SimNodeComponentData = Node<{
+export type SimNodeComponentData = {
   nodes: SimulationNodeMap,
   currentNode: number,
-}>;
+};
+
+export type RfNode = Node<SimNodeComponentData>;
 
 export default function TreePage(){
-const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+const [nodes, setNodes, onNodesChange] = useNodesState<RfNode>([]);
 const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-const {simulation} = useSimulationData();
+const {simulationData} = useSimulationData();
+const [simulation, setSimulation] = useState<NdSimulation | null>(null);
+
 
   type GraphData = {
     children: {id: number}[]; 
     edges: {id: number, sourceId: number, targetId: number}[]
   }
 
-  function simulationToGraphChildren(): GraphData{
+  function simulationToGraphChildren(currentSimulation: NdSimulation): GraphData{
     let out: GraphData = {children: [], edges: []};
-    if(!simulation) return out;
-
+    //if(!currentSimulation) return out;
+    
     //create node from each branching
-    simulation.branchings.forEach((value,_)=>{
-      const currentSimulationNode: SimulationNode = simulation.nodes.get(value)!;
+    currentSimulation.nodes.forEach((value,_)=>{
+      if(value.nextIds.length == 1) return ; //not interested in nodes that arent branches or leaves
+      const currentSimulationNode: SimulationNode = value;
       out.children.push({id: currentSimulationNode.id});
 
-      //create edge beetwen this node and its children (or not if its leaf)
+      //create edge beetwen this node and its children's first branching or leaf (or not if its already a leaf)
       currentSimulationNode.nextIds.forEach((childId: number)=>{
         const newEdgeId = out.edges.length;
+        let childFirstBranchId = childId;
+        while(true){
+          const potentialBranch = currentSimulation.nodes.get(childFirstBranchId)!;
+          if(potentialBranch.nextIds.length == 0 || potentialBranch.nextIds.length > 1){
+            break;
+          }
+          childFirstBranchId = potentialBranch.nextIds[0];
+        }
+
         out.edges.push({id: newEdgeId, 
             sourceId:currentSimulationNode.id,
-            targetId:childId,
+            targetId:childFirstBranchId,
         })
       });
 
@@ -61,9 +69,13 @@ const {simulation} = useSimulationData();
   }
 
   useEffect(() => {
-    if(!simulation) return;
+    console.log("entering useEffect!");
+    if(!simulationData) return;
+    const newSimulation = new NdSimulation(simulationData)
+    setSimulation(newSimulation);
 
-    const graphData = simulationToGraphChildren();
+    console.log("actually inside useEffect!");
+    const graphData = simulationToGraphChildren(newSimulation);
 
     //map data (ideally got from zurand/props) to elk graph )
       const elkGraph = {
@@ -91,23 +103,24 @@ const {simulation} = useSimulationData();
     const getLayout = async () => {
       const res = await elk.layout(elkGraph);
 
-      const elkNodes: Node[] =
-        res.children?.map((node) => ({
-          id: node.id,
+      const elkNodes: RfNode[] =
+        res.children?.map(node => ({
+          id: node.id.toString(),
           type: "simNode",
           position: { x: node.x ?? 0, y: node.y ?? 0 },
-          data: {   
-            nodes: simulation.nodes,
-            currentNode: node.id,},
-          draggable: false, 
+          data: {
+            nodes: newSimulation.nodes,
+            currentNode: Number(node.id),
+          },
+          draggable: false,
         })) ?? [];
 
-      const elkEdges: Edge[] = baseEdges.map((edge) => ({
+      const elkEdges: Edge[] = res.edges?.map((edge) => ({
         id: edge.id,
-        source: edge.source,
-        target: edge.target,
+        source: edge.sources[0],
+        target: edge.targets[0],
         type: "straight",
-      }));
+      })) ?? [];
 
       setNodes(elkNodes);
       setEdges(elkEdges);
@@ -115,7 +128,7 @@ const {simulation} = useSimulationData();
     }
     getLayout();
 
-  }, [setNodes, setEdges, simulation]);
+  }, [setNodes, setEdges, simulationData]);
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
@@ -134,21 +147,67 @@ const {simulation} = useSimulationData();
   );
 }
 
-export function SimulationNodeComponent(props : NodeProps<SimNodeComponentData>){
 
-    function prepareDetails(){
+
+export function SimulationNodeComponent(props : NodeProps<RfNode>){
+
+    const [detailsVisible , setDetailVisible] = useState<boolean>(false);
+    const {rejectState, acceptState} = useSpecialStates();
+    
+    function prepareDetails() : string[] {
       const nodes = props.data.nodes;
+      const currentNodeId = props.data.currentNode;
+      const currentNode = nodes.get(currentNodeId)!;
+      let out: string[] = [];
 
+      
+      const isLeaf = currentNode.nextIds.length === 0;
+
+      if(isLeaf){
+        if(currentNode.step[0].stateAfter == rejectState){
+          out.push("Output: Reject")
+        }else if(currentNode.step[0].stateAfter == acceptState){
+          out.push("Output: Accept")
+        }else{
+          out.push("Output: Unknown")
+        }
+      }else{
+        currentNode.nextIds.forEach((childId)=>{
+          const childNodeStep = nodes.get(childId)!.step;
+          let transition: string = "";
+          transition += childNodeStep[0].stateBefore + ", ";
+
+          childNodeStep.forEach((tape)=>{
+            transition+=tape.readChar+", ";
+          });
+          transition+=" => ";
+
+          transition += childNodeStep[0].stateAfter + ", ";
+
+          childNodeStep.forEach((tape)=>{
+            transition+=tape.writtenChar+", ";
+          });
+
+          childNodeStep.forEach((tape)=>{
+            transition+=tape.transitionAction+", ";
+          });
+          out.push(transition);
+        });
+      }
+      return out;
     }
 
-    return <div className="SimulationNode">
-      <p>node id: {props.data.currentNode}</p>
-      <SimulationNodeComponentDetails transitions={[]} ></SimulationNodeComponentDetails>
+    return <div className="SimulationNode" onClick={()=>detailsVisible? setDetailVisible(false) : setDetailVisible(true)}>
+      <Handle type="source" className="simNodeHandle bottomHandle" position={Position.Bottom} />
+      {detailsVisible? <SimulationNodeComponentDetails viewableData={prepareDetails()} />: "" }
+      <Handle className="simNodeHandle topHandle" type="target" position={Position.Top} />
     </div>
 }
 
-export function SimulationNodeComponentDetails({transitions}: {transitions: string[]} ){
+//viewable data can be list of transitions or in case of leaf an output
+export function SimulationNodeComponentDetails({viewableData}: {viewableData: string[]} ){
     return <div className="SimulationNodeDetails">
-        
+        {viewableData.map((value,id)=><p className='SimulationNodeDetailsRow'>{id}: {value}</p>) 
+        }
     </div>
 }

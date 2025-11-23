@@ -12,7 +12,7 @@ export type SimulationData = {
 }
 
 export const useSimulationData = (create<SimulationData>)()(
-    persist(
+
         (set)=>({
                 simulationData: null,
                 simulationName: null,
@@ -23,8 +23,5 @@ export const useSimulationData = (create<SimulationData>)()(
                     set({simulationName: value})
                 }
                }),
-              {
-                name: "simulation-data"
-              }
-            )
+          
 )
