@@ -1,27 +1,36 @@
-import { type SimulationNodeMap } from "../Tape/simulationTypes";
+import { type SimulationNodeMap, type SimulationNodeRecord } from "../Tape/simulationTypes";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { NdSimulation } from "../Tape/Simulation";
 
 export type SimulationData = {
-    simulationData: SimulationNodeMap | null;
+    simulationData: SimulationNodeRecord | null;
     simulationName: string | null;
+    simulationPath: number[];
 
-    setSimulationData: (value : SimulationNodeMap | null) => void;
+    setSimulationData: (value : SimulationNodeRecord | null) => void;
     setSimulationName: (value: string | null) => void;
+    setSimulationPath: (value: number[]) => void;
 }
 
-export const useSimulationData = (create<SimulationData>)()(
-
+export const useSimulationData = create<SimulationData>()(
+    persist(
         (set)=>({
                 simulationData: null,
                 simulationName: null,
+                simulationPath: [],
                 setSimulationData: (value)=>{
                     set({simulationData: value})
                 },
                 setSimulationName: (value)=>{
                     set({simulationName: value})
-                }
+                },
+                setSimulationPath: (value)=>{
+                    set({simulationPath: value})
+                },
                }),
-          
+               {
+                name: "simulation-data",
+               }
+            )
 )

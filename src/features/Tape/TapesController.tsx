@@ -10,14 +10,14 @@ import {useSimulationInput} from "../GlobalData/simulationInput.tsx"
 import { useSpecialStates } from "../GlobalData/specialStates.tsx";
 import { toast } from 'react-hot-toast';
 import { NdSimulation } from "./Simulation.ts";
-import type { SimulationNodeMap } from "./simulationTypes.tsx";
+import type { SimulationNodeMap, SimulationNodeRecord } from "./simulationTypes.tsx";
 import {useSimulationData} from "../GlobalData/simulationData.tsx"
 
 export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
 
   const {hasErrors} = useSimulationProgram();
 
-  const {simulationData, setSimulationData} = useSimulationData();
+  const {simulationData, setSimulationData, simulationPath, setSimulationPath} = useSimulationData();
 
   const { initialState, acceptState, rejectState } = useSpecialStates();
 
@@ -133,7 +133,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   }
 
   function toggleInputFieldVisibility(id: number){
-    console.log(`toggle, ${id}`)
     setInputFieldVisibility((prev)=>prev.map((v,i)=>i === id ? !v : v));
   }
 
@@ -193,6 +192,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
             : val
         )
       );
+      console.log("currentTapeState: ", currentTapeState );
     }
 }
 
@@ -200,9 +200,8 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
     const simulationExport : SimulationExport = buildSimulationExport();
     try{
-      //console.log("sent to API: ", simulationExport);
-      const simulationNodeMap : SimulationNodeMap = await sendSimulation(simulationExport);
-      SchemaToSimulation(simulationNodeMap);
+      const simulationNodeRecord : SimulationNodeRecord = await sendSimulation(simulationExport);
+      SchemaToSimulation(simulationNodeRecord);
       toast.success(`Simulation loaded successfully`);
     }catch(err){
       console.log(err);
@@ -211,13 +210,16 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     }
   }
 
-  function SchemaToSimulation(schema: SimulationNodeMap){
+  function SchemaToSimulation(schema: SimulationNodeRecord){
         stepRef.current = 0;
     stepDirRef.current = 0;
     stateRef.current = initialState;
     outputRef.current = "";
     const newSimulation = new NdSimulation(schema);
+    newSimulation.updatePath();
+
     setSimulationData(schema);
+    setSimulationPath(newSimulation.path);
     setSimulation(newSimulation);
   }
 
@@ -250,7 +252,17 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   //loads simulationData from zustand storage
   useEffect(()=>{
     if(!simulationData) return;
-    setSimulation(new NdSimulation(simulationData));
+    console.log("[simulationData useEffect] Path: ", simulationPath);
+
+    const newSimulation = new NdSimulation(simulationData);
+
+    if (simulationPath.length > 0) {
+    newSimulation.path = simulationPath;
+  } else {
+    newSimulation.updatePath();
+  }
+
+    setSimulation(newSimulation);
   },[simulationData])
 
 
@@ -422,7 +434,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   const playSimulation = () => {
     setIsPlaying(true);
     if(simulation){
-      console.log("path: " ,simulation.path);
+      console.log("[play] path: " ,simulation.path);
     }
   };
 
@@ -438,6 +450,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   const resetSimulation = () => {
     setSimulation(null);
     setSimulationData(null);
+    setSimulationPath([]);
     
     stepRef.current = 0;
     stepDirRef.current = 0;

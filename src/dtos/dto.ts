@@ -1,5 +1,5 @@
 
-import { CreatedSimulationSchema, NdTmReturnDtoSchema, SendSimulationDtoSchema, SimulationNodesRecordSchema, type SendSimulationDto, type SimulationExport, type SimulationNodeMap } from "../features/Tape/simulationTypes.tsx";
+import { CreatedSimulationSchema, NdTmReturnDtoSchema, SendSimulationDtoSchema, SimulationNodesRecordSchema, type SendSimulationDto, type SimulationExport, type SimulationNodeMap, type SimulationNodeRecord } from "../features/Tape/simulationTypes.tsx";
 import { useSimulationProgram } from "../features/GlobalData/simulationProgram.tsx"
 import { useSimulationAliases } from "../features/GlobalData/simulationAliases.tsx";
 import {useSimulationInput} from "../features/GlobalData/simulationInput.tsx"
@@ -68,7 +68,7 @@ export function buildSimulationExport(): SimulationExport{
     };
 }
 
-export async function sendSimulation(objToSend: SimulationExport) : Promise<SimulationNodeMap> {
+export async function sendSimulation(objToSend: SimulationExport) : Promise<SimulationNodeRecord> {
 
   const objToSendSchema = SendSimulationDtoSchema.safeParse(objToSend);
   if (!objToSendSchema.success) {

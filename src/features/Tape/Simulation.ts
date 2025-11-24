@@ -1,4 +1,23 @@
-import type { SimulationNode, SimulationNodeMap, SimulationStep } from './simulationTypes';
+import type {
+  SimulationNode,
+  SimulationNodeMap,
+  SimulationNodeRecord,
+  SimulationStep,
+  TapeState,
+  TapeStateRecord,
+  TapeSymbol,
+} from "./simulationTypes";
+
+function reviveTapeState(raw: TapeStateRecord): TapeState {
+  return {
+    head: raw.head,
+    tape: new Map<number, TapeSymbol>(
+      Object.entries(raw.tape).map(
+        ([k, v]) => [Number(k), v as TapeSymbol] as [number, TapeSymbol]
+      )
+    ),
+  };
+}
 
 export class NdSimulation{
 
@@ -7,25 +26,42 @@ export class NdSimulation{
     branchings: number[]; //IDs of all branchings in simulation, useful for creating tree visual
     branchChoices: Map<number, number | null> //which branch was chosen for nodes with multiple next nodes, <id of branching node, id of chosen next node>
     
-    constructor(newNodes: SimulationNodeMap){
-       this.nodes = newNodes;
+    constructor(newNodes: SimulationNodeRecord){
+        this.path = [];
+        this.branchings = [];
+        this.branchChoices = new Map();
 
-       this.path = [];
+        this.nodes = new Map();
 
-       this.branchings = [];
-       this.branchChoices = new Map();
-        this.nodes.forEach((v,_)=>{
-            if(v.nextIds.length > 1){
-                this.branchings.push(v.id);
-                this.branchChoices.set(v.id , null);
-            }
-        })
+        Object.entries(newNodes).forEach(([k, nodeRecord]) => {
+        const id = Number(k);
 
-        this.updatePath();
+        const revivedSteps: SimulationStep[] = nodeRecord.step.map(step => ({
+            ...step,
+            tapeBefore: reviveTapeState(step.tapeBefore),
+        }));
+
+        const simNode: SimulationNode = {
+            ...nodeRecord,
+            step: revivedSteps,
+        };
+
+        this.nodes.set(id, simNode);
+        });
+
+        this.nodes.forEach((v) => {
+        if (v.nextIds.length > 1) {
+            this.branchings.push(v.id);
+            this.branchChoices.set(v.id, null);
+        }
+        });
+
+        //this.updatePath();
     }
 
     //updates current path based on chosen branches;
     //assumes that if nodes map is non-empty then it has a root with an id of 0
+    //also can just put chosen path straight to it i guess
     updatePath(){
         this.path = [];
         if(this.isEmpty()) return; 
