@@ -4,56 +4,70 @@ type AuthState = {
   token: string | null;
   tokenType: string | null; 
   expiresAt: number | null; 
-  login: (token: string, tokenType: string, ttlSec: number) => void;
+  login: (token: string, tokenType: string, ttlSec: number, rememberMe: boolean) => void;
   logout: () => void;
   isAuthenticated: boolean;
 };
 
 const AuthContext = createContext<AuthState | null>(null);
 
+const STORAGE_KEY = "auth";
+
+type StoredAuth = {
+  token: string;
+  tokenType: string;
+  expiresAt: number;
+};
+
+function loadAuth(): { token: string | null; tokenType: string | null; expiresAt: number | null;} {
+  try {
+
+    // session storage (no remember me)
+    const raw = sessionStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(STORAGE_KEY);
+
+    if (!raw) return { token: null, tokenType: null, expiresAt: null };
+
+    const parsed = JSON.parse(raw) as StoredAuth;
+    
+    if (!parsed.expiresAt || Date.now() >= parsed.expiresAt) {
+      sessionStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY);
+      return { token: null, tokenType: null, expiresAt: null };
+    }
+
+    return {
+      token: parsed.token,
+      tokenType: parsed.tokenType,
+      expiresAt: parsed.expiresAt,
+    };
+  } catch {
+    sessionStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
+    return { token: null, tokenType: null, expiresAt: null };
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => {
-    try {
-      const raw = localStorage.getItem("auth");
-      if (!raw) return null;
-      const parsed = JSON.parse(raw) as { token: string; tokenType: string; expiresAt: number };
-      if (parsed.expiresAt && Date.now() < parsed.expiresAt) return parsed.token;
-      localStorage.removeItem("auth");
-      return null;
-    } catch {
-      localStorage.removeItem("auth");
-      return null;
-    }
-  });
+  const [{ token, tokenType, expiresAt }, setAuthState] = useState(loadAuth);
 
-  const [tokenType, setTokenType] = useState<string | null>(() => {
-    const raw = localStorage.getItem("auth");
-    try { return raw ? (JSON.parse(raw).tokenType as string ?? null) : null; } catch { return null; }
-  });
-
-  const [expiresAt, setExpiresAt] = useState<number | null>(() => {
-    const raw = localStorage.getItem("auth");
-    try {
-      const exp = raw ? (JSON.parse(raw).expiresAt as number) : null;
-      return exp && Date.now() < exp ? exp : null;
-    } catch {
-      return null;
-    }
-  });
-
-  const login = (t: string, typ: string, ttlSec: number) => {
+  const login = (t: string, typ: string, ttlSec: number, rememberMe: boolean) => {
     const exp = Date.now() + ttlSec * 1000;
-    setToken(t);
-    setTokenType(typ);
-    setExpiresAt(exp);
-    localStorage.setItem("auth", JSON.stringify({ token: t, tokenType: typ, expiresAt: exp }));
+
+    setAuthState({ token: t, tokenType: typ, expiresAt: exp });
+
+    const data: StoredAuth = { token: t, tokenType: typ, expiresAt: exp };
+
+    const targetStorage = rememberMe ? localStorage : sessionStorage;
+    const otherStorage = rememberMe ? sessionStorage : localStorage;
+
+    targetStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    otherStorage.removeItem(STORAGE_KEY);
   };
 
   const logout = () => {
-    setToken(null);
-    setTokenType(null);
-    setExpiresAt(null);
-    localStorage.removeItem("auth");
+    setAuthState({ token: null, tokenType: null, expiresAt: null });
+    sessionStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
   };
 
   const isAuthenticated = !!token && !!tokenType && !!expiresAt && Date.now() < expiresAt;

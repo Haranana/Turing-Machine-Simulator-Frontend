@@ -13,6 +13,7 @@ export default function LoginPage(){
     const [password1, setPassword1] = useState<string>("");
     const [initialValidationPassed, setInitialValidationPassed] = useState<boolean>(false);
     const [errorMessage ,setErrorMessage] = useState<string | null>(null);
+    const [rememberMe, setRememberMe] = useState<boolean>(false);
     const {login} = useAuth();
     const navigate = useNavigate();
 
@@ -41,7 +42,8 @@ export default function LoginPage(){
                 expiresInSeconds: number;
             };
 
-            login(data.accessToken, data.tokenType, data.expiresInSeconds);
+            console.log("login with: ", rememberMe);
+            login(data.accessToken, data.tokenType, data.expiresInSeconds, rememberMe);
             navigate("/account", { replace: true });
             } catch (e: any) {
                 setErrorMessage(e?.message ?? "Błąd sieci.");
@@ -82,7 +84,7 @@ export default function LoginPage(){
                 
                 
                 <div className="login-remember-forgot">
-                    <label><input className="login-checkbox" type="checkbox" name="remember-me" id="login-remember-me"/>Remember me</label>
+                    <label><input className="login-checkbox"  type="checkbox" name="remember-me" id="login-remember-me" checked={rememberMe} onChange={(e)=>setRememberMe(e.target.checked)}/>Remember me</label>
                     <Link  className="remember-me-link" to="index" title='Simulation'>Forgot password?</Link>
                 </div>
 
