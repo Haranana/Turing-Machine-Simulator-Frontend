@@ -20,12 +20,14 @@ export default function SaveTuringMachine(){
     const {codeLines, setCodeLines} = useSimulationProgram();
     const { initialState, acceptState, rejectState, setSpecialStates } = useSpecialStates();
     const {sep1, sep2, blank, left, right, stay , setSimulationAliases} = useSimulationAliases();
+
+    //data from input fields in save as
     const [newTuringMachineName , setNewTuringMachineName] = useState<string>("");
     const [newTuringMachineDescription , setNewTuringMachineDescription] = useState<string>("");
+
     const [initialValidationPassed, setInitialValidationPassed] = useState<boolean>(false);
     const {simulationTapesAmount} = useSimulationInput();
-    const {loadedTmId} = useLoadedTmData();
-
+    const {loadedTmId, loadedTmName, setLoadedTmData} = useLoadedTmData();
     const [isSaveTmModalOpen, setSaveTmModalOpen] = useState<boolean>(false);
     const [tmToOverwrite, setTmToOverwrite] = useState<{id: number, name: string}|null>(null);
     const [saveAsDashboardButtonPressed, setSaveAsDashboardButtonPressed] = useState<boolean>(false);
@@ -38,8 +40,6 @@ export default function SaveTuringMachine(){
         accountData!=null && name.length > 0 && name.length <= 30 && description.length > 0 && description.length <= 255 &&
         accountData.id != null && accountData.email != null && accountData.status != null && accountData.createdAt != null ? setInitialValidationPassed(true) : setInitialValidationPassed(false);
     }
-
- 
 
     async function handleSaveAs(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
         e.preventDefault();
@@ -68,29 +68,43 @@ export default function SaveTuringMachine(){
             });
             if(res.status == 200 || res.status == 201){
                 toast.success(`Turing Machine saved successfully`);
+                const dto : TuringMachineGetDto = await res.json();
+                setLoadedTmData(dto.name, dto.id);
+                
             }else if(res.status == 409){
                 const pd = await res.json(); 
                 setTmToOverwrite({ id: pd.existingId, name: pd.name });
+                setSaveTmModalOpen(true);
             }
             else{
-                toast.error(`Turing Machine couldn't be saved\n${res.status} ${res.statusText}\n${res.text}`);
+                const text = await res.text();
+                toast.error(`Turing Machine couldn't be saved\n${text}`);
             }
         }catch(e: any){
-             toast.error(`Turing Machine couldn't be saved\n${e.text}`);
+             toast.error(`[ex] Turing Machine couldn't be saved\n`);
         }
 
     }
 
     async function handleSave(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
         e.preventDefault()
-        //if tmToOverwrite is not null then we overwrite some tm, otherwise use id of lastly loaded tm
+
+        //if tmToOverwrite is not null then we overwrite some tm, 
+        //otherwise use id of lastly loaded tm
         //otherwise there's not any tm loaded, so error (just probably route to save as in the future)
         let tmToSaveId: number = 0;
-        if(tmToOverwrite != null){
+        let tmToSaveName: string| null = null;
+        let tmToSaveDescription: string| null = null;
+
+        if(tmToOverwrite != null){ //overwritting some machine
             tmToSaveId = tmToOverwrite.id;
-        }else if(loadedTmId != null){
+            tmToSaveName = newTuringMachineName;
+            tmToSaveDescription = newTuringMachineDescription
+        }else if(loadedTmId != null){ //no overwritting, just editing currently loaded one
             tmToSaveId = loadedTmId;
-        }else{
+            tmToSaveName = null;
+            tmToSaveDescription = null;
+        }else{ //oops
               toast.error(`No Turing Machine Loaded\nuse Save as to create new one!`);
               return;
         }
@@ -98,8 +112,8 @@ export default function SaveTuringMachine(){
         const sendBody : TuringMachineEditDto = {
             
                     id: tmToSaveId, 
-                    name: newTuringMachineName,
-                    description: newTuringMachineDescription,
+                    name: tmToSaveName,
+                    description: tmToSaveDescription,
                     program: codeLines.join("\n"),
                     initialState: initialState,
                     acceptState: acceptState,
@@ -124,10 +138,10 @@ export default function SaveTuringMachine(){
                 toast.success(`Turing Machine saved successfully`);
             }
             else{
-                toast.error(`Turing Machine couldn't be saved\n${res.status} ${res.statusText}\n${res.text}`);
+                toast.error(`Turing Machine couldn't be saved`);
             }
         }catch(e: any){
-             toast.error(`Turing Machine couldn't be saved\n${e.text}`);
+             toast.error(`Turing Machine couldn't be saved`);
         }
     }
 
@@ -138,7 +152,7 @@ export default function SaveTuringMachine(){
                 Save As
                 {saveAsDashboardButtonPressed? <ChevronRightIcon className="saveTmDashboardIcon"></ChevronRightIcon> : <ChevronDownIcon className="saveTmDashboardIcon"></ChevronDownIcon>}
             </button>
-            <button className={`SaveTmDashboardButton SaveTmDashboardSaveButton ${loadedTmId==null? "" : "DisabledButton"}`} disabled={loadedTmId==null} onClick={e=>handleSave(e)}>Save </button>
+            <button className={`SaveTmDashboardButton SaveTmDashboardSaveButton ${loadedTmId==null ? "DisabledButton" : ""}`} disabled={loadedTmId==null} onClick={e=>handleSave(e)}>Save </button>
         </div>
         {isAccountDataLoaded() && saveAsDashboardButtonPressed?
          <form className="SaveTuringMachineForm">
