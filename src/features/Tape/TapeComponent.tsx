@@ -10,7 +10,7 @@ type Props = { tapeInput: TapeInput };
 export const TapeComponent = ({tapeInput}: Props) => {
 
   useEffect(()=>{
-    console.log("TapeInput before crash: ", tapeInput);
+
   },[tapeInput]);
 
  // Id komórki na którą wskazuje głowica taśmy
@@ -101,7 +101,7 @@ export const TapeComponent = ({tapeInput}: Props) => {
 
   const startStep = () => {
 
-    //console.log(tapeInput);
+
 
     const dir = dirRef.current;
     const animationType = animationTypeRef.current;
@@ -189,7 +189,7 @@ const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
       setPhase("idle");
 
       if (animationTypeRef.current === "reverse") {
-        //console.log("before tape")
+
          setTapeValues(prev => {
             const newMap = new Map(tapeInput.tapeState.tape);
             return newMap;

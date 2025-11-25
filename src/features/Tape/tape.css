@@ -1,8 +1,16 @@
 .SimulationData{
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: center;
   font-family: var(--font-main);
+}
+
+.SimulationDataParagraph{
+  margin-left: 10vw;
+  margin-right: 10vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .SimulationControls{
@@ -175,3 +183,15 @@
   cursor: default;
 }
 
+.SimulationNameWrapper{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.SimulationName{
+  font-family: var(--font-secondary);
+  font-size: 200%;
+    margin-top: 4px;
+  margin-bottom: 4px;
+}

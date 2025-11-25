@@ -12,12 +12,16 @@ import { toast } from 'react-hot-toast';
 import { NdSimulation } from "./Simulation.ts";
 import type { SimulationNodeMap, SimulationNodeRecord } from "./simulationTypes.tsx";
 import {useSimulationData} from "../GlobalData/simulationData.tsx"
+import { useLoadedTmData } from "../GlobalData/loadedTmData.tsx";
+import { useAuth } from "../../auth/AuthContext.tsx";
 
 export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
 
+  const { isAuthenticated } = useAuth();
+  const {loadedTmName} = useLoadedTmData();
   const {hasErrors} = useSimulationProgram();
 
-  const {simulationData, setSimulationData, simulationPath, setSimulationPath} = useSimulationData();
+  const {simulationData, setSimulationData, simulationPath, setSimulationPath, simulationName} = useSimulationData();
 
   const { initialState, acceptState, rejectState } = useSpecialStates();
 
@@ -192,7 +196,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
             : val
         )
       );
-      console.log("currentTapeState: ", currentTapeState );
     }
 }
 
@@ -204,7 +207,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       SchemaToSimulation(simulationNodeRecord);
       toast.success(`Simulation loaded successfully`);
     }catch(err){
-      console.log(err);
       toast.error(`Error: simulation couldn't be loaded`);
 
     }
@@ -217,7 +219,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     outputRef.current = "";
     const newSimulation = new NdSimulation(schema);
     newSimulation.updatePath();
-
     setSimulationData(schema);
     setSimulationPath(newSimulation.path);
     setSimulation(newSimulation);
@@ -243,7 +244,8 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     //loads tapes amount data from zustand storage,
   useEffect(()=>{
     setTapesAmount(simulationTapesAmount);
-        tapeInputRef.current = simulationInput;
+    tapeInputRef.current = simulationInput;
+
     for(let tapeId=0; tapeId < simulationTapesAmount; tapeId++){
       placeInputOnTape(simulationInput[tapeId], tapeId);
     }
@@ -252,7 +254,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   //loads simulationData from zustand storage
   useEffect(()=>{
     if(!simulationData) return;
-    console.log("[simulationData useEffect] Path: ", simulationPath);
 
     const newSimulation = new NdSimulation(simulationData);
 
@@ -304,9 +305,11 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     if(tapesAmount >= 5) return;
     const newlyAddedId = tapesAmount;
     const realTapesAmount = tapesAmount+1;
+    const newInput = [...simulationInput, ""];
 
     setTapesAmount(realTapesAmount);
     setSimulationTapesAmount(realTapesAmount);
+    setSimulationInput(newInput);
     
     
     setInputFieldVisibility(prev=>[...prev,false]);
@@ -433,9 +436,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   const playSimulation = () => {
     setIsPlaying(true);
-    if(simulation){
-      console.log("[play] path: " ,simulation.path);
-    }
   };
 
   const pauseSimulation = () => {
@@ -451,6 +451,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     setSimulation(null);
     setSimulationData(null);
     setSimulationPath([]);
+    setSimulationInput(simulationInput.map((_,__)=>""));
     
     stepRef.current = 0;
     stepDirRef.current = 0;
@@ -533,10 +534,17 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   return (
     <div className="simulation-interface">
+
+      {isAuthenticated && loadedTmName!=null?
+        <div className="SimulationNameWrapper">
+          <p className="SimulationName">{loadedTmName}</p>
+        </div>: ""
+      }
+     
       <div className="SimulationData">
-        <p>State: {getCurrentState()}</p>
-        {<p>Output: {getCurrentOutput(stepRef.current)}</p>}
-        <p>Step: {stepRef.current ?? ""}</p>
+        <p className="SimulationDataParagraph">State: {getCurrentState()}</p>
+        <p className="SimulationDataParagraph">Output: {getCurrentOutput(stepRef.current)}</p>
+        <p className="SimulationDataParagraph">Step: {stepRef.current ?? ""}</p>
       </div>
 
       {Array.from({ length: tapesAmount }).map((_, i) => (
