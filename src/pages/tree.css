@@ -37,3 +37,12 @@
     justify-content: center;
     align-items: center;
 }
+
+
+.SimulationEdge.SelectedEdge{
+  --xy-edge-stroke-default: green;
+}
+
+.SelectedNode .SimulationNode{
+  background-color: green;
+}
