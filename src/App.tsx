@@ -15,6 +15,8 @@ import { Toaster } from 'react-hot-toast';
 import './index.css'
 import ProtectedRoute from './auth/ProtectedRoute'
 import TreePage from './pages/TreePage'
+import NotFoundPage from './pages/NotFoundPage'
+import AccountActivatedPage from './pages/AccountActivatedPage'
 
 export default  function App() {
 
@@ -35,10 +37,11 @@ return (
             <Route path="login" element={<LoginPage/>}/>
               <Route path="signup" element={<SignUpPage/>} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="activate" element={<AccountActivatedPage></AccountActivatedPage>} />
 
             </Route>
 
-            <Route path="*" element={<h1>Not found</h1>} />
+            <Route path="*" element={<NotFoundPage></NotFoundPage>} />
           </Routes>
       </div>
     <Toaster

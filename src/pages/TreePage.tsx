@@ -254,11 +254,11 @@ export default function TreePage(){
         else edges.set(edge.id, false);
       });
 
-      console.log("nodes and edges: ", nodes, " | ", edges);
+      
       setSimulationPath(newPath)
       setSelectedNodesAndEdges({nodes: nodes, edges: edges});
       updateNodesAndEdgedClasses(nodes, edges);
-      console.log("current path (local|zustand): ", newPath , " | " ,simulationPath);
+      
     };
 
   
