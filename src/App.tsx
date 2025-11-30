@@ -17,6 +17,7 @@ import ProtectedRoute from './auth/ProtectedRoute'
 import TreePage from './pages/TreePage'
 import NotFoundPage from './pages/NotFoundPage'
 import AccountActivatedPage from './pages/AccountActivatedPage'
+import ChangePassword from './features/AccountComponents/ChangePassword'
 
 export default  function App() {
 
@@ -29,6 +30,7 @@ return (
               <Route path="index" element={<SimulatorPage />} />
               <Route path="console" element={<ConsolePage />} />
               <Route path="tree" element={<TreePage></TreePage>}/>
+              <Route path="password/change" element={<ChangePassword/>}/>
             
               <Route element={<ProtectedRoute/>}>
                 <Route path="account" element={<AccountPage/>} />
@@ -38,7 +40,6 @@ return (
               <Route path="signup" element={<SignUpPage/>} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="activate" element={<AccountActivatedPage></AccountActivatedPage>} />
-
             </Route>
 
             <Route path="*" element={<NotFoundPage></NotFoundPage>} />

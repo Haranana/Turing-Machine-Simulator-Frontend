@@ -85,7 +85,7 @@ export default function LoginPage(){
                 
                 <div className="login-remember-forgot">
                     <label><input className="login-checkbox"  type="checkbox" name="remember-me" id="login-remember-me" checked={rememberMe} onChange={(e)=>setRememberMe(e.target.checked)}/>Remember me</label>
-                    <Link  className="remember-me-link" to="index" title='Simulation'>Forgot password?</Link>
+                    <Link  className="remember-me-link" to="password/change" title='ChangePassword'>Forgot password?</Link>
                 </div>
 
                             
