@@ -19,6 +19,7 @@ import NotFoundPage from './pages/NotFoundPage'
 import AccountActivatedPage from './pages/AccountActivatedPage'
 import ChangePassword from './features/AccountComponents/ChangePassword'
 import DeleteAccount from './features/AccountComponents/DeleteAccount'
+import SearchPage from './pages/SearchPage'
 
 export default  function App() {
 
@@ -33,6 +34,7 @@ return (
               <Route path="tree" element={<TreePage></TreePage>}/>
               <Route path="password/change" element={<ChangePassword/>}/>
               <Route path='account/delete' element={<DeleteAccount/>}/>
+              <Route path='search' element={<SearchPage/>}/>
             
               <Route element={<ProtectedRoute/>}>
                 <Route path="account" element={<AccountPage/>} />
