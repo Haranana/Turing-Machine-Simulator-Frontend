@@ -29,6 +29,9 @@ export default function TuringMachineToLoadDetails({tm, isVisible}: inputProp){
                 <p className="TmDetailsRow TmDetailsText TmDetailsTapes">Tapes Amount: {tm.tapesAmount}</p>
                 <p className="TmDetailsRow TmDetailsText TmDetailsCreatedAt">Created at: {dateToShowable( tm.createdAt)}</p>
                 <p className="TmDetailsRow TmDetailsText TmDetailsUpdatedAt">Last update: {dateToShowable(tm.updatedAt)}</p>
+                <hr className="TmDetailsSeparator"></hr>
+                <p className="TmDetailsRow TmDetailsText TmDetailsLeft">is public: {tm.isVisible? "yes" : "no"}</p>
+                <p className="TmDetailsRow TmDetailsText TmDetailsStay">Share code: {tm.shareCode? tm.shareCode : "none"}</p>
             </div>
             <div className="TmDetailsColumn TmDetailsColumn2">
                 <textarea  cols={50} rows={40}  className="TmDetailsProgram" 
