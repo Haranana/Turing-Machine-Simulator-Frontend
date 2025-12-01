@@ -3,6 +3,7 @@ import { AccountDataContext } from "./AccountDataContext";
 import Modal from "../Modal/Modal";
 import toast from "react-hot-toast";
 import { useApiFetch } from "../../api/util";
+import { dateToShowable } from "./TuringMachineToLoad";
 
 export default function EditProfile(){
 
@@ -50,10 +51,26 @@ export default function EditProfile(){
     }
 
     return <div className="AccountPageSubpage LoadTuringMachineSubpage">
-        <p className="editProfileTextField">Email: {accountData?.email}</p>
-        <p className="editProfileTextField">User since: {accountData?.createdAt}</p>
-        <button className="editProfileButton changePasswordButton" onClick={onChangePasswordClicked}>Change password</button>
-        <button className="editProfileButton deleteAccountButton" onClick={onDeleteAccountClicked}>Delete account</button> 
+
+        <div className="editProfileRow">
+            <div className="editProfileTextField">
+                <p className="editProfileTextFieldTitle">Email: </p>
+                <p className="editProfileTextFieldValue">{accountData?.email}</p>
+            </div>
+        </div>
+
+        <div className="editProfileRow">
+            <div className="editProfileTextField">
+                <p className="editProfileTextFieldTitle">User since: </p>
+                <p className="editProfileTextFieldValue">{accountData != null? dateToShowable(accountData.createdAt) : ""}</p>
+            </div>
+        </div>
+
+        <div className="editProfileRow"><button className="editProfileButton changePasswordButton" onClick={onChangePasswordClicked}>Change password</button></div>
+        
+
+        <div className="editProfileRow"><button className="editProfileButton deleteAccountButton" onClick={onDeleteAccountClicked}>Delete account</button> </div>
+        
         {/*<hr className='LineSeparator'></hr>*/}
         <Modal open={isChangePasswordModalOpen} onClose={()=>{setChangePasswordModalOpen(false)}}>
                         <div className="ChangePasswordTextWrapper">
