@@ -3,14 +3,22 @@ import {useSpecialStates} from "../../features/GlobalData/specialStates"
 import { useSimulationAliases } from "../../features/GlobalData/simulationAliases";
 import { useSimulationInput } from "../GlobalData/simulationInput";
 import type { TuringMachineGetDto } from "./AccountDataTypes"
-import { ChevronDownIcon, TrashIcon } from "@heroicons/react/24/solid"
+import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from "@heroicons/react/24/solid"
 import { useApiFetch } from "../../api/util";
 import { toast } from 'react-hot-toast';
 import Modal from "../Modal/Modal";
 import { useState } from "react";
 import { useLoadedTmData } from "../GlobalData/loadedTmData";
+import TuringMachineToLoadDetails from "./TuringMachineToLoadDetails";
 
-type inputProp = {tm: TuringMachineGetDto, handleDeleted: ()=>void}
+type inputProp = {tm: TuringMachineGetDto, tmId: number, handleDeleted: ()=>void}
+
+    export function dateToShowable(date: string){
+        const DateTime: string[] = date.split("T");
+        const time = DateTime[1].substring(0, 5);
+
+        return DateTime[0]+" "+time;
+    }   
 
 export default function TuringMachineToLoad(props: inputProp){
 
@@ -22,13 +30,9 @@ export default function TuringMachineToLoad(props: inputProp){
     const apiFetch = useApiFetch();
 
     const [isDeleteTmModalOpen, setDeleteTmModalOpen] = useState<boolean>(false);
+    const [areDetailsVisible , setDetailsVisible] = useState<boolean>(false);
 
-    function dateToShowable(date: string){
-        const DateTime: string[] = date.split("T");
-        const time = DateTime[1].substring(0, 5);
 
-        return DateTime[0]+" "+time;
-    }   
 
     function onLoadTuringMachine(){
         setCodeLines(props.tm.program.split("\n"));
@@ -67,7 +71,7 @@ export default function TuringMachineToLoad(props: inputProp){
     return <>
         <div className="TuringMachineRow">
             <div className="TmRowShowWrapper TmRowButtonWrapper" >
-                <button className="TmRowShowButton TmRowButton"><ChevronDownIcon ></ChevronDownIcon></button>
+                <button className="TmRowShowButton TmRowButton" onClick={()=>setDetailsVisible(!areDetailsVisible)}>{areDetailsVisible? <ChevronUpIcon/> : <ChevronDownIcon/>}</button>
             </div>
             <div className="TmRowNameWrapper TmRowTextWrapper">
                 <span className="TmRowName TmRowTextField">{props.tm.name}</span>
@@ -86,6 +90,7 @@ export default function TuringMachineToLoad(props: inputProp){
                 <button className="TmRowDeleteButton TmRowButton" onClick={()=>{setDeleteTmModalOpen(true)}}><TrashIcon></TrashIcon></button>
             </div>
         </div>
+        <TuringMachineToLoadDetails tm={props.tm} tmId={props.tmId} isVisible={areDetailsVisible}/>
         <Modal open={isDeleteTmModalOpen} onClose={()=>{setDeleteTmModalOpen(false)}}>
                 <div className="DeleteTmModalTextWrapper">
                     <h2>Delete {props.tm.name} ?</h2>

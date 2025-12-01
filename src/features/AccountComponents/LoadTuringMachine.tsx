@@ -17,9 +17,8 @@ export default function LoadTuringMachine(){
     const [sortType, setSortType] = useState<"asc" | "desc">("asc");
     const [TuringMachinesData, setTuringMachinesData] = useState<Page<TuringMachineGetDto> | null>(null);
     const [listReloadNeeded, setListReloadNeeded] = useState<number>(0);
-
-
     const tmToDeleteNameRef = useRef<String | null>(null);
+    
     useEffect(()=>{
         
         const buildTmList = async () => {
@@ -107,7 +106,7 @@ export default function LoadTuringMachine(){
 
         <div className="TmList">
             {
-               TuringMachinesData.content.map(tm => <TuringMachineToLoad key={tm.id} tm={tm} handleDeleted={handleDeleted}></TuringMachineToLoad>)
+               TuringMachinesData.content.map( (tm, index) => <TuringMachineToLoad key={index} tm={tm} tmId={index} handleDeleted={handleDeleted}></TuringMachineToLoad>)
             }
         </div>
         :

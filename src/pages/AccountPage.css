@@ -100,7 +100,7 @@
 .LoadTuringMachineSubpage{
     display: flex;
     flex-direction: column;
-    width: 50%;
+    width: 75%;
 }
 
 .TmList{
@@ -240,4 +240,57 @@
   width: 24px;
   height: 24px;
  
+}
+
+.TmDetails {
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 250ms ease, opacity 200ms ease;
+  align-self: stretch;
+  display: flex;
+  overflow: hidden;      
+  pointer-events: none;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.TmDetails.TmDetailsVisible{
+  max-height: 1000px;
+  opacity: 1;
+  box-sizing: border-box;
+  margin-bottom: 30px;
+  margin-top: 30px;
+}
+
+.TmDetailsColumn1{
+    width: 35%;
+}
+
+.TmDetailsColumn2{
+    width: 50%;
+}
+
+.TmDetailsColumn{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.TmDetailsDescription {
+   resize: none;    
+  overflow: auto;
+}
+
+.TmDetailsText{
+    margin-top: 8px;
+    margin-bottom: 8px;
+   font-family: var(--font-secondary);
+}
+
+.TmDetailsSeparator{
+    color: black;
+    width: 80%;
+      border-bottom: none;
+    outline: none;
 }
