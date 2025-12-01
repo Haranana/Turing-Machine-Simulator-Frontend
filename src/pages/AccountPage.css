@@ -126,6 +126,16 @@
     border: none;
 }
 
+.TmRowIcon{
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    border: none;
+}
+
 .TmRowButton:hover{
     cursor: pointer;
 }
@@ -148,12 +158,14 @@
 .TmRowButton.TmRowDeleteButton{
     background-color: rgb(154, 60, 60);
     color: white;
-    
 }
 
-.TmRowButtonWrapper{
+.TmRowButtonWrapper.TmRowDeleteWrapper{
     width: 10%;
     height: 10%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }
 
 .TmRowButtonWrapper.TmRowShowWrapper{

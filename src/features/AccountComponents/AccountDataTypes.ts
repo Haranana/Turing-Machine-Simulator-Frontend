@@ -21,6 +21,9 @@ export type TuringMachineGetDto = {
 
     createdAt: string;
     updatedAt: string;
+
+    isVisible: boolean;
+    shareCode: string;
 }
 
 type SortDir = "asc" | "desc";

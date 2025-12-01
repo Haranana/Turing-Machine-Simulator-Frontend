@@ -3,7 +3,7 @@ import {useSpecialStates} from "../../features/GlobalData/specialStates"
 import { useSimulationAliases } from "../../features/GlobalData/simulationAliases";
 import { useSimulationInput } from "../GlobalData/simulationInput";
 import type { TuringMachineGetDto } from "./AccountDataTypes"
-import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from "@heroicons/react/24/solid"
+import { ChevronDownIcon, ChevronUpIcon, EyeIcon, EyeSlashIcon, TrashIcon } from "@heroicons/react/24/solid"
 import { useApiFetch } from "../../api/util";
 import { toast } from 'react-hot-toast';
 import Modal from "../Modal/Modal";
@@ -88,6 +88,9 @@ export default function TuringMachineToLoad(props: inputProp){
             </div>
             <div className="TmRowDeleteWrapper TmRowButtonWrapper">
                 <button className="TmRowDeleteButton TmRowButton" onClick={()=>{setDeleteTmModalOpen(true)}}><TrashIcon></TrashIcon></button>
+            </div>
+            <div className="TmRowVisibilityWrapper TmRowButtonWrapper">
+                {props.tm.isVisible? <span className="TmRowVisiblityIcon TmRowIcon"><EyeIcon /></span>  : <span className="TmRowVisiblityIcon TmRowIcon"><EyeSlashIcon/></span>}
             </div>
         </div>
         <TuringMachineToLoadDetails tm={props.tm} tmId={props.tmId} isVisible={areDetailsVisible}/>
