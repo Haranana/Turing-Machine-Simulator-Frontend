@@ -62,7 +62,7 @@ export default function EditProfile(){
         <div className="editProfileRow">
             <div className="editProfileTextField">
                 <p className="editProfileTextFieldTitle">User since: </p>
-                <p className="editProfileTextFieldValue">{accountData != null? dateToShowable(accountData.createdAt) : ""}</p>
+                <p className="editProfileTextFieldValue">{ (accountData != null && accountData.createdAt != null)? dateToShowable(accountData.createdAt) : ""}</p>
             </div>
         </div>
 
