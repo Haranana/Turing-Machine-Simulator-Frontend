@@ -2,10 +2,14 @@ import { useContext, useState } from "react";
 import { AccountDataContext } from "./AccountDataContext";
 import Modal from "../Modal/Modal";
 import toast from "react-hot-toast";
+import { useApiFetch } from "../../api/util";
 
 export default function EditProfile(){
+
     const accountData = useContext(AccountDataContext);
     const [isChangePasswordModalOpen , setChangePasswordModalOpen]= useState<boolean>(false);
+    const [isDeleteAccountModalOpen , setDeleteAccountModalOpen]= useState<boolean>(false);
+    const apiFetch = useApiFetch();
 
     async function onChangePasswordClicked() {
         if (!accountData) return;
@@ -27,11 +31,29 @@ export default function EditProfile(){
         }
     }
 
+    async function onDeleteAccountClicked(){
+        if (!accountData) return;
+
+        try {
+            const res = await apiFetch("http://localhost:9090/api/account/delete/token", {
+                method: "POST",
+            });
+
+            if (res.ok) {
+                setDeleteAccountModalOpen(true);
+            } else {
+                toast.error("Account couldn't be Deleted");
+            }
+        } catch {
+            toast.error("Account couldn't be Deleted");
+        }
+    }
+
     return <div className="AccountPageSubpage LoadTuringMachineSubpage">
         <p className="editProfileTextField">Email: {accountData?.email}</p>
         <p className="editProfileTextField">User since: {accountData?.createdAt}</p>
         <button className="editProfileButton changePasswordButton" onClick={onChangePasswordClicked}>Change password</button>
-        <button className="editProfileButton deleteAccountButton">Delete account</button> 
+        <button className="editProfileButton deleteAccountButton" onClick={onDeleteAccountClicked}>Delete account</button> 
         {/*<hr className='LineSeparator'></hr>*/}
         <Modal open={isChangePasswordModalOpen} onClose={()=>{setChangePasswordModalOpen(false)}}>
                         <div className="ChangePasswordTextWrapper">
@@ -40,6 +62,15 @@ export default function EditProfile(){
                         </div>
                         <div className="ChangePasswordButtonWrapper">
                             <button className="ModalButton ChangePasswordOkButton" onClick={()=>{setChangePasswordModalOpen(false);}}>Ok</button>
+                        </div>
+        </Modal>
+        <Modal open={isDeleteAccountModalOpen} onClose={()=>{setDeleteAccountModalOpen(false)}}>
+                        <div className="DeleteAccountTextWrapper">
+                            <h2>E-mail sent!</h2>
+                            <p>To delete your account please log in into your mail and follow instructions in message send by us</p>
+                        </div>
+                        <div className="DeleteAccountButtonWrapper">
+                            <button className="ModalButton DeleteAccountOkButton" onClick={()=>{setDeleteAccountModalOpen(false);}}>Ok</button>
                         </div>
         </Modal>
     </div>
