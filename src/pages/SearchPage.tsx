@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 
 export default function SearchPage(){
 
-    const {setTmDataProgram , setTmDataTapesAmount, setTmDataName} = useTuringMachineData();
+    const {setTmDataProgram , setTmDataTapesAmount, setTmDataName, setTmDataTapesInputs} = useTuringMachineData();
     const {setAliases, setSpecialStates} = useTuringMachineSettings()
 
     const inputRef = useRef<string>("");
@@ -71,6 +71,12 @@ export default function SearchPage(){
         });
         setTmDataTapesAmount(tm.tapesAmount);
         setTmDataName(tm.name);
+        let clearInput: string[] = [];
+        for(let i =0 ; i < tm.tapesAmount; i++){
+            clearInput.push("");
+        } 
+        setTmDataTapesInputs(clearInput);
+        toast.success("Turing Machine loaded successfully");
     }
 
     return <div className="SearchPage">

@@ -29,10 +29,10 @@ export default function LoadTuringMachine(){
                     headers: { "Content-Type": "application/json" },
                 });
                 if(res.status == 200){
-                    console.log("got machines: ", res.status);
+                    //console.log("got machines: ", res.status);
                     const page: Page<TuringMachineGetDto> = await res.json();
                     setTuringMachinesData(page);
-                    console.log(page);
+                    //console.log(page);
                     //console.log("Machine program: ", page.content[0].program.split("\n"));
                     
                 }else{

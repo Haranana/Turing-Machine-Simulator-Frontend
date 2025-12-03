@@ -19,7 +19,7 @@ type inputProp = {tm: TuringMachineGetDto, tmId: number, handleDeleted: ()=>void
 
 export default function TuringMachineToLoad(props: inputProp){
 
-    const {tmDataName, setTmDataName, setTmDataTapesAmount, setTmDataProgram} = useTuringMachineData();
+    const {tmDataName, setTmDataName, setTmDataTapesAmount, setTmDataProgram, setTmDataTapesInputs} = useTuringMachineData();
     const {setAliases, setSpecialStates} = useTuringMachineSettings();
 
     const apiFetch = useApiFetch();
@@ -42,11 +42,18 @@ export default function TuringMachineToLoad(props: inputProp){
         });
         setTmDataTapesAmount(props.tm.tapesAmount);
         setTmDataName(props.tm.name);
+
+        let clearInput: string[] = [];
+        for(let i =0 ; i < props.tm.tapesAmount; i++){
+            clearInput.push("");
+        } 
+        setTmDataTapesInputs(clearInput);
+        toast.success("Turing Machine loaded successfully");
     }
 
     async function deleteTuringMachine(){
         try{
-            const res = await apiFetch(`http://localhost:9090/api/tm/${props.tm.id}` , {
+            const res = await apiFetch(`http://localhost:9090/api/tm/${props.tm.name}` , {
                 method: "DELETE",
             })
             if(res.status == 200 || res.status == 204){
