@@ -1,8 +1,5 @@
 import './page.css';
 import './SettingsPage.css'
-//import {useSimulationAliases} from '../features/GlobalData/simulationAliases'
-//import { useSpecialStates } from '../features/GlobalData/specialStates';
-import type {AliasesFields} from '../features/GlobalData/simulationAliases'
 import { useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useTuringMachineSettings } from '../features/GlobalData/GlobalData';

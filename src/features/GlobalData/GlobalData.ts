@@ -104,7 +104,7 @@ export const useSimulationData = create<SimulationData>()(persist(
 
 export const useTuringMachineData = create<TuringMachineData>()(persist(
     (set)=>({
-        tmDataTapesInputs: [],
+        tmDataTapesInputs: [""],
         tmDataTapesAmount: 1,
         tmDataProgram: [],
         tmDataProgramHasError: false,

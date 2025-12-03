@@ -1,24 +1,21 @@
-import { Editor, useMonaco } from "@monaco-editor/react";
-import { useSimulationAliases } from "../features/GlobalData/simulationAliases";
-import { useSimulationInput } from "../features/GlobalData/simulationInput";
-import type monaco from "monaco-editor";
+
 
 import "./page.css";
 import { useEffect, useRef } from "react";
-import { useSimulationProgram } from "../features/GlobalData/simulationProgram";
+import { Editor, useMonaco } from "@monaco-editor/react";
+import type monaco from "monaco-editor";
+import { useTuringMachineData, useTuringMachineSettings } from "../features/GlobalData/GlobalData";
 
 const LANGUAGE_ID = "tm";
 
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 export default function ConsolePage() {
-  const { simulationTapesAmount } = useSimulationInput();
-
   const monacoInstance = useMonaco();
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
-  const { sep1, sep2, left, stay, right } = useSimulationAliases();
-  const { codeLines, setCodeLines, setHasErrors } = useSimulationProgram();
+  const { symbolSeparator, transitionArrow, left, stay, right } = useTuringMachineSettings(s=>s.aliases);
+  const { tmDataProgram, setTmDataProgram, setTmDataProgramHasError, setTmDataTapesInputs, tmDataTapesAmount } = useTuringMachineData();
 
   function stripTerminators(lines: string[]): string[] {
     return lines.map(l => l.replace(/;\s*$/, ""));
@@ -53,9 +50,9 @@ export default function ConsolePage() {
     const reAction = new RegExp(
       `(${esc(left)}|${esc(stay)}|${esc(right)})`
     );
-    const reSep2 = new RegExp(esc(sep2));
-    const reSep1 = new RegExp(esc(sep1));
-    const reState = new RegExp(`((?!${esc(sep1)}|\\n).)+`);
+    const reSep2 = new RegExp(esc(symbolSeparator));
+    const reSep1 = new RegExp(esc(transitionArrow));
+    const reState = new RegExp(`((?!${esc(symbolSeparator)}|\\n).)+`);
     const reSymbol = /./;
     const reTerm = /;\s*/; 
 
@@ -152,7 +149,7 @@ export default function ConsolePage() {
         ],
       },
     });
-  }, [monacoInstance, sep1, sep2, left, stay, right]);
+  }, [monacoInstance, symbolSeparator, transitionArrow, left, stay, right]);
 
   function validateModel(
     model: monaco.editor.ITextModel,
@@ -162,8 +159,8 @@ export default function ConsolePage() {
     const lines = model.getLinesContent();
     const markers: monaco.editor.IMarkerData[] = [];
 
-    const s1 = esc(sep1);
-    const s2 = esc(sep2);
+    const s1 = esc(symbolSeparator);
+    const s2 = esc(transitionArrow);
     const act = `(?:${esc(left)}|${esc(stay)}|${esc(right)})`;
     const sym = `(?:.)`;
     const listN = (x: string) =>
@@ -219,7 +216,7 @@ export default function ConsolePage() {
     <div className="page">
       <Editor
         onMount={(editor, monacoLib) => {
-          console.log(codeLines);
+          console.log(tmDataProgram);
           editorRef.current = editor;
 
           const model = editor.getModel();
@@ -229,23 +226,23 @@ export default function ConsolePage() {
           const markers = validateModel(
             model,
             monacoLib,
-            simulationTapesAmount
+            tmDataTapesAmount
           );
 
 
 
-          setCodeLines(stripTerminators(model.getLinesContent()));
-          setHasErrors((markers ?? []).length > 0);
+          setTmDataProgram(stripTerminators(model.getLinesContent()));
+          setTmDataProgramHasError((markers ?? []).length > 0);
 
           // Jedna subskrypcja na zmiany treści
           const sub = editor.onDidChangeModelContent(() => {
             const m = validateModel(
               model,
               monacoLib,
-              simulationTapesAmount
+              tmDataTapesAmount
             );
-            setCodeLines(stripTerminators(model.getLinesContent()));
-            setHasErrors((m ?? []).length > 0);
+            setTmDataProgram(stripTerminators(model.getLinesContent()));
+            setTmDataProgramHasError((m ?? []).length > 0);
           });
 
           editor.onDidDispose(() => sub.dispose());
@@ -255,11 +252,11 @@ export default function ConsolePage() {
           const editor = editorRef.current;
           const model = editor.getModel();
           if (!model) return;
-          setCodeLines(stripTerminators(model.getLinesContent()));
+          setTmDataProgram(stripTerminators(model.getLinesContent()));
         }}
         className="code-editor"
         defaultLanguage={LANGUAGE_ID}
-        defaultValue={ addTerminators(codeLines).join("\n")}
+        defaultValue={ addTerminators(tmDataProgram).join("\n")}
         height="90vh"
         width="90vw"
         theme="tm-theme"

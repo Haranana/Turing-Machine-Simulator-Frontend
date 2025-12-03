@@ -16,7 +16,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   const { isAuthenticated } = useAuth();
   const {tmDataProgram, tmDataName, tmDataProgramHasError, tmDataTapesInputs, setTmDataTapesInputs, tmDataTapesAmount, setTmDataTapesAmount} = useTuringMachineData();
   const {simulationDataNodes , setSimulationDataNodes, simulationDataNodesPath, setSimulationDataNodesPath} = useSimulationData();
-  const {initialState, acceptState, rejectState} = useTuringMachineSettings(s=>s.aliases);
+  const {initialState, acceptState, rejectState} = useTuringMachineSettings(s=>s.specialStates);
 
   // Input taśmy, w przyszłości pewnie będzie zastąpiony listą stringów, dla każdej z taśm
   // Pole przechowuje wartosc tekstowa z inputu, niekoniecznie jest to zatwierdzony input programu
@@ -235,10 +235,20 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     //loads tapes amount data from zustand storage,
   useEffect(()=>{
     setTapesAmount(tmDataTapesAmount);
-    tapeInputRef.current = tmDataTapesInputs;
+    let tapesInput: string[] = tmDataTapesInputs;
+
+    /* safeguard */
+    if(tapesInput.length < tmDataTapesAmount){
+      tapesInput = [];
+      for(let i = 0; i<tmDataTapesAmount; i++){
+        tapesInput.push("");
+      }
+    }
+
+    tapeInputRef.current = tapesInput;
 
     for(let tapeId=0; tapeId < tmDataTapesAmount; tapeId++){
-      placeInputOnTape(tmDataTapesInputs[tapeId], tapeId);
+      placeInputOnTape(tapesInput[tapeId], tapeId);
     }
   },[])
 
@@ -421,7 +431,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   }
 
   function enterInput(tapeId: number){
-    setSimulationInput(tapeInputRef.current);
+    setTmDataTapesInputs(tapeInputRef.current);
     placeInputOnTape(tapeInputRef.current[tapeId], tapeId);
   }
 
