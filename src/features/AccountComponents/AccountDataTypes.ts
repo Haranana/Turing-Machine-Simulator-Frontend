@@ -53,8 +53,6 @@ export type TuringMachineSaveDto = {
 }
 
 export type TuringMachineEditDto = {
-    id: number;
-
     name : string | null ; 
     description: string | null;
     program: string | null;

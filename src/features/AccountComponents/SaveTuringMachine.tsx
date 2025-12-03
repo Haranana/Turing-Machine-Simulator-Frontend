@@ -87,12 +87,10 @@ export default function SaveTuringMachine(){
         //if tmToOverwrite is not null then we overwrite some tm, 
         //otherwise use id of lastly loaded tm
         //otherwise there's not any tm loaded, so error (just probably route to save as in the future)
-        let tmToSaveId: number = 0;
         let tmToSaveName: string| null = null;
         let tmToSaveDescription: string| null = null;
 
         if(tmToOverwrite != null){ //overwritting some machine
-            tmToSaveId = tmToOverwrite.id;
             tmToSaveName = newTuringMachineName;
             tmToSaveDescription = newTuringMachineDescription
         }else if(tmDataName != null){ //no overwritting, just editing currently loaded one
@@ -104,11 +102,14 @@ export default function SaveTuringMachine(){
               return;
         }
 
+        if(tmDataName == null){
+            toast.error("No turing machine is currently loaded,\nplease create new one by using Save as option");
+        }
+
         const sendBody : TuringMachineEditDto = {
-            
-                    id: tmToSaveId, 
-                    name: tmToSaveName,
-                    description: tmToSaveDescription,
+        
+                    name: tmDataName,
+                    description: null,
                     program: tmDataProgram.join("\n"),
                     initialState: initialState,
                     acceptState: acceptState,
@@ -122,7 +123,7 @@ export default function SaveTuringMachine(){
                     tapesAmount: tmDataTapesAmount,
                 };
         try{
-            const res = await apiFetch("http://localhost:9090/api/tm" , {
+            const res = await apiFetch("http://localhost:9090/api/tm/edit" , {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(
@@ -147,7 +148,8 @@ export default function SaveTuringMachine(){
                 Save As
                 {saveAsDashboardButtonPressed? <ChevronRightIcon className="saveTmDashboardIcon"></ChevronRightIcon> : <ChevronDownIcon className="saveTmDashboardIcon"></ChevronDownIcon>}
             </button>
-            <button className={`SaveTmDashboardButton SaveTmDashboardSaveButton ${tmDataName==null ? "DisabledButton" : ""}`} disabled={tmDataName==null} onClick={e=>handleSave(e)}>Save </button>
+            <button className={`SaveTmDashboardButton SaveTmDashboardSaveButton ${tmDataName==null ? "DisabledButton" : ""}`} disabled={tmDataName==null} onClick={e=>handleSave(e)}>
+                Save </button>
         </div>
         {isAccountDataLoaded() && saveAsDashboardButtonPressed?
          <form className="SaveTuringMachineForm">

@@ -6,6 +6,7 @@ import {type TuringMachineGetDto, type PageableQuery , type Page} from "./Accoun
 import TuringMachineToLoad from "./TuringMachineToLoad";
 import { toast } from 'react-hot-toast';
 import Modal from "../Modal/Modal";
+import { useTuringMachineData } from "../GlobalData/GlobalData";
 
 
 export default function LoadTuringMachine(){
@@ -18,6 +19,7 @@ export default function LoadTuringMachine(){
     const [TuringMachinesData, setTuringMachinesData] = useState<Page<TuringMachineGetDto> | null>(null);
     const [listReloadNeeded, setListReloadNeeded] = useState<number>(0);
     const tmToDeleteNameRef = useRef<String | null>(null);
+    const {setTmDataName} = useTuringMachineData();
     
     useEffect(()=>{
         
@@ -53,6 +55,7 @@ export default function LoadTuringMachine(){
     }
 
     function handleDeleted() {
+        setTmDataName(null);
         setListReloadNeeded(k => k + 1); 
     }
 
