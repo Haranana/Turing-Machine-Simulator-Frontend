@@ -9,7 +9,7 @@ export type SimulationProgram = {
     setHasErrors: (value: boolean)=>void;
 }
 
-export const useSimulationProgram = (create<SimulationProgram>)()(
+ const useSimulationProgram = (create<SimulationProgram>)()(
     persist(
         (set)=>({
                 codeLines: ["q1,a,q2,b,S"],

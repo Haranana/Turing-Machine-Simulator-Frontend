@@ -13,7 +13,7 @@ export type SimulationData = {
     setSimulationPath: (value: number[]) => void;
 }
 
-export const useSimulationData = create<SimulationData>()(
+ const useSimulationData = create<SimulationData>()(
     persist(
         (set)=>({
                 simulationData: null,

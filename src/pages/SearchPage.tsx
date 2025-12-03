@@ -1,22 +1,16 @@
 import "../pages/SearchPage.css"
 
 import { useEffect, useRef, useState } from "react"
-import { useSimulationProgram } from "../features/GlobalData/simulationProgram";
-import { useSpecialStates } from "../features/GlobalData/specialStates";
-import { useSimulationAliases } from "../features/GlobalData/simulationAliases";
-import { useSimulationInput } from "../features/GlobalData/simulationInput";
-import { useLoadedTmData } from "../features/GlobalData/loadedTmData";
+import { useTuringMachineData } from "../features/GlobalData/GlobalData";
+import { useTuringMachineSettings } from "../features/GlobalData/GlobalData";
 import type { TuringMachineGetDto } from "../features/AccountComponents/AccountDataTypes";
 import toast from "react-hot-toast";
 
 
 export default function SearchPage(){
 
-    const {setCodeLines} = useSimulationProgram();
-    const {setSpecialStates } = useSpecialStates();
-    const {setSimulationAliases} = useSimulationAliases();
-    const {setSimulationTapesAmount} = useSimulationInput();
-    const {setLoadedTmData} = useLoadedTmData();
+    const {setTmDataProgram , setTmDataTapesAmount, setTmDataName} = useTuringMachineData();
+    const {setAliases, setSpecialStates} = useTuringMachineSettings()
 
     const inputRef = useRef<string>("");
     const [validationError, setValidationError] = useState<string | null>(null);
@@ -65,18 +59,18 @@ export default function SearchPage(){
     }
 
     async function loadSimulation(tm: TuringMachineGetDto){
-        setCodeLines(tm.program.split("\n"));
+        setTmDataProgram(tm.program.split("\n"));
         setSpecialStates(tm.initialState, tm.acceptState, tm.rejectState);
-        setSimulationAliases({
-            sep1: tm.sep1,
-            sep2: tm.sep2,
+        setAliases({
+            symbolSeparator: tm.sep1,
+            transitionArrow: tm.sep2,
             blank: tm.blank,
             right: tm.moveRight,
             left: tm.moveLeft,
             stay: tm.moveStay,
         });
-        setSimulationTapesAmount(tm.tapesAmount);
-        setLoadedTmData(tm.name, tm.id);
+        setTmDataTapesAmount(tm.tapesAmount);
+        setTmDataName(tm.name);
     }
 
     return <div className="SearchPage">

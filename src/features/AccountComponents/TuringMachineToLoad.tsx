@@ -1,14 +1,11 @@
-import { useSimulationProgram } from "../../features/GlobalData/simulationProgram"
-import {useSpecialStates} from "../../features/GlobalData/specialStates"
-import { useSimulationAliases } from "../../features/GlobalData/simulationAliases";
-import { useSimulationInput } from "../GlobalData/simulationInput";
+import { useTuringMachineData } from "../GlobalData/GlobalData";
+import { useTuringMachineSettings } from "../GlobalData/GlobalData";
 import type { TuringMachineGetDto } from "./AccountDataTypes"
 import { ChevronDownIcon, ChevronUpIcon, EyeIcon, EyeSlashIcon, TrashIcon } from "@heroicons/react/24/solid"
 import { useApiFetch } from "../../api/util";
 import { toast } from 'react-hot-toast';
 import Modal from "../Modal/Modal";
 import { useState } from "react";
-import { useLoadedTmData } from "../GlobalData/loadedTmData";
 import TuringMachineToLoadDetails from "./TuringMachineToLoadDetails";
 
 type inputProp = {tm: TuringMachineGetDto, tmId: number, handleDeleted: ()=>void}
@@ -22,11 +19,9 @@ type inputProp = {tm: TuringMachineGetDto, tmId: number, handleDeleted: ()=>void
 
 export default function TuringMachineToLoad(props: inputProp){
 
-    const {setCodeLines} = useSimulationProgram();
-    const {setSpecialStates } = useSpecialStates();
-    const {setSimulationAliases} = useSimulationAliases();
-    const {setSimulationTapesAmount} = useSimulationInput();
-    const {setLoadedTmData, loadedTmName, resetTmData} = useLoadedTmData();
+    const {tmDataName, setTmDataName, setTmDataTapesAmount, setTmDataProgram} = useTuringMachineData();
+    const {setAliases, setSpecialStates} = useTuringMachineSettings();
+
     const apiFetch = useApiFetch();
 
     const [isDeleteTmModalOpen, setDeleteTmModalOpen] = useState<boolean>(false);
@@ -35,18 +30,18 @@ export default function TuringMachineToLoad(props: inputProp){
 
 
     function onLoadTuringMachine(){
-        setCodeLines(props.tm.program.split("\n"));
+        setTmDataProgram(props.tm.program.split("\n"));
         setSpecialStates(props.tm.initialState, props.tm.acceptState, props.tm.rejectState);
-        setSimulationAliases({
-            sep1: props.tm.sep1,
-            sep2: props.tm.sep2,
+        setAliases({
+            symbolSeparator: props.tm.sep1,
+            transitionArrow: props.tm.sep2,
             blank: props.tm.blank,
             right: props.tm.moveRight,
             left: props.tm.moveLeft,
             stay: props.tm.moveStay,
         });
-        setSimulationTapesAmount(props.tm.tapesAmount);
-        setLoadedTmData(props.tm.name, props.tm.id);
+        setTmDataTapesAmount(props.tm.tapesAmount);
+        setTmDataName(props.tm.name);
     }
 
     async function deleteTuringMachine(){
@@ -56,8 +51,8 @@ export default function TuringMachineToLoad(props: inputProp){
             })
             if(res.status == 200 || res.status == 204){
                 toast.success("Turing Machine deleted successfully");
-                if(props.tm.name === loadedTmName){
-                    resetTmData();
+                if(props.tm.name === tmDataName){
+                    setTmDataName(null);
                 }
             }else{
                 toast.error(`Turing Machine couldn't be deleted\n${res.status} ${res.statusText}\n${res.text}`);
@@ -82,7 +77,6 @@ export default function TuringMachineToLoad(props: inputProp){
             <div className="TmRowUpdateWrapper TmRowTextWrapper">
                 <span className="TmRowUpdatedDate TmRowTextField">{dateToShowable(props.tm.updatedAt)}</span>
             </div>
-            {/*<span className="TmRowCreatedDate TmRowTextField">{props.tm.createdAt}</span>*/}
             <div className="TmRowLoadWrapper TmRowButtonWrapper">
                 <button className="TmRowLoadButton TmRowButton" onClick={()=>{onLoadTuringMachine()}}>Load</button>
             </div>

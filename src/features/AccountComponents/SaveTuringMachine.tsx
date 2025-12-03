@@ -1,33 +1,27 @@
-import { useSimulationProgram } from "../../features/GlobalData/simulationProgram"
-import {useSpecialStates} from "../../features/GlobalData/specialStates"
-import { useSimulationAliases } from "../../features/GlobalData/simulationAliases";
-import { useSimulationInput } from "../GlobalData/simulationInput";
-import { useLoadedTmData } from "../GlobalData/loadedTmData";
 import { useContext, useState } from "react";
 import { AccountDataContext } from "./AccountDataContext";
 import { ChevronDownIcon, ChevronRightIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
 import { useApiFetch } from "../../api/util";
 import { toast } from 'react-hot-toast';
-import { boolean } from "zod";
-import type { TmNameConfilctErrorBody } from "./AccountDataTypes";
 import Modal from "../Modal/Modal";
-import type { TuringMachineEditDto, TuringMachineSaveDto, TuringMachineGetDto } from "./AccountDataTypes";
+import type { TuringMachineEditDto, TuringMachineGetDto } from "./AccountDataTypes";
+import { useTuringMachineData, useTuringMachineSettings } from "../GlobalData/GlobalData";
 
 
 export default function SaveTuringMachine(){
     const accountData = useContext(AccountDataContext);
     const apiFetch = useApiFetch();
-    const {codeLines, setCodeLines} = useSimulationProgram();
-    const { initialState, acceptState, rejectState, setSpecialStates } = useSpecialStates();
-    const {sep1, sep2, blank, left, right, stay , setSimulationAliases} = useSimulationAliases();
+
+    const {tmDataProgram , tmDataTapesAmount, tmDataName, setTmDataName} = useTuringMachineData();
+    const {symbolSeparator,transitionArrow,blank, left, right, stay} = useTuringMachineSettings(s=>s.aliases);
+    const {initialState, acceptState, rejectState} = useTuringMachineSettings(s=>s.specialStates);
 
     //data from input fields in save as
     const [newTuringMachineName , setNewTuringMachineName] = useState<string>("");
     const [newTuringMachineDescription , setNewTuringMachineDescription] = useState<string>("");
 
     const [initialValidationPassed, setInitialValidationPassed] = useState<boolean>(false);
-    const {simulationTapesAmount} = useSimulationInput();
-    const {loadedTmId, loadedTmName, setLoadedTmData} = useLoadedTmData();
+
     const [isSaveTmModalOpen, setSaveTmModalOpen] = useState<boolean>(false);
     const [tmToOverwrite, setTmToOverwrite] = useState<{id: number, name: string}|null>(null);
     const [saveAsDashboardButtonPressed, setSaveAsDashboardButtonPressed] = useState<boolean>(false);
@@ -46,17 +40,17 @@ export default function SaveTuringMachine(){
          const sendBody = {
                     name: newTuringMachineName,
                     description: newTuringMachineDescription,
-                    program: codeLines.join("\n"),
+                    program: tmDataProgram.join("\n"),
                     initialState: initialState,
                     acceptState: acceptState,
                     rejectState: rejectState,
                     blank: blank,
-                    sep1: sep1,
-                    sep2: sep2,
+                    sep1: symbolSeparator,
+                    sep2: transitionArrow,
                     moveRight: right,
                     moveLeft: left,
                     moveStay: stay,
-                    tapesAmount: simulationTapesAmount,
+                    tapesAmount: tmDataTapesAmount,
                 };
         try{
             const res = await apiFetch("http://localhost:9090/api/tm" , {
@@ -69,7 +63,8 @@ export default function SaveTuringMachine(){
             if(res.status == 200 || res.status == 201){
                 toast.success(`Turing Machine saved successfully`);
                 const dto : TuringMachineGetDto = await res.json();
-                setLoadedTmData(dto.name, dto.id);
+                setTmDataName(dto.name);
+                //setLoadedTmData(dto.name, dto.id);
                 
             }else if(res.status == 409){
                 const pd = await res.json(); 
@@ -100,8 +95,8 @@ export default function SaveTuringMachine(){
             tmToSaveId = tmToOverwrite.id;
             tmToSaveName = newTuringMachineName;
             tmToSaveDescription = newTuringMachineDescription
-        }else if(loadedTmId != null){ //no overwritting, just editing currently loaded one
-            tmToSaveId = loadedTmId;
+        }else if(tmDataName != null){ //no overwritting, just editing currently loaded one
+            //tmToSaveId = loadedTmId;
             tmToSaveName = null;
             tmToSaveDescription = null;
         }else{ //oops
@@ -114,17 +109,17 @@ export default function SaveTuringMachine(){
                     id: tmToSaveId, 
                     name: tmToSaveName,
                     description: tmToSaveDescription,
-                    program: codeLines.join("\n"),
+                    program: tmDataProgram.join("\n"),
                     initialState: initialState,
                     acceptState: acceptState,
                     rejectState: rejectState,
                     blank: blank,
-                    sep1: sep1,
-                    sep2: sep2,
+                    sep1: symbolSeparator,
+                    sep2: transitionArrow,
                     moveRight: right,
                     moveLeft: left,
                     moveStay: stay,
-                    tapesAmount: simulationTapesAmount,
+                    tapesAmount: tmDataTapesAmount,
                 };
         try{
             const res = await apiFetch("http://localhost:9090/api/tm" , {
@@ -152,7 +147,7 @@ export default function SaveTuringMachine(){
                 Save As
                 {saveAsDashboardButtonPressed? <ChevronRightIcon className="saveTmDashboardIcon"></ChevronRightIcon> : <ChevronDownIcon className="saveTmDashboardIcon"></ChevronDownIcon>}
             </button>
-            <button className={`SaveTmDashboardButton SaveTmDashboardSaveButton ${loadedTmId==null ? "DisabledButton" : ""}`} disabled={loadedTmId==null} onClick={e=>handleSave(e)}>Save </button>
+            <button className={`SaveTmDashboardButton SaveTmDashboardSaveButton ${tmDataName==null ? "DisabledButton" : ""}`} disabled={tmDataName==null} onClick={e=>handleSave(e)}>Save </button>
         </div>
         {isAccountDataLoaded() && saveAsDashboardButtonPressed?
          <form className="SaveTuringMachineForm">

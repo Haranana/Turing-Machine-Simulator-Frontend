@@ -2,13 +2,9 @@
 import SimulatorPage from './pages/SimulatorPage'
 import ConsolePage from './pages/ConsolePage'
 import AccountPage from './pages/AccountPage'
-import { AuthProvider
- } from './auth/AuthContext'
-import { BrowserRouter } from 'react-router-dom'
 import SettingsPage from './pages/SettingsPage'
 import SignUpPage from './pages/SignUpPage'
 import { Routes, Route } from 'react-router-dom'
-import { useState } from 'react'
 import Layout from "./Layout";
 import LoginPage from './pages/LoginPage'
 import { Toaster } from 'react-hot-toast';

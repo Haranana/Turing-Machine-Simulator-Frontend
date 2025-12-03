@@ -1,17 +1,19 @@
 import './page.css';
 import './SettingsPage.css'
-import {useSimulationAliases} from '../features/GlobalData/simulationAliases'
-import { useSpecialStates } from '../features/GlobalData/specialStates';
+//import {useSimulationAliases} from '../features/GlobalData/simulationAliases'
+//import { useSpecialStates } from '../features/GlobalData/specialStates';
 import type {AliasesFields} from '../features/GlobalData/simulationAliases'
 import { useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { useTuringMachineSettings } from '../features/GlobalData/GlobalData';
 
 
 
 export default  function SettingsPage() {
 
-    const { sep1, sep2, blank, left, stay, right, setSimulationAliases} = useSimulationAliases()
-    const { initialState, acceptState, rejectState, setSpecialStates} = useSpecialStates()
+    const { symbolSeparator, transitionArrow, blank, left, stay, right} = useTuringMachineSettings(s=>s.aliases)
+    const {setAliases, setSpecialStates} = useTuringMachineSettings();
+    const { initialState, acceptState, rejectState} = useTuringMachineSettings(s=>s.specialStates)
 
     const sep1Ref = useRef<HTMLInputElement>(null);
     const sep2Ref = useRef<HTMLInputElement>(null);
@@ -30,10 +32,10 @@ export default  function SettingsPage() {
     const SaveSettings: () => void = () => {
 
         let sep1RefValue = sep1Ref.current?.value;
-        sep1RefValue = sep1RefValue === undefined? sep1 : sep1RefValue as string;
+        sep1RefValue = sep1RefValue === undefined? symbolSeparator : sep1RefValue as string;
 
         let sep2RefValue = sep2Ref.current?.value;
-        sep2RefValue = sep2RefValue === undefined? sep2 : sep2RefValue as string;
+        sep2RefValue = sep2RefValue === undefined? transitionArrow : sep2RefValue as string;
 
         let blankRefValue = blankRef.current?.value;
         blankRefValue = blankRefValue === undefined? blank : blankRefValue as string;
@@ -47,20 +49,17 @@ export default  function SettingsPage() {
         let rightRefValue = rightRef.current?.value;
         rightRefValue = rightRefValue === undefined? right : rightRefValue as string;
 
-        //sep2RefValue = sep1RefValue // ! currently API only accepts 1 separator, change when API is updated
-
         let initialRefValue = initialRef.current?.value;
         initialRefValue = initialRefValue === undefined? initialState : initialRefValue as string;
 
         let acceptRefValue = acceptRef.current?.value;
         acceptRefValue = acceptRefValue === undefined? acceptState : acceptRefValue as string;
 
-        let rejectRefValue = rejectRef.current?.value;
-        rejectRefValue = rejectRefValue === undefined? rejectState : rejectRefValue as string;
+        let rejectRefValue : string | null = rejectRef.current == null || rejectRef.current.value === "" ? null : rejectRef.current.value as string;
 
-        setSimulationAliases({
-            sep1: sep1RefValue,
-            sep2: sep2RefValue,
+        setAliases({
+            symbolSeparator: sep1RefValue,
+            transitionArrow: sep2RefValue,
             blank: blankRefValue,
             left: leftRefValue,
             stay: stayRefValue,
@@ -104,7 +103,7 @@ export default  function SettingsPage() {
                             minLength={1}
                             maxLength={10}
                             id="sep1-alias"
-                            defaultValue={sep1}
+                            defaultValue={symbolSeparator}
                             onChange={(e)=>onInputChange(e.target.value)}
                             />
                         </div>
@@ -119,7 +118,7 @@ export default  function SettingsPage() {
                             minLength={1}
                             maxLength={10}
                             id="sep2-alias"
-                            defaultValue={sep2}
+                            defaultValue={transitionArrow}
                             onChange={(e)=>onInputChange(e.target.value)}
                             />
                         </div>
@@ -219,8 +218,8 @@ export default  function SettingsPage() {
                             minLength={1}
                             maxLength={20}
                             id="StateReject"
-                            defaultValue={rejectState}
-                            onChange={(e)=>onInputChange(e.target.value)}
+                            defaultValue={rejectState == null? "" : rejectState}
+                            /*onChange={(e)=>onInputChange(e.target.value)}*/ // can be null so we don't check whether saving is allowed
                             />
                         </div>
 

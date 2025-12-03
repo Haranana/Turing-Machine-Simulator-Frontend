@@ -1,9 +1,8 @@
 
 import { CreatedSimulationSchema, NdTmReturnDtoSchema, SendSimulationDtoSchema, SimulationNodesRecordSchema, type SendSimulationDto, type SimulationExport, type SimulationNodeMap, type SimulationNodeRecord } from "../features/Tape/simulationTypes.tsx";
-import { useSimulationProgram } from "../features/GlobalData/simulationProgram.tsx"
-import { useSimulationAliases } from "../features/GlobalData/simulationAliases.tsx";
-import {useSimulationInput} from "../features/GlobalData/simulationInput.tsx"
-import { useSpecialStates } from "../features/GlobalData/specialStates.tsx";
+
+import { useTuringMachineSettings } from "../features/GlobalData/GlobalData.ts";
+import { useTuringMachineData } from "../features/GlobalData/GlobalData.ts";
 
 function localCodeToGlobal(
   codeLines: string[],
@@ -49,22 +48,26 @@ function localCodeToGlobal(
 }
 
 export function buildSimulationExport(): SimulationExport{
-  const { codeLines } = useSimulationProgram.getState();
-  const { sep1, sep2, blank, left, right, stay } = useSimulationAliases.getState();
-  const { simulationInput, simulationTapesAmount } = useSimulationInput.getState();
-  const { initialState, acceptState, rejectState } = useSpecialStates.getState();
+  //const { codeLines } = useSimulationProgram.getState();
+  //const { sep1, sep2, blank, left, right, stay } = useSimulationAliases.getState();
+  //const { simulationInput, simulationTapesAmount } = useSimulationInput.getState();
+  //const { initialState, acceptState, rejectState } = useSpecialStates.getState();
 
-  const program = localCodeToGlobal(codeLines,sep1, left, right, stay, simulationTapesAmount);
+  const { tmDataProgram , tmDataTapesInputs, tmDataTapesAmount } = useTuringMachineData.getState();
+  const {symbolSeparator, transitionArrow, blank, left, right, stay} = useTuringMachineSettings.getState().aliases;
+  const {initialState, acceptState, rejectState } = useTuringMachineSettings.getState().specialStates;
+
+  const program = localCodeToGlobal(tmDataProgram ,symbolSeparator, left, right, stay, tmDataTapesAmount);
   return { 
       initialState: initialState,
       acceptState: acceptState,
       rejectState: rejectState,
       program: program,
-      sep1: sep1,
-      sep2: sep2,
+      sep1: symbolSeparator,
+      sep2: transitionArrow,
       blank: blank,
-      input:simulationInput,
-      tapesAmount:simulationTapesAmount
+      input:tmDataTapesInputs,
+      tapesAmount:tmDataTapesAmount
     };
 }
 

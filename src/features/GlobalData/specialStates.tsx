@@ -12,7 +12,7 @@ export type SpecialStates = {
     setRejectState: (value : string) => void;
 }
 
-export const useSpecialStates = (create<SpecialStates>)()(
+ const useSpecialStates = (create<SpecialStates>)()(
     persist(
         (set)=>({
 

@@ -2,36 +2,27 @@ import "./tape.css";
 
 import { PlayIcon, PauseIcon, StopIcon, ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronDownIcon, PlusIcon, MinusIcon } from "@heroicons/react/24/solid";
 import { useState, useRef, useEffect, useCallback } from "react";
-import {type TapeState, type TapeSymbol, type TapeViewInput, type SimulationStep, type TapeInput, type AnimationType, type SimulationExport, type TransitionAction } from "./simulationTypes.tsx";
+import {type TapeSymbol, type TapeViewInput, type SimulationStep, type TapeInput, type AnimationType, type SimulationExport, type TransitionAction } from "./simulationTypes.tsx";
 import {TapeComponent} from "./TapeComponent"
 import { buildSimulationExport, sendSimulation} from "../../dtos/dto.ts"
-import { useSimulationProgram } from "../GlobalData/simulationProgram.tsx"
-import {useSimulationInput} from "../GlobalData/simulationInput.tsx"
-import { useSpecialStates } from "../GlobalData/specialStates.tsx";
 import { toast } from 'react-hot-toast';
 import { NdSimulation } from "./Simulation.ts";
-import type { SimulationNodeMap, SimulationNodeRecord } from "./simulationTypes.tsx";
-import {useSimulationData} from "../GlobalData/simulationData.tsx"
-import { useLoadedTmData } from "../GlobalData/loadedTmData.tsx";
+import type { SimulationNodeRecord } from "./simulationTypes.tsx";
 import { useAuth } from "../../auth/AuthContext.tsx";
+import { useSimulationData, useTuringMachineData, useTuringMachineSettings } from "../GlobalData/GlobalData.ts";
 
 export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
 
   const { isAuthenticated } = useAuth();
-  const {loadedTmName} = useLoadedTmData();
-  const {hasErrors} = useSimulationProgram();
-
-  const {simulationData, setSimulationData, simulationPath, setSimulationPath, simulationName} = useSimulationData();
-
-  const { initialState, acceptState, rejectState } = useSpecialStates();
-
-  const {simulationInput, setSimulationInput , setSimulationTapesAmount, simulationTapesAmount} = useSimulationInput();
+  const {tmDataProgram, tmDataName, tmDataProgramHasError, tmDataTapesInputs, setTmDataTapesInputs, tmDataTapesAmount, setTmDataTapesAmount} = useTuringMachineData();
+  const {simulationDataNodes , setSimulationDataNodes, simulationDataNodesPath, setSimulationDataNodesPath} = useSimulationData();
+  const {initialState, acceptState, rejectState} = useTuringMachineSettings(s=>s.aliases);
 
   // Input taśmy, w przyszłości pewnie będzie zastąpiony listą stringów, dla każdej z taśm
   // Pole przechowuje wartosc tekstowa z inputu, niekoniecznie jest to zatwierdzony input programu
   const tapeInputRef = useRef<string[]>([""]);
 
-  const [tapesAmount, setTapesAmount] = useState<number>(simulationTapesAmount);
+  const [tapesAmount, setTapesAmount] = useState<number>(tmDataTapesAmount);
 
     // Taśma używana w symilacji
   const [tapeValues] = useState<Map<number, TapeSymbol>[]>(
@@ -219,8 +210,8 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     outputRef.current = "";
     const newSimulation = new NdSimulation(schema);
     newSimulation.updatePath();
-    setSimulationData(schema);
-    setSimulationPath(newSimulation.path);
+    setSimulationDataNodes(schema);
+    setSimulationDataNodesPath(newSimulation.path);
     setSimulation(newSimulation);
   }
 
@@ -238,33 +229,33 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   //save data to Zustand storage, in future should probably also store inputs and simulation
   useEffect(() => {
-    setTapesAmount(simulationTapesAmount);    
-  }, [simulationTapesAmount]);
+    setTapesAmount(tmDataTapesAmount);    
+  }, [tmDataTapesAmount]);
 
     //loads tapes amount data from zustand storage,
   useEffect(()=>{
-    setTapesAmount(simulationTapesAmount);
-    tapeInputRef.current = simulationInput;
+    setTapesAmount(tmDataTapesAmount);
+    tapeInputRef.current = tmDataTapesInputs;
 
-    for(let tapeId=0; tapeId < simulationTapesAmount; tapeId++){
-      placeInputOnTape(simulationInput[tapeId], tapeId);
+    for(let tapeId=0; tapeId < tmDataTapesAmount; tapeId++){
+      placeInputOnTape(tmDataTapesInputs[tapeId], tapeId);
     }
   },[])
 
   //loads simulationData from zustand storage
   useEffect(()=>{
-    if(!simulationData) return;
+    if(!simulationDataNodes) return;
 
-    const newSimulation = new NdSimulation(simulationData);
+    const newSimulation = new NdSimulation(simulationDataNodes);
 
-    if (simulationPath.length > 0) {
-    newSimulation.path = simulationPath;
+    if (simulationDataNodesPath.length > 0) {
+    newSimulation.path = simulationDataNodesPath;
   } else {
     newSimulation.updatePath();
   }
 
     setSimulation(newSimulation);
-  },[simulationData])
+  },[simulationDataNodes])
 
 
   //updates states upon new tape creation
@@ -305,11 +296,11 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     if(tapesAmount >= 5) return;
     const newlyAddedId = tapesAmount;
     const realTapesAmount = tapesAmount+1;
-    const newInput = [...simulationInput, ""];
+    const newInput = [...tmDataTapesInputs, ""];
 
     setTapesAmount(realTapesAmount);
-    setSimulationTapesAmount(realTapesAmount);
-    setSimulationInput(newInput);
+    setTmDataTapesAmount(realTapesAmount);
+    setTmDataTapesInputs(newInput);
     
     
     setInputFieldVisibility(prev=>[...prev,false]);
@@ -330,7 +321,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     if(tapesAmount<=1) return;
     const realTapesAmount = tapesAmount-1;
     setTapesAmount(realTapesAmount);
-    setSimulationTapesAmount(realTapesAmount);
+    setTmDataTapesAmount(realTapesAmount);
     
     setInputFieldVisibility(prev=>prev.slice(0,-1));
     setIsAnimating(prev=>prev.slice(0,-1));
@@ -449,9 +440,9 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   //Discards simulation
   const resetSimulation = () => {
     setSimulation(null);
-    setSimulationData(null);
-    setSimulationPath([]);
-    setSimulationInput(simulationInput.map((_,__)=>""));
+    setSimulationDataNodes(null);
+    setSimulationDataNodesPath([]);
+    setTmDataTapesInputs(tmDataTapesInputs.map((_,__)=>""));
     
     stepRef.current = 0;
     stepDirRef.current = 0;
@@ -488,7 +479,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     stepRef.current = step;
     stateRef.current = stepsNode[0].stateBefore;
     
-    setTapeData(prev=>prev.map((v,i)=>({
+    setTapeData(prev=>prev.map((_,i)=>({
       tapeState: stepsNode[i].tapeBefore,
       writtenChar: null,
       action: null,
@@ -508,14 +499,14 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   function getCurrentState(){
     if(simulation==null) return "";
-    const currentStep : number = stepRef.current;
+    //const currentStep : number = stepRef.current;
     
     const out = isCurrentStepLeaf()? simulation.getLastStep(0)!.stateAfter : stateRef.current;
     return out;
     //return currentStep === stepsAmount()? simulation.getLastStep(0)!.stateAfter : stateRef.current;
   }
 
-  function getCurrentOutput(stepId: number){
+  function getCurrentOutput(_: number){
     if(simulation==null) return "";
     const isLastStep = isCurrentStepLeaf();
     if(isLastStep){
@@ -535,9 +526,9 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   return (
     <div className="simulation-interface">
 
-      {isAuthenticated && loadedTmName!=null?
+      {isAuthenticated && tmDataName!=null?
         <div className="SimulationNameWrapper">
-          <p className="SimulationName">{loadedTmName}</p>
+          <p className="SimulationName">{tmDataName}</p>
         </div>: ""
       }
      
@@ -669,8 +660,8 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
        
       </div>
       <div className="LoadSimulationContainer">
-        <button className={`LoadSimulationButton ${isSimulationLoaded() || hasErrors? "tooltip DisabledButton" : ""}`} 
-        data-tooltip={isSimulationLoaded()? "Discrad this simulation before loading new one" : hasErrors? "Resolve code errors before loading simulation" : "Unidentified error has occured"}
+        <button className={`LoadSimulationButton ${isSimulationLoaded() || tmDataProgramHasError? "tooltip DisabledButton" : ""}`} 
+        data-tooltip={isSimulationLoaded()? "Discrad this simulation before loading new one" : tmDataProgramHasError? "Resolve code errors before loading simulation" : "Unidentified error has occured"}
           disabled={isSimulationLoaded()} onClick={()=>loadSimulation()}>Load Simulation
         </button>
       </div>

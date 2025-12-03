@@ -21,7 +21,7 @@ const numericKey = z.string().regex(/^-?\d+$/);
 export type SimulationExport = {
   initialState : string,
   acceptState : string,
-  rejectState : string,
+  rejectState : string | null,
   program : string[],
   sep1 : string,
   sep2: string,

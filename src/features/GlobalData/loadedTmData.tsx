@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type loadedTmData = {
+type loadedTmData = {
     isTmLoaded: boolean,
     loadedTmName: string | null,
     loadedTmId: number | null,
@@ -9,7 +9,7 @@ export type loadedTmData = {
     resetTmData: ()=>void,
 }
 
-export const useLoadedTmData = create<loadedTmData>()(
+const useLoadedTmData = create<loadedTmData>()(
     persist((set)=>({
         isTmLoaded: false,
         loadedTmName: null,

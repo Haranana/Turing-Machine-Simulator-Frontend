@@ -15,7 +15,7 @@ export type SimulationAliases = AliasesFields & {
   setSimulationAlias: (k: keyof AliasesFields, v: string) => void;
 }
 
-export const useSimulationAliases = create<SimulationAliases>()(
+ const useSimulationAliases = create<SimulationAliases>()(
     persist(
     (set)=>({
     sep1: ",",

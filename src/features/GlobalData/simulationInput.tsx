@@ -10,7 +10,7 @@ export type SimulationInput = {
   setSimulationTapesAmount : (value: number) => void,
 }
 
-export const useSimulationInput = create<SimulationInput>()(
+ const useSimulationInput = create<SimulationInput>()(
     persist(
     (set)=>({
     simulationInput: [""],

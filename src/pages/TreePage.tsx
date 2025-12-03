@@ -5,8 +5,7 @@ import {useEffect, useRef, useState } from "react";
 import { ReactFlow,Background,useNodesState,useEdgesState,type Node,type Edge, type NodeProps, type NodeTypes, Handle, Position} from "@xyflow/react";
 import { type SimulationNode , type SimulationNodeMap } from '../features/Tape/simulationTypes';
 import ELK, {type ElkNode } from "elkjs/lib/elk.bundled.js";
-import { useSimulationData } from '../features/GlobalData/simulationData';
-import { useSpecialStates } from '../features/GlobalData/specialStates';
+import { useSimulationData, useTuringMachineSettings } from "../features/GlobalData/GlobalData";
 import { NdSimulation } from '../features/Tape/Simulation';
 
 const elk  = new ELK();
@@ -37,7 +36,7 @@ export default function TreePage(){
 
   const [nodes, setNodes, onNodesChange] = useNodesState<RfNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const {simulationData, setSimulationPath, simulationPath} = useSimulationData();
+  const {simulationDataNodes, simulationDataNodesPath, setSimulationDataNodesPath} = useSimulationData();
   const [simulation, setSimulation] = useState<NdSimulation | null>(null);
   const [selectedNodesAndEdges , setSelectedNodesAndEdges] = useState<SelectedNodesAndEdges>({nodes: new Map<number, boolean>() , edges: new Map<number, boolean>()})
   const graphData = useRef<GraphData>({children: [], edges: []});
@@ -50,8 +49,8 @@ export default function TreePage(){
   //create elk layout of graph
   //based on the layout create react flow graph
   useEffect(() => {
-    if(!simulationData) return;
-    const newSimulation = new NdSimulation(simulationData)
+    if(!simulationDataNodes) return;
+    const newSimulation = new NdSimulation(simulationDataNodes)
     //console.log("current path: ", simulationPath);
     setSimulation(newSimulation);
 
@@ -115,7 +114,7 @@ export default function TreePage(){
     }
     getLayout();
 
-  }, [setNodes, setEdges, simulationData]);
+  }, [setNodes, setEdges, simulationDataNodes]);
 
   function updateNodesAndEdgedClasses(selectedNodes: Map<number, boolean> , selectedEdges: Map<number, boolean>){
     console.log("updateNodesAndEdgedClasses,  selectedNodes: ", selectedNodes, "\nselectedEdges: ", selectedEdges )
@@ -170,11 +169,11 @@ export default function TreePage(){
     let nodes = new Map<number, boolean>()
     let edges = new Map<number, boolean>()
 
-    const nodeInPath = (id: number) => simulationPath.includes(id);
+    const nodeInPath = (id: number) => simulationDataNodesPath.includes(id);
 
     const edgeInPath = (sourceId: number, targetId: number) => {
-      const sIn = simulationPath.includes(sourceId);
-      const tIn = simulationPath.includes(targetId);
+      const sIn = simulationDataNodesPath.includes(sourceId);
+      const tIn = simulationDataNodesPath.includes(targetId);
       return sIn && tIn;
     };
 
@@ -206,11 +205,11 @@ export default function TreePage(){
       console.log("[otc]: chosen:", nodesMapChildId);
 
      
-      if(simulationData==null){
+      if(simulationDataNodes==null){
         console.log("simulation is null lmao");
         return;
       }
-       const simulation = new NdSimulation(simulationData);
+       const simulation = new NdSimulation(simulationDataNodes);
       
 
       let newPath = [];
@@ -255,7 +254,7 @@ export default function TreePage(){
       });
 
       
-      setSimulationPath(newPath)
+      setSimulationDataNodesPath(newPath)
       setSelectedNodesAndEdges({nodes: nodes, edges: edges});
       updateNodesAndEdgedClasses(nodes, edges);
       
@@ -287,7 +286,7 @@ export default function TreePage(){
 export function SimulationNodeComponent(props : NodeProps<RfNode>){
 
     const [detailsVisible , setDetailVisible] = useState<boolean>(false);
-    const {rejectState, acceptState} = useSpecialStates();
+    const {rejectState, acceptState} = useTuringMachineSettings(s=>s.specialStates);
     
     function prepareDetails() : transitionData {
       const nodes = props.data.nodes;
