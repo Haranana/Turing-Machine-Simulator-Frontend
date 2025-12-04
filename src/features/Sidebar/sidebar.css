@@ -42,6 +42,15 @@
 
 }
 
+.sidebar .disabledLinkButton a{
+  pointer-events: none;
+  cursor: default;
+}
+
+.sidebar .disabledLinkButton svg{
+  stroke: var(--color-primary-3);
+}
+
 .sidebar a:hover {
   background: var(--color-primary-3);
 }
