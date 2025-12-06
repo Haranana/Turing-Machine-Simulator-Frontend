@@ -1,85 +1,132 @@
 import './page.css';
 import './SettingsPage.css'
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useTuringMachineSettings } from '../features/GlobalData/GlobalData';
+import ChipList from './ChipList';
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
+import { boolean } from 'zod';
 
 
 
 export default  function SettingsPage() {
 
     const { symbolSeparator, transitionArrow, blank, left, stay, right} = useTuringMachineSettings(s=>s.aliases)
-    const {setAliases, setSpecialStates} = useTuringMachineSettings();
+    const {setAliases, setSpecialStates , setAllowMultipleTapes, setAllowNondeterminism,  setOnlyComplete, setOnlyInputAlphabet ,setOnlyStatesFromSet, setOnlyTapeAlphabet, setRejectOnNonAccept, setStatesSet , setTapeAlphabet, setInputAlphabet } = useTuringMachineSettings();
     const { initialState, acceptState, rejectState} = useTuringMachineSettings(s=>s.specialStates)
+    const {allowMultipleTapes, allowNondeterminism, onlyComplete, onlyInputAlphabet, onlyStatesFromSet, onlyTapeAlphabet, rejectOnNonAccept, statesSet, tapeAlphabet, inputAlphabet} = useTuringMachineSettings(s=>s.specialSettings);
+    
 
-    const sep1Ref = useRef<HTMLInputElement>(null);
-    const sep2Ref = useRef<HTMLInputElement>(null);
-    const blankRef = useRef<HTMLInputElement>(null);
-    const leftRef = useRef<HTMLInputElement>(null);
-    const stayRef = useRef<HTMLInputElement>(null);
-    const rightRef = useRef<HTMLInputElement>(null);
+    const [symbolSeparatorFieldValue, setSymbolSeparatorFieldValue] =useState<string>(symbolSeparator);
+    const [transitionArrowFieldValue, setTransitionArrowFieldValue] =useState<string>(transitionArrow);
+    const [blankFieldValue, setBlankFieldValue] =useState<string>(blank);
+    const [leftFieldValue, setLeftFieldValue] =useState<string>(left);
+    const [stayFieldValue, setStayFieldValue] =useState<string>(stay);
+    const [rightFieldValue, setRightFieldValue] =useState<string>(right);
 
-    const initialRef = useRef<HTMLInputElement>(null);
-    const acceptRef = useRef<HTMLInputElement>(null);
-    const rejectRef = useRef<HTMLInputElement>(null);
+    const [initialFieldValue, setInitialFieldValue] =useState<string>(initialState);
+    const [acceptFieldValue, setAcceptFieldValue] =useState<string>(acceptState);
+    const [rejectFieldValue, setRejectFieldValue] =useState<string>(rejectState == null? "" : rejectState);
 
-    const [allowedToSave, setAllowedToSave] = useState<boolean>(true);
-    const [savedSuccesfuly, setSavedSuccesfuly] = useState<boolean | null>(null);
+    const [allowNondeterminismFieldValue, setAllowNondeterminismFieldValue] =useState<boolean>(allowNondeterminism);
+    const [allowMultipleTapesFieldValue, setAllowMultipleTapesFieldValue] =useState<boolean>(allowMultipleTapes);
+    const [onlyCompleteFieldValue, setOnlyCompleteFieldValue] =useState<boolean>(onlyComplete);
+    const [rejectOnNonAcceptFieldValue, setRejectOnNonAcceptFieldValue] =useState<boolean>(rejectOnNonAccept);
 
-    const SaveSettings: () => void = () => {
+    const [inputAlphabetFieldValue, setInputAlphabetFieldValue] = useState<string[]>(inputAlphabet);
+    const [tapeAlphabetFieldValue, setTapeAlphabetFieldValue] =useState<string[]>(tapeAlphabet);
+    const [statesSetFieldValue, setStatesSetFieldValue] = useState<string[]>(statesSet);
 
-        let sep1RefValue = sep1Ref.current?.value;
-        sep1RefValue = sep1RefValue === undefined? symbolSeparator : sep1RefValue as string;
+    const [onlyTapeAlphabetFieldValue , setOnlyTapeAlphabetFieldValue] = useState<boolean>(onlyTapeAlphabet);
+    const [onlyInputAlphabetFieldValue , setOnlyInputAlphabetFieldValue] = useState<boolean>(onlyInputAlphabet);
+    const [onlyStatesFromSetFieldValue , setOnlyStatesFromSetFieldValue] = useState<boolean>(onlyStatesFromSet);
 
-        let sep2RefValue = sep2Ref.current?.value;
-        sep2RefValue = sep2RefValue === undefined? transitionArrow : sep2RefValue as string;
+    const [tapeAlphabetDetailsOpen, setTapeAlphabetDetailsOpen] = useState<boolean>(onlyTapeAlphabet? true : false );
+    const [inputAlphabetDetailsOpen, setInputAlphabetDetailsOpen] = useState<boolean>(onlyInputAlphabet? true : false );
+    const [statesDetailsOpen, setStatesDetailsOpen] = useState<boolean>(onlyStatesFromSet? true : false );
 
-        let blankRefValue = blankRef.current?.value;
-        blankRefValue = blankRefValue === undefined? blank : blankRefValue as string;
+    const [saveError, setSaveError] = useState<string | null>(null);
 
-        let leftRefValue = leftRef.current?.value;
-        leftRefValue = leftRefValue === undefined? left : leftRefValue as string;
+    const validateAndSave: () => void = () => {
+        const trimmedSymbolSeparator = symbolSeparatorFieldValue.trim();
+        const trimmedTransitionArrow = transitionArrowFieldValue.trim();
+        const trimmedBlank = blankFieldValue.trim();
+        const trimmedLeft = leftFieldValue.trim();
+        const trimmedStay = stayFieldValue.trim();
+        const trimmedRight = rightFieldValue.trim();
 
-        let stayRefValue = stayRef.current?.value;
-        stayRefValue = stayRefValue === undefined? stay : stayRefValue as string;
+        const trimmedInitial = initialFieldValue.trim();
+        const trimmedAccept = acceptFieldValue.trim();
+        const trimmedReject = rejectFieldValue==""? null : rejectFieldValue.trim() ;
 
-        let rightRefValue = rightRef.current?.value;
-        rightRefValue = rightRefValue === undefined? right : rightRefValue as string;
+        if (
+            trimmedSymbolSeparator.length === 0 ||
+            trimmedTransitionArrow.length === 0 ||
+            trimmedBlank.length === 0 ||
+            trimmedLeft.length === 0 ||
+            trimmedStay.length === 0 ||
+            trimmedRight.length === 0 ||
+            trimmedInitial.length === 0 ||
+            trimmedAccept.length === 0) {
+                toast.error('Changes couldn\'t be saved\nAliases, initial state and accept state must not be empty');
+                setSaveError("Aliases, initial state and accept state must not be empty");
+                return;
+        }
 
-        let initialRefValue = initialRef.current?.value;
-        initialRefValue = initialRefValue === undefined? initialState : initialRefValue as string;
+        if(inputAlphabetFieldValue.includes(trimmedBlank)){
+            toast.error('Changes couldn\'t be saved\nInput alphabet cannot contain blank symbol');
+            setSaveError("Input alphabet cannot contain blank symbol");
+            return;
+        }
 
-        let acceptRefValue = acceptRef.current?.value;
-        acceptRefValue = acceptRefValue === undefined? acceptState : acceptRefValue as string;
+        if( inputAlphabetFieldValue.some((v,_)=>!tapeAlphabetFieldValue.includes(v))){
+            toast.error('Changes couldn\'t be saved\nInput alphabet must be subset of Tape alphabet');
+            setSaveError("Input alphabet must be subset of Tape alphabet");
+            return;
+        }
 
-        let rejectRefValue : string | null = rejectRef.current == null || rejectRef.current.value === "" ? null : rejectRef.current.value as string;
+        let statesSetWithSpecialStates = [...statesSetFieldValue];
+        if(!statesSetFieldValue.includes(trimmedInitial)){
+            statesSetWithSpecialStates.push(trimmedInitial);
+        }
+        if(!statesSetFieldValue.includes(trimmedAccept)){
+            statesSetWithSpecialStates.push(trimmedAccept);
+        }
+        if(trimmedReject!=null && !statesSetFieldValue.includes(trimmedReject)){
+            statesSetWithSpecialStates.push(trimmedReject);
+        }
 
         setAliases({
-            symbolSeparator: sep1RefValue,
-            transitionArrow: sep2RefValue,
-            blank: blankRefValue,
-            left: leftRefValue,
-            stay: stayRefValue,
-            right: rightRefValue,
+            symbolSeparator: trimmedSymbolSeparator,
+            transitionArrow: trimmedTransitionArrow,
+            blank: trimmedBlank,
+            left: trimmedLeft,
+            stay: trimmedStay,
+            right: trimmedRight,
         });
 
         
         setSpecialStates(
-            initialRefValue,
-            acceptRefValue,
-            rejectRefValue
+            trimmedInitial,
+            trimmedAccept,
+            trimmedReject
         );
 
+        setOnlyComplete(onlyCompleteFieldValue);
+        setAllowMultipleTapes(allowMultipleTapesFieldValue);
+        setAllowNondeterminism(allowNondeterminismFieldValue);
+        
+        setOnlyInputAlphabet(onlyInputAlphabetFieldValue);
+        setOnlyTapeAlphabet(onlyTapeAlphabetFieldValue);
+        setOnlyStatesFromSet(onlyStatesFromSetFieldValue);
+        setRejectOnNonAccept(rejectOnNonAcceptFieldValue);
+
+        setInputAlphabet(inputAlphabetFieldValue);
+        setTapeAlphabet(tapeAlphabetFieldValue);
+        setStatesSet(statesSetWithSpecialStates);
+
         toast.success('Changes saved');
-    }
-
-    function onInputChange(value: string){
-        if(value==="" || value==null){
-            setAllowedToSave(false);
-        }else{
-            setAllowedToSave(true);
-        }
-
+        setSaveError(null);
     }
 
     return(
@@ -91,92 +138,86 @@ export default  function SettingsPage() {
                     </div>
                     <div className="SegmentSecondColumn"> 
                         <div className="SettingsTextFieldRow">
-                            <label className="SettingsTextFieldLabel" htmlFor="sep1-alias">Separator:</label>
+                            <label className="SettingsTextFieldLabel" htmlFor="sep1-alias">Symbol separator:</label>
                             <input
-                            ref={sep1Ref}
+                            value={symbolSeparatorFieldValue}
                             className="SettingsTextField Sep1TextField"
                             type="text"
                             name="sep1-alias"
                             minLength={1}
                             maxLength={10}
                             id="sep1-alias"
-                            defaultValue={symbolSeparator}
-                            onChange={(e)=>onInputChange(e.target.value)}
+                            onChange={(e)=>setSymbolSeparatorFieldValue(e.target.value)}
                             />
                         </div>
 
                         <div className="SettingsTextFieldRow">
                             <label className="SettingsTextFieldLabel" htmlFor="sep2-alias">Separator 2:</label>
                             <input
-                            ref={sep2Ref}
+                            value={transitionArrowFieldValue}
                             className="SettingsTextField Sep2TextField"
                             type="text"
                             name="sep2-alias"
                             minLength={1}
                             maxLength={10}
                             id="sep2-alias"
-                            defaultValue={transitionArrow}
-                            onChange={(e)=>onInputChange(e.target.value)}
+                            onChange={(e)=>setTransitionArrowFieldValue(e.target.value)}
                             />
                         </div>
 
                         <div className="SettingsTextFieldRow">
                             <label className="SettingsTextFieldLabel" htmlFor="blank-alias">Blank:</label>
                             <input
-                            ref={blankRef}
+                            value={blankFieldValue}
                             className="SettingsTextField BlankTextField"
                             type="text"
                             name="blank-alias"
                             minLength={1}
                             maxLength={10}
                             id="blank-alias"
-                            defaultValue={blank}
-                            onChange={(e)=>onInputChange(e.target.value)}
+                            onChange={(e)=>setBlankFieldValue(e.target.value)}
                             />
                         </div>
 
                         <div className="SettingsTextFieldRow">
                             <label className="SettingsTextFieldLabel" htmlFor="left-alias">Move head left:</label>
                             <input
-                            ref={leftRef}
+                            value={leftFieldValue}
                             className="SettingsTextField LeftTextField"
                             type="text"
                             name="left-alias"
                             minLength={1}
                             maxLength={10}
                             id="left-alias"
-                            defaultValue={left}
-                           onChange={(e)=>onInputChange(e.target.value)}
+                           onChange={(e)=>setLeftFieldValue(e.target.value)}
                             />
                         </div>
 
                         <div className="SettingsTextFieldRow">
                             <label className="SettingsTextFieldLabel" htmlFor="stay-alias">Don't Move head:</label>
                             <input
-                            ref={stayRef}
+                            value={stayFieldValue}
                             className="SettingsTextField StayTextField"
                             type="text"
                             name="stay-alias"
                             minLength={1}
                             maxLength={10}
                             id="stay-alias"
-                            defaultValue={stay}
-                            onChange={(e)=>onInputChange(e.target.value)}
+                            onChange={(e)=>setStayFieldValue(e.target.value)}
                             />
                         </div>
 
                         <div className="SettingsTextFieldRow">
                             <label className="SettingsTextFieldLabel" htmlFor="right-alias">Move head right:</label>
                             <input
-                            ref={rightRef}
+                            value={rightFieldValue}
                             className="SettingsTextField RightTextField"
                             type="text"
                             name="right-alias"
                             minLength={1}
                             maxLength={10}
                             id="right-alias"
-                            defaultValue={right}
-                            onChange={(e)=>onInputChange(e.target.value)}
+                            onChange={(e)=>setRightFieldValue(e.target.value)}
                             />
                         </div>
 
@@ -190,58 +231,165 @@ export default  function SettingsPage() {
                             <p className='SegmentDescription'>Choose how would you want to refer to special states inside your code.</p>
                     </div>
                     <div className="SegmentSecondColumn"> 
-                                                <div className="SettingsTextFieldRow">
+                        <div className="SettingsTextFieldRow">
                             <label className="SettingsTextFieldLabel" htmlFor="StateAccept">Accept state:</label>
                             <input
-                            ref={rejectRef}
+                            value={acceptFieldValue}
                             className="SettingsTextField LeftTextField"
                             type="text"
                             name="StateAccept"
                             minLength={1}
                             maxLength={20}
                             id="StateAccept"
-                            defaultValue={acceptState}
-                            onChange={(e)=>onInputChange(e.target.value)}
+                            onChange={(e)=>setAcceptFieldValue(e.target.value)}
                             />
                         </div>
 
                         <div className="SettingsTextFieldRow">
                             <label className="SettingsTextFieldLabel" htmlFor="StateReject">Reject state</label>
                             <input
-                            ref={acceptRef}
+                            value={rejectFieldValue}
                             className="SettingsTextField StayTextField"
                             type="text"
                             name="StateReject"
                             minLength={1}
                             maxLength={20}
                             id="StateReject"
-                            defaultValue={rejectState == null? "" : rejectState}
-                            /*onChange={(e)=>onInputChange(e.target.value)}*/ // can be null so we don't check whether saving is allowed
+                            onChange={(e)=>setRejectFieldValue(e.target.value)}
                             />
                         </div>
 
                         <div className="SettingsTextFieldRow">
                             <label className="SettingsTextFieldLabel" htmlFor="StateInitial">Initial state:</label>
                             <input
-                            ref={initialRef}
+                            value={initialFieldValue}
                             className="SettingsTextField RightTextField"
                             type="text"
                             name="StateInitial"
                             minLength={1}
                             maxLength={20}
                             id="StateInitial"
-                            defaultValue={initialState}
-                            onChange={(e)=>onInputChange(e.target.value)}
+                            onChange={(e)=>setInitialFieldValue(e.target.value)}
                             />
                         </div>
                     </div>
                 </div>
+                <hr className='LineSeparator'></hr>
+                <div className='SettingsSegment SpecialSettingsSegment'>
+                    <div className='SegmentFirstColumn'>
+                            <p className='SegmentTitle'>Special Settings</p>
+                            <p className='SegmentDescription'>Loremus Ipsemus</p>
+                    </div>
+                    <div className="SegmentSecondColumn">
+                        <div className="SettingsTextFieldRow">
+                            <label className="SettingsTextFieldLabel" htmlFor="NonDet">Allow nondeterminism:</label>
+                            <input
+                            checked={allowNondeterminismFieldValue}
+                            className="SettingsCheckbox"
+                            type="checkbox"
+                            name="NonDet"
+                            id="NonDet"
+                            onChange={e=>setAllowNondeterminismFieldValue(e.target.checked)}
+                            />
+                        </div>
+                        <div className="SettingsTextFieldRow">
+                            <label className="SettingsTextFieldLabel" htmlFor="MultTapes">Allow Multiple tapes:</label>
+                            <input
+                            checked={allowMultipleTapesFieldValue}
+                            className="SettingsCheckbox"
+                            type="checkbox"
+                            name="MultTapes"
+                            id="MultTapes"
+                             onChange={e=>setAllowMultipleTapesFieldValue(e.target.checked)}
+                            />
+                        </div>
+                        <div className="SettingsTextFieldRow">
+                            <label className="SettingsTextFieldLabel" htmlFor="OnlyComplete">Allow only complete machines:</label>
+                            <input
+                            checked={onlyCompleteFieldValue}
+                            className="SettingsCheckbox"
+                            type="checkbox"
+                            name="OnlyComplete"
+                            id="OnlyComplete"
+                            onChange={e=>setOnlyCompleteFieldValue(e.target.checked)}
+                            />
+                        </div>
+                        <div className="SettingsTextFieldRow">
+                            <label className="SettingsTextFieldLabel" htmlFor="NonAcceptReject">Reject on non-accepts:</label>
+                            <input
+                            checked={rejectOnNonAcceptFieldValue}
+                            className="SettingsCheckbox"
+                            type="checkbox"
+                            name="NonAcceptReject"
+                            id="NonAcceptReject"
+                            onChange={e=>setRejectOnNonAcceptFieldValue(e.target.checked)}
+                            />
+                        </div>
+                        <div className="SettingsTextFieldRow">
+                            <label className="SettingsTextFieldLabel" htmlFor="InputAlphabet">Use defined input alphabet:</label>
+                             <input
+                                checked={onlyInputAlphabetFieldValue}
+                                className="SettingsCheckbox"
+                                type="checkbox"
+                                name="InputAlphabet"
+                                id="InputAlphabet"
+                                onChange={e=>setOnlyInputAlphabetFieldValue(e.target.checked)}
+                            />
+                            <button className='SettingsDetailsButton' onClick={()=>setInputAlphabetDetailsOpen(!inputAlphabetDetailsOpen)}>{inputAlphabetDetailsOpen? <ChevronUpIcon/> : <ChevronDownIcon/>}</button>
 
+                        </div>
+                        {inputAlphabetDetailsOpen? <ChipList name='Input alphabet' singleCharacterMode={true} 
+                            defaultValues={inputAlphabetFieldValue} 
+                            defaultValuesMessage="Do not include blank. Make sure that input alphabet is subset of tape alphabet" 
+                            defaultInputMessage="Write alphabet elements here"
+                            onDataChanged={setInputAlphabetFieldValue}></ChipList> : ""
+                        }
 
+                        <div className="SettingsTextFieldRow">
+                            <label className="SettingsTextFieldLabel" htmlFor="TapeAlphabet">Tape alphabet:</label>
+                             <input
+                                checked={onlyTapeAlphabetFieldValue}
+                                className="SettingsCheckbox"
+                                type="checkbox"
+                                name="TapeAlphabet"
+                                id="TapeAlphabet"
+                                onChange={e=>setOnlyTapeAlphabetFieldValue(e.target.checked)}
+                            />
+                             <button className='SettingsDetailsButton' onClick={()=>setTapeAlphabetDetailsOpen(!tapeAlphabetDetailsOpen)}>{tapeAlphabetDetailsOpen? <ChevronUpIcon/> : <ChevronDownIcon/>}</button>
+                        </div>
+                        {tapeAlphabetDetailsOpen? <ChipList name='Tape alphabet' singleCharacterMode={true} 
+                            defaultValues={tapeAlphabetFieldValue} 
+                            defaultValuesMessage="Blank is included by default. Make sure that tape alphabet is overset of input alphabet" 
+                            defaultInputMessage="Write alphabet elements here"
+                            onDataChanged={setTapeAlphabetFieldValue}></ChipList> : ""
+                        }
 
-                <button className={`SaveSettings  ${!allowedToSave? "DisabledButton tooltip lessTooltipPadding" : ""} `} onClick={SaveSettings}
-                data-tooltip={!allowedToSave? "No field can be empty" : "Save settings"}
-                    >Save</button>
+                        <div className="SettingsTextFieldRow">
+                            <label className="SettingsTextFieldLabel" htmlFor="States">States:</label>
+                            <input
+                                checked={onlyStatesFromSetFieldValue}
+                                className="SettingsCheckbox"
+                                type="checkbox"
+                                name="States"
+                                id="States"
+                                onChange={e=>setOnlyStatesFromSetFieldValue(e.target.checked)}
+                            />
+                            <button className='SettingsDetailsButton' onClick={()=>setStatesDetailsOpen(!statesDetailsOpen)}>{statesDetailsOpen? <ChevronUpIcon/> : <ChevronDownIcon/>}</button>
+                        </div>
+                        {statesDetailsOpen? <ChipList name='States set' singleCharacterMode={false} 
+                            defaultValues={statesSetFieldValue} 
+                            defaultValuesMessage="initial state, accept state and reject state are included by default" 
+                            defaultInputMessage="Write your states here"
+                            onDataChanged = {setStatesSetFieldValue} ></ChipList> : ""
+                        }
+                    </div>
+                </div>    
+                
+                <div className='SaveSettingsDiv'>
+                    <button className={`SaveSettings`} onClick={validateAndSave}>Save</button>
+                    {/*saveError!=null? <p className='SettingsSaveError'>Error: {saveError}</p> : "" */}
+                </div>
         </div>  
     );
 }
+

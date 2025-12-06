@@ -1,0 +1,193 @@
+
+
+.alphabet-editor {
+    --cl-color-bg: var(--color-bg);
+    --cl-text-field-bg-color: var(--color-primary-01);
+    
+    --cl-color-button: var(--color-primary-1);
+    --cl-color-button-hover: var(--color-primary-2);
+
+    --cl-border-color: var(--color-text-dark);
+    --cl-color-input-focus: var(--color-primary-1);
+
+    --cl-text-color-main: var(--color-text-dark);
+    --cl-text-color-bg: var(--color-text-grayish);
+    --cl-text-color-button: var(--color-text-light);
+
+  margin-top: 18px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 600px;
+  padding: 12px;
+  border: 1px solid var(--cl-border-color);
+  border-radius: 6px;
+  background-color: var(--cl-color-bg);
+  color: var(--cl-text-color);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+}
+
+.alphabet-label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.alphabet-chips-container {
+  min-height: 40px;
+  border: 1px solid var(--cl-border-color);
+  border-radius: 4px;
+  padding: 6px;
+  background-color: var(--cl-text-field-bg-color);
+}
+
+.alphabet-empty-info {
+  font-size: 12px;
+  color: var(--cl-text-color-2);
+}
+
+.alphabet-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.alphabet-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background-color: var(--cl-text-field-bg-color);
+  border: 1px solid var(--cl-border-color);
+}
+
+.alphabet-chip-symbol {
+  font-family: "Consolas", "Fira Code", monospace;
+}
+
+.alphabet-chip-remove {
+  border: none;
+  outline: none;
+  background: none;
+  color: #ff7b7b;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.alphabet-chip-remove:hover {
+  color: #ffaaaa;
+}
+
+.alphabet-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.alphabet-input {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--cl-border-color);
+  background-color: var(--cl-text-field-bg-color);
+  color: var(--cl-text-color);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.alphabet-input:focus {
+  outline: none;
+  border-color: var(--cl-color-input-focus);
+  box-shadow: 0 0 0 1px #4c9aff55;
+}
+
+.alphabet-add-button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  /*border: 1px solid #4c9aff;*/
+  border: none;
+  background-color: var(--cl-color-button);
+  color: var(--cl-text-color-button);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.alphabet-add-button:hover {
+  background-color: var(--cl-color-button-hover);
+}
+
+.alphabet-add-button:active {
+  transform: translateY(1px);
+}
+
+.alphabet-help {
+  font-size: 11px;
+  color: var(--cl-text-color-2);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.alphabet-editor svg{
+  width:20px;        
+  height:20px;   
+}
+
+.SettingsDetailsButton{
+    outline: none;
+    border: none;
+    padding: 0;
+    background-color: transparent;
+    color: var(--color-text-dark);
+    height: 20px;
+    font-size: 140%;
+    width: 20px;
+    cursor: pointer;
+    margin-left: 1%;
+}
+
+.PresetsDropdown {
+  position: relative;         
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.PresetsDropdownSummary{
+    border: solid 1px var(--cl-border-color);
+    height: 100%;
+  padding-left: 2px;
+  padding-right: 2px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.PresetsDropdownList{
+  position: absolute;
+  top: 100%;              
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--cl-color-bg);
+  border: solid 1px var(--cl-border-color);
+  
+}
+
+.PresetsDropdownButton{
+  width: 100%;
+  background-color: var(--cl-color-bg);
+  border: none;
+  cursor: pointer;
+}
+
+.PresetsDropdownButton:hover{
+  background-color: var(--cl-color-button);
+}

@@ -7,7 +7,7 @@
 
 .SegmentFirstColumn{
     padding-top: 0;
-    width: 40%;
+    width: 30%;
     margin-left: 10%;
     margin-right: 10%;
 }
@@ -55,7 +55,7 @@
     margin-top: 2vh;
     width: 5vw;
     height: 3vw;
-    margin-left: 75%;
+   
     border: none;
     font-family: var(--font-main);
     background-color: var(--color-primary-2);
@@ -63,6 +63,19 @@
     cursor: pointer;
     font-size: 1.1rem;
     border-radius: 9999999px;
+}
+
+.SaveSettingsDiv{
+     margin-left: 50%;
+     display: flex;
+     justify-content: center;
+     flex-direction: column;
+     align-items: center;
+     margin-bottom: 40px;
+}
+
+.SettingsSaveError{
+
 }
 
 .SaveSettings:hover{

@@ -1,3 +1,19 @@
+export type SpecialSettings = {
+  allowNondeterminism: boolean;
+  allowMultipleTapes: boolean;
+  onlyComplete: boolean;
+  rejectOnNonAccept: boolean;
+
+  statesSet: string[];
+  onlyStatesFromSet: boolean;
+
+  tapeAlphabet: string[];
+  onlyTapeAlphabet: boolean;
+
+  inputAlphabet: string[];
+  onlyInputAlphabet: boolean;
+}
+
 export type TuringMachineGetDto = {
     name : string;
     description: string;
@@ -5,7 +21,7 @@ export type TuringMachineGetDto = {
 
     initialState: string;
     acceptState: string;
-    rejectState: string;
+    rejectState: string | null;
 
     blank: string;
     sep1: string;
@@ -19,18 +35,12 @@ export type TuringMachineGetDto = {
     createdAt: string;
     updatedAt: string;
 
-    isVisible: boolean;
+    isPublic: boolean;
     shareCode: string;
+
+    specialSettings: SpecialSettings;
 }
 
-type SortDir = "asc" | "desc";
-type SortSpec = { property: string; direction?: SortDir };
-
-export type PageableQuery = {
-  page?: number;     
-  size?: number;     //records per page
-  sort?: SortSpec[]; //ex. [{ property: "createdAt", direction: "desc" }]
-};
 
 export type TuringMachineSaveDto = {
 
@@ -40,7 +50,7 @@ export type TuringMachineSaveDto = {
 
     initialState: string;
     acceptState: string;
-    rejectState: string;
+    rejectState: string | null;
 
     blank: string;
     sep1: string;
@@ -50,6 +60,8 @@ export type TuringMachineSaveDto = {
     moveStay: string;
 
     tapesAmount: number;
+
+    specialSettings: SpecialSettings;
 }
 
 export type TuringMachineEditDto = {
@@ -69,8 +81,18 @@ export type TuringMachineEditDto = {
     moveStay: string | null;
 
     tapesAmount: number | null;
+
+    specialSettings: SpecialSettings;
 }
 
+type SortDir = "asc" | "desc";
+type SortSpec = { property: string; direction?: SortDir };
+
+export type PageableQuery = {
+  page?: number;     
+  size?: number;     //records per page
+  sort?: SortSpec[]; //ex. [{ property: "createdAt", direction: "desc" }]
+};
 
 
 export type Page<T> = {

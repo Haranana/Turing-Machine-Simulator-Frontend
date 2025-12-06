@@ -20,7 +20,7 @@ type inputProp = {tm: TuringMachineGetDto, tmId: number, handleDeleted: ()=>void
 export default function TuringMachineToLoad(props: inputProp){
 
     const {tmDataName, setTmDataName, setTmDataTapesAmount, setTmDataProgram, setTmDataTapesInputs} = useTuringMachineData();
-    const {setAliases, setSpecialStates} = useTuringMachineSettings();
+    const {setAliases, setSpecialStates,setOnlyComplete , setRejectOnNonAccept ,setAllowMultipleTapes, setAllowNondeterminism, setInputAlphabet, setTapeAlphabet, setStatesSet, setOnlyInputAlphabet, setOnlyTapeAlphabet, setOnlyStatesFromSet} = useTuringMachineSettings();
 
     const apiFetch = useApiFetch();
 
@@ -48,6 +48,20 @@ export default function TuringMachineToLoad(props: inputProp){
             clearInput.push("");
         } 
         setTmDataTapesInputs(clearInput);
+
+        setAllowMultipleTapes(props.tm.specialSettings.allowMultipleTapes)
+        setAllowNondeterminism(props.tm.specialSettings.allowNondeterminism)
+        setOnlyComplete(props.tm.specialSettings.onlyComplete)
+        setRejectOnNonAccept(props.tm.specialSettings.allowMultipleTapes)
+        
+        setOnlyInputAlphabet(props.tm.specialSettings.onlyInputAlphabet);
+        setOnlyTapeAlphabet(props.tm.specialSettings.onlyTapeAlphabet);
+        setOnlyStatesFromSet(props.tm.specialSettings.onlyStatesFromSet);
+
+        setInputAlphabet(props.tm.specialSettings.inputAlphabet);
+        setTapeAlphabet(props.tm.specialSettings.tapeAlphabet);
+        setStatesSet(props.tm.specialSettings.statesSet);
+
         toast.success("Turing Machine loaded successfully");
     }
 
@@ -91,7 +105,7 @@ export default function TuringMachineToLoad(props: inputProp){
                 <button className="TmRowDeleteButton TmRowButton" onClick={()=>{setDeleteTmModalOpen(true)}}><TrashIcon></TrashIcon></button>
             </div>
             <div className="TmRowVisibilityWrapper TmRowButtonWrapper">
-                {props.tm.isVisible? <span className="TmRowVisiblityIcon TmRowIcon"><EyeIcon /></span>  : <span className="TmRowVisiblityIcon TmRowIcon"><EyeSlashIcon/></span>}
+                {props.tm.isPublic? <span className="TmRowVisiblityIcon TmRowIcon"><EyeIcon /></span>  : <span className="TmRowVisiblityIcon TmRowIcon"><EyeSlashIcon/></span>}
             </div>
         </div>
         <TuringMachineToLoadDetails tm={props.tm} tmId={props.tmId} isVisible={areDetailsVisible}/>

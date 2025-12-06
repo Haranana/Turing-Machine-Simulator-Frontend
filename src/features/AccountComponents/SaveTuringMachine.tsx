@@ -4,7 +4,7 @@ import { ChevronDownIcon, ChevronRightIcon, PencilSquareIcon } from "@heroicons/
 import { useApiFetch } from "../../api/util";
 import { toast } from 'react-hot-toast';
 import Modal from "../Modal/Modal";
-import type { TuringMachineEditDto, TuringMachineGetDto } from "./AccountDataTypes";
+import type { TuringMachineEditDto, TuringMachineGetDto, TuringMachineSaveDto } from "./AccountDataTypes";
 import { useTuringMachineData, useTuringMachineSettings } from "../GlobalData/GlobalData";
 
 
@@ -13,7 +13,8 @@ export default function SaveTuringMachine(){
     const apiFetch = useApiFetch();
 
     const {tmDataProgram , tmDataTapesAmount, tmDataName, setTmDataName} = useTuringMachineData();
-    const {symbolSeparator,transitionArrow,blank, left, right, stay} = useTuringMachineSettings(s=>s.aliases);
+    const {onlyComplete, rejectOnNonAccept , allowMultipleTapes,allowNondeterminism, inputAlphabet, tapeAlphabet, statesSet, onlyInputAlphabet, onlyTapeAlphabet, onlyStatesFromSet} = useTuringMachineSettings(s=>s.specialSettings);
+    const { symbolSeparator,transitionArrow,blank, left, right, stay} = useTuringMachineSettings(s=>s.aliases);
     const {initialState, acceptState, rejectState} = useTuringMachineSettings(s=>s.specialStates);
 
     //data from input fields in save as
@@ -37,7 +38,7 @@ export default function SaveTuringMachine(){
 
     async function handleSaveAs(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
         e.preventDefault();
-         const sendBody = {
+         const sendBody : TuringMachineSaveDto = {
                     name: newTuringMachineName,
                     description: newTuringMachineDescription,
                     program: tmDataProgram.join("\n"),
@@ -51,6 +52,21 @@ export default function SaveTuringMachine(){
                     moveLeft: left,
                     moveStay: stay,
                     tapesAmount: tmDataTapesAmount,
+                    specialSettings: {
+                        allowNondeterminism: allowNondeterminism,
+                        allowMultipleTapes: allowMultipleTapes,
+                        onlyComplete: onlyComplete,
+                        rejectOnNonAccept: rejectOnNonAccept,
+
+                        statesSet: statesSet,
+                        onlyStatesFromSet: onlyStatesFromSet,
+
+                        tapeAlphabet: tapeAlphabet,
+                        onlyTapeAlphabet: onlyTapeAlphabet,
+
+                        inputAlphabet: inputAlphabet,
+                        onlyInputAlphabet: onlyInputAlphabet,
+                    }
                 };
         try{
             const res = await apiFetch("http://localhost:9090/api/tm" , {
@@ -121,6 +137,21 @@ export default function SaveTuringMachine(){
                     moveLeft: left,
                     moveStay: stay,
                     tapesAmount: tmDataTapesAmount,
+                    specialSettings: {
+                        allowNondeterminism: allowNondeterminism,
+                        allowMultipleTapes: allowMultipleTapes,
+                        onlyComplete: onlyComplete,
+                        rejectOnNonAccept: rejectOnNonAccept,
+
+                        statesSet: statesSet,
+                        onlyStatesFromSet: onlyStatesFromSet,
+
+                        tapeAlphabet: tapeAlphabet,
+                        onlyTapeAlphabet: onlyTapeAlphabet,
+
+                        inputAlphabet: inputAlphabet,
+                        onlyInputAlphabet: onlyInputAlphabet,
+                    }
                 };
         try{
             const res = await apiFetch("http://localhost:9090/api/tm/edit" , {

@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 export default function SearchPage(){
 
     const {setTmDataProgram , setTmDataTapesAmount, setTmDataName, setTmDataTapesInputs} = useTuringMachineData();
-    const {setAliases, setSpecialStates} = useTuringMachineSettings()
+    const {setAliases, setSpecialStates,setOnlyComplete , setRejectOnNonAccept ,setAllowMultipleTapes, setAllowNondeterminism, setInputAlphabet, setTapeAlphabet, setStatesSet, setOnlyInputAlphabet, setOnlyTapeAlphabet, setOnlyStatesFromSet} = useTuringMachineSettings();
 
     const inputRef = useRef<string>("");
     const [validationError, setValidationError] = useState<string | null>(null);
@@ -76,6 +76,21 @@ export default function SearchPage(){
             clearInput.push("");
         } 
         setTmDataTapesInputs(clearInput);
+
+        setAllowMultipleTapes(tm.specialSettings.allowMultipleTapes)
+        setAllowNondeterminism(tm.specialSettings.allowNondeterminism)
+        setOnlyComplete(tm.specialSettings.onlyComplete)
+        setRejectOnNonAccept(tm.specialSettings.allowMultipleTapes)
+        
+        setOnlyInputAlphabet(tm.specialSettings.onlyInputAlphabet);
+        setOnlyTapeAlphabet(tm.specialSettings.onlyTapeAlphabet);
+        setOnlyStatesFromSet(tm.specialSettings.onlyStatesFromSet);
+
+        setInputAlphabet(tm.specialSettings.inputAlphabet);
+        setTapeAlphabet(tm.specialSettings.tapeAlphabet);
+        setStatesSet(tm.specialSettings.statesSet);
+
+        toast.success("Turing Machine loaded successfully");
         toast.success("Turing Machine loaded successfully");
     }
 

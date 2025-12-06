@@ -3,10 +3,22 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 10%;
+    min-width: 400px;
+    background-color: var(--color-primary-0);
 }
 
 .SearchPageHeadline{
     font-family: var(--font-secondary);
+    background-color: var(--color-primary-1);
+    width: 100%;
+    margin-top: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .SearchBarWrapper{
