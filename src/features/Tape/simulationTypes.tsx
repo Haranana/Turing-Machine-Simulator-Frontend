@@ -100,6 +100,7 @@ export const SimulationNodeSchema = z.object({
   prevId: z.number().nullable(),
   nextIds: z.array(z.number()),
   step: z.array(SimulationStepRecordSchema),
+  output: z.string().nullable(),
 })
 
 export const SimulationNodesRecordSchema = z
@@ -185,4 +186,5 @@ export type SimulationNode = {
   prevId: number | null;
   nextIds: number[];
   step: SimulationStep[]; 
+  output: string | null
 };

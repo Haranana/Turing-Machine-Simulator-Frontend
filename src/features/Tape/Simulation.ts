@@ -99,6 +99,15 @@ export class NdSimulation{
         const steps : SimulationStep[] | null = this.nodes.get(this.path[stepId])==null? null : this.nodes.get(this.path[stepId])!.step; 
         return steps == null? null : steps[tapeId];
     }
+
+    getOutput(step: number) : string | null{
+        const stepId = step + 1;
+
+        if( !(stepId >=1 && stepId < this.path.length)) return null;
+
+        const out : string | null = this.nodes.get(this.path[stepId])==null? null : this.nodes.get(this.path[stepId])!.output;
+        return out;
+    }
     
     getSteps(step : number): SimulationStep[] | null{
         const stepId = step + 1;
@@ -157,7 +166,6 @@ export class NdSimulation{
     }
 
 
-    /* old version:
     isLeaf(step: number) : boolean{
         if(this.isEmpty()) return false;
         const stepId = step + 1;
@@ -166,8 +174,9 @@ export class NdSimulation{
 
         return curNode.nextIds.length===0? true : false;
     }
-    */
 
+
+    /*old version:
     isLeaf(step: number) : boolean{
         if(this.isEmpty()) return false;
         const stepId = step;
@@ -175,7 +184,7 @@ export class NdSimulation{
         if(!curNode) return false;
 
         return curNode.nextIds.length===0? true : false;
-    }
+    }*/
 
     getLastSteps(): SimulationStep[] | null {
         if(this.isEmpty()) return null;

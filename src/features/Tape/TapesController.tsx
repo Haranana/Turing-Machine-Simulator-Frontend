@@ -374,13 +374,13 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     updateTape();
 
     if(!isEndingStep(currentStep)){
-      stepRef.current=currentStep+1;
-      const currentStepNode = simulation.getStep(currentStep+1 , 0);
-      stateRef.current = currentStepNode!.stateBefore 
-    }else{
-      setIsPlaying(false);
-      stepRef.current = currentStep + 1;
-    }
+    stepRef.current = currentStep + 1;
+    const currentStepNode = simulation.getStep(currentStep + 1 , 0);
+    stateRef.current = currentStepNode!.stateBefore;
+  } else {
+
+    setIsPlaying(false);
+  }
       
   }, [isPlaying, isAnimating]); 
 
@@ -394,12 +394,13 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
     updateTape();
     if(!isEndingStep(currentStep)){
-      stepRef.current=currentStep+1;
-      const currentStepNode = simulation.getStep(currentStep+1 , 0);
-      stateRef.current = currentStepNode!.stateBefore 
-    }else {
     stepRef.current = currentStep + 1;
-    }
+    const currentStepNode = simulation.getStep(currentStep + 1 , 0);
+    stateRef.current = currentStepNode!.stateBefore;
+  } else {
+
+  setIsPlaying(false);
+  }
   }
 
   const doPrevSimulationStep = () => {
@@ -534,6 +535,10 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   function getCurrentOutput(_: number){
     if(simulation==null) return "";
+    const out = simulation.getOutput(stepRef.current)
+    return out == null? "" : out;
+    /*
+    if(simulation==null) return "";
     const isLastStep = isCurrentStepLeaf();
     if(isLastStep){
       if(simulation.getLastStep(0)!.stateAfter === acceptState){
@@ -545,7 +550,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       }
     }else{
       return "";
-    }
+    }*/
   }
 
 
