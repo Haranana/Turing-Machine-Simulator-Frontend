@@ -1,0 +1,16 @@
+.ConsoleWrapper .monaco-editor,
+.ConsoleWrapper .monaco-editor .margin,
+.ConsoleWrapper .monaco-editor-background {
+  background-color: var(--color-extreme) !important;
+}
+.ConsoleWrapper .monaco-editor .view-lines {
+  background-color: transparent !important;
+}
+
+.ConsoleWrapper .monaco-editor .current-line {
+  border: none !important;
+}
+
+.ConsoleWrapper .margin .line-numbers {
+  color: var(--color-accent-hover) !important;
+}

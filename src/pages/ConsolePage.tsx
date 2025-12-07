@@ -1,6 +1,7 @@
 
 
 import "./page.css";
+import "./ConsolePage.css"
 import { useEffect, useRef } from "react";
 import { Editor, useMonaco } from "@monaco-editor/react";
 import type monaco from "monaco-editor";
@@ -36,15 +37,17 @@ export default function ConsolePage() {
       base: "vs",
       inherit: true,
       rules: [
-  { token: "comment",   foreground: "6A9955", fontStyle: "italic" }, // Comment (zielony jak w VS Code)
-  { token: "function",  foreground: "C586C0", fontStyle: "bold"   }, // Action (L/R/S) – fiolet
-  { token: "constant",  foreground: "D7BA7D"                       }, // Transition arrow / separator 2 – złoty
-  { token: "string",    foreground: "2B91AF", fontStyle: "bold"   }, // States – turkus
-  { token: "variable",  foreground: "D16969"                       }, // Read and written symbol – czerwono-różowy
-  { token: "delimiter", foreground: "C8C8C8"                       }, // Symbol separator (przecinek) – jasny szary
-  { token: "invalid",   foreground: "FF0000", fontStyle: "bold"   }, // Error
-],
-      colors: {},
+      { token: "comment",   foreground: "6A9955", fontStyle: "italic" }, // Comment (zielony jak w VS Code)
+      { token: "function",  foreground: "C586C0", fontStyle: "bold"   }, // Action (L/R/S) – fiolet
+      { token: "constant",  foreground: "D7BA7D"                       }, // Transition arrow / separator 2 – złoty
+      { token: "string",    foreground: "2B91AF", fontStyle: "bold"   }, // States – turkus
+      { token: "variable",  foreground: "D16969"                       }, // Read and written symbol – czerwono-różowy
+      { token: "delimiter", foreground: "C8C8C8"                       }, // Symbol separator (przecinek) – jasny szary
+      { token: "invalid",   foreground: "FF0000", fontStyle: "bold"   }, // Error
+    ],
+      colors: {
+        "editorCursor.foreground": "#919191ff",
+      },
     });
     monacoInstance.editor.setTheme("tm-theme");
     monacoInstance.languages.register({ id: LANGUAGE_ID });
@@ -467,27 +470,25 @@ function validateModel(
 
   return (
     <div className="page">
+    <div className="ConsoleWrapper">
       <Editor
         onMount={(editor, monacoLib) => {
-          //console.log(tmDataProgram);
+
           editorRef.current = editor;
 
           const model = editor.getModel();
           if (!model) return;
 
-          // Pierwsza walidacja + zapis
+
           const markers = validateModel(
             model,
             monacoLib,
             tmDataTapesAmount
           );
 
-
-
           setTmDataProgram(stripTerminators(model.getLinesContent()));
           setTmDataProgramHasError((markers ?? []).length > 0);
 
-          // Jedna subskrypcja na zmiany treści
           const sub = editor.onDidChangeModelContent(() => {
             const m = validateModel(
               model,
@@ -513,10 +514,15 @@ function validateModel(
         height="90vh"
         width="90vw"
         theme="tm-theme"
+    
         options={{
           fontSize: 24,
+          minimap: {
+            enabled: false,
+          },
         }}
       />
+    </div>
     </div>
   );
 }
