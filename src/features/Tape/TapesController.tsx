@@ -17,6 +17,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   const {tmDataProgram, tmDataName, tmDataProgramHasError, tmDataTapesInputs, setTmDataTapesInputs, tmDataTapesAmount, setTmDataTapesAmount} = useTuringMachineData();
   const {simulationDataNodes , setSimulationDataNodes, simulationDataNodesPath, setSimulationDataNodesPath} = useSimulationData();
   const {initialState, acceptState, rejectState} = useTuringMachineSettings(s=>s.specialStates);
+  const {allowMultipleTapes, onlyInputAlphabet, inputAlphabet} = useTuringMachineSettings(s=>s.specialSettings);
 
   // Input taśmy, w przyszłości pewnie będzie zastąpiony listą stringów, dla każdej z taśm
   // Pole przechowuje wartosc tekstowa z inputu, niekoniecznie jest to zatwierdzony input programu
@@ -81,7 +82,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   const [simulation , setSimulation] = useState<NdSimulation | null>(null);
 
-
   const handleAnimEnd = useCallback((id: number) => {
     setIsAnimating(prev=>prev.map((v,i)=>i===id? false : v));
   }, []);
@@ -118,6 +118,13 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   function setAllIsAnimating(value: boolean){
     setIsAnimating(prev=>prev.map(()=>value));
+  }
+
+  function validateInput(value: string, id: number){
+  
+    if(!onlyInputAlphabet) return true;
+
+    return [...value].every((char, _)=> inputAlphabet.includes(char));    
   }
 
   function hasAllAnimationsEnded(){
@@ -234,20 +241,26 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
     //loads tapes amount data from zustand storage,
   useEffect(()=>{
-    setTapesAmount(tmDataTapesAmount);
+    let tapesNum: number = tmDataTapesAmount;
+    if(!allowMultipleTapes && tmDataTapesAmount > 0 ){
+      setTmDataTapesAmount(1);
+      tapesNum = 1;
+    }
+    
+    setTapesAmount(tapesNum);
     let tapesInput: string[] = tmDataTapesInputs;
 
     /* safeguard */
-    if(tapesInput.length < tmDataTapesAmount){
+    if(tapesInput.length < tapesNum){
       tapesInput = [];
-      for(let i = 0; i<tmDataTapesAmount; i++){
+      for(let i = 0; i<tapesNum; i++){
         tapesInput.push("");
       }
     }
 
     tapeInputRef.current = tapesInput;
 
-    for(let tapeId=0; tapeId < tmDataTapesAmount; tapeId++){
+    for(let tapeId=0; tapeId < tapesNum; tapeId++){
       placeInputOnTape(tapesInput[tapeId], tapeId);
     }
   },[])
@@ -431,8 +444,11 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   }
 
   function enterInput(tapeId: number){
+    if(validateInput(tapeInputRef.current[tapeId], tapeId)){
+
     setTmDataTapesInputs(tapeInputRef.current);
-    placeInputOnTape(tapeInputRef.current[tapeId], tapeId);
+      placeInputOnTape(tapeInputRef.current[tapeId], tapeId);
+    }
   }
 
   const playSimulation = () => {
@@ -566,7 +582,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
           i===tapesAmount-1? 
           <button
               className={`TapeActionsButton AddTapeButton ${isSimulationLoaded() ? "DisabledButton" : ""}`}
-              disabled={isSimulationLoaded()}
+              disabled={isSimulationLoaded() || !allowMultipleTapes}
               onClick={addTape}
               data-tooltip={isSimulationLoaded() ? "Cannot add tape when Simulation is loaded" : "Add tape"}>
               <PlusIcon /></button> :""
