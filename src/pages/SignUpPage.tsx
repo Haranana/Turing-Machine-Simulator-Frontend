@@ -87,14 +87,18 @@ export default function SignUpPage(){
     }
 
     return(
-    <div className="page">
-        <div className="login-window">
+    <div className="LoginPageWrapper">
+        <div className="login-page">
             <h1 className="login-header">Create an account</h1>
             
-            <form>
-                <label><input className="login-text-field" type="email" name="email" id="login-email" placeholder="Email" required
-                onChange={(e)=>{setEmail(e.target.value);checkIfValidationPassed(e.target.value, password1, password2);}}/></label><br></br>
-                <div className = "login-password-wrapper">
+            <form className="login-form">
+                <div className = "login-form-row">
+                    <input className="login-text-field" type="email" name="email" id="login-email" placeholder="Email" required
+                onChange={(e)=>{setEmail(e.target.value);checkIfValidationPassed(e.target.value, password1, password2);}}/>
+                </div>
+                
+                <div className = "login-form-row">
+                    <div className = "login-password-wrapper">
                     <input className="login-text-field" type={password1Visible? "text" : "password"} name="password" id="login-password" placeholder="Password"
                     onChange={(e)=>{setPassword1(e.target.value);  checkIfValidationPassed(email, e.target.value, password2);}} required/>
                     <span  className="toggle-password" onClick={()=>{togglePassword(1);}}>
@@ -103,7 +107,10 @@ export default function SignUpPage(){
                         <EyeSlashIcon id="login-password-icon" className="password-icon"/>}
                     </span>
                 </div>
-                <div className = "login-password-wrapper">
+                </div>
+                
+                <div className = "login-form-row">
+                    <div className = "login-password-wrapper">
                     <input className="login-text-field" type={password2Visible? "text" : "password"} name="password" id="login-password" placeholder="Repeat password"
                     onChange={(e)=>{setPassword2(e.target.value);  checkIfValidationPassed(email, password1, e.target.value);}} required/>
                     <span  className="toggle-password" onClick={()=>{togglePassword(2);}}>
@@ -112,12 +119,18 @@ export default function SignUpPage(){
                         <EyeSlashIcon id="login-password-icon" className="password-icon"/>}
                     </span>
                 </div>
+                </div>
+                
+                <div className = "login-form-row">
                 <div className="ErrorMesssageWrapper">
                     <p className="ErrorMessage">{initialValidationErrorMessage}</p>
                 </div>
+                </div>
 
-
-                <input className={`login-button SignUpButton ${!initialValidationPassed? "DisabledButton" : ""}`} type="submit" value="Sign up" disabled={!initialValidationPassed} onClick={(e)=>handleSubmit(e)}/>
+                <div className = "login-form-row">
+                    <input className={`login-button SignUpButton ${!initialValidationPassed? "DisabledButton" : ""}`} type="submit" value="Sign up" disabled={!initialValidationPassed} onClick={(e)=>handleSubmit(e)}/>
+                </div>
+                
             </form>
         </div>
     </div>

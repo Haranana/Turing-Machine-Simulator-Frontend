@@ -67,39 +67,53 @@ export default function LoginPage(){
     }
 
     return(
-    <div className="page">
-        <div className="login-window">
+        <div className="LoginPageWrapper">
+        <div className="login-page">
             <h1 className="login-header">Sign in</h1>
             
-            <form>
-                <label><input className="login-text-field" type="email" name="email" id="login-email" placeholder="Email" onChange={(e)=>{setEmail(e.target.value);checkIfValidationPassed(e.target.value , password1);}} required/></label><br></br>
-                <div className = "login-password-wrapper">
-                    <input className="login-text-field" type={passwordVisible? "text" : "password"} name="password" id="login-password" placeholder="Password" onChange={(e)=>{setPassword1(e.target.value);checkIfValidationPassed( email , e.target.value);}} required/>
-                    <span  className="toggle-password" onClick={()=>togglePassword()}>
-                        {passwordVisible?
-                        <EyeIcon id="login-password-icon" className="password-icon"/> :
-                        <EyeSlashIcon id="login-password-icon" className="password-icon"/>}
-                    </span>
+            <form className="login-form">
+                <div className="login-form-row">
+                     <input className="login-text-field" type="email" name="email" id="login-email" placeholder="Email" onChange={(e)=>{setEmail(e.target.value);checkIfValidationPassed(e.target.value , password1);}} required/>
+                </div>
+               
+                <div className = "login-form-row">
+                    <div className="login-password-wrapper">
+                        <input className="login-text-field" type={passwordVisible? "text" : "password"} name="password" id="login-password" placeholder="Password" onChange={(e)=>{setPassword1(e.target.value);checkIfValidationPassed( email , e.target.value);}} required/>
+                        <div  className="toggle-password" onClick={()=>togglePassword()}>
+                            {passwordVisible?
+                            <EyeIcon id="login-password-icon" className="password-icon"/> :
+                            <EyeSlashIcon id="login-password-icon" className="password-icon"/>}
+                        </div>
+                    </div>
                 </div>
                 
                 
-                <div className="login-remember-forgot">
-                    <label><input className="login-checkbox"  type="checkbox" name="remember-me" id="login-remember-me" checked={rememberMe} onChange={(e)=>setRememberMe(e.target.checked)}/>Remember me</label>
-                    <Link  className="remember-me-link" to="/password/change" title='ChangePassword'>Forgot password?</Link>
+                <div className="login-form-row login-remember-forgot">
+                    <div>
+                        <label><input className="login-checkbox"  type="checkbox" name="remember-me" id="login-remember-me" checked={rememberMe} onChange={(e)=>setRememberMe(e.target.checked)}/>Remember me</label>
+                    </div>
+                    
+                    <div>
+                        <Link  className="remember-me-link" to="/password/change" title='ChangePassword'>Forgot password?</Link>
+                    </div>
+                    
                 </div>
 
                             
                 <div className="ErrorMesssageWrapper">
                     <p className="ErrorMessage">{errorMessage}</p>
                 </div>
-                <input className={`login-button ${!initialValidationPassed? "DisabledButton" : ""}`} type="submit" value="Log in" disabled={!initialValidationPassed} onClick={(e)=>handleSubmit(e)}/>
-                <div className="login-signup">
+                <div className="login-form-row">
+                      <input className={` login-button ${!initialValidationPassed? "DisabledButton" : ""}`} type="submit" value="Log in" disabled={!initialValidationPassed} onClick={(e)=>handleSubmit(e)}/>
+                </div>
+              
+                <div className="login-form-row login-signup">
                     <span>Don't have an account? <Link className="login-signup-link" to="/signup" title='SignUp'>Sign up</Link></span>
                 </div>
 
 
             </form>
         </div>
-    </div>
+        </div>
     );
 }

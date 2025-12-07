@@ -42,6 +42,7 @@
 
   --font-1: "Roboto Mono", monospace;
   --font-2: "Poppins", sans-serif;  
+   --border-radius-extreme: 48px;
   --border-radius-strong: 24px;
   --border-radius-mild: 12px;
 }

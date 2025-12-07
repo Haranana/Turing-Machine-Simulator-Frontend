@@ -1,44 +1,75 @@
 
 /*login window*/
-.login-window{
+
+.LoginPageWrapper{
     display: flex;
-    
-    width: 30vw;
+    justify-content: center;
+    align-items: center;
+}
+.login-page{
+    --login-page-color: var(--color-strong);
+    --login-input-color: var(--color-medium);
+    --login-checkbox-border-color: var(--color-extreme);
+
+    font-family: var(--font-1);
+
+    display: flex;
+    margin-top: 4%;
     height: 70vh;
+
     align-self: center;
     flex-direction: column;
     align-items: center;
-    
 
+    min-width: 450px;
 
     padding-top: 7vh;
-    font-family: var(--font-main);
+    font-family: var(--font-1);
 
-        box-shadow: 3px 3px 7px 7px rgba(0, 0, 0, 0.316);
-    border-radius: 50px;
-    background-color: var(--color-bg-2);
+    box-shadow: 3px 3px 7px 7px rgba(0, 0, 0, 0.316);
+
+    border-radius: var(--border-radius-extreme);
+    background-color: var(--login-page-color);
+    color: var(--color-text)
+    
+}
+
+.login-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.login-form-row{
+        display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    min-width: 250px;
+    width: 75%;
 }
 
 /*header*/
 .login-header{
-    font-family: var(--font-main);
     font-size: 250%;
 }
 
 /*text fields*/
 .login-text-field{
     height: 5vh;
-    width: 20vw;
+    width: 100%;
     margin-top: 1vh;
     margin-bottom: 1vh;
     border-radius:9999px;
     border:none;
-    background-color: var(--color-primary-2);
-    color: var(--color-text-light);    
+    background-color: var(--login-input-color);
+    color: var(--color-text);    
     box-sizing: border-box;
-    padding-left: 1em;
-    font-family: var(--font-main);
-    
+    padding-left: 1em;    
 }
 
 .login-text-field:focus {
@@ -46,10 +77,35 @@
 }
 
 .login-text-field::placeholder{
-    color: white;
+    color: var(--color-text);
+}
+
+.login-password-wrapper{
+    display: flex;
+    flex-direction: row;
+    background-color: var(--login-input-color);
+    height: 5vh;
+    width: 100%;
+    border-radius:9999px;
+    width: 100%;
+}
+
+.login-password-wrapper .login-text-field{
+     margin-top: 0px;
+    background-color: transparent;
+    width: 80%;
+}
+
+.login-password-wrapper .toggle-password{
+    width: 20%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
 
 /*password*/
+/*
 .login-password-wrapper{
     position: relative;
     width: 20vw;  
@@ -58,16 +114,13 @@
 .login-password-wrapper .login-text-field{
   width: 100%;
   padding-right: 2.5em; 
-}
+}*/
 
 .password-icon{
-  max-width: 20px;
-  max-height: 20px;
-  position: absolute;
-  right: 0.7em;
-  top: 50%;
-  transform: translateY(-50%);
+  width: 25px;
+  height: 25px;
   cursor: pointer;
+
 }
 
 
@@ -80,7 +133,7 @@
   -webkit-appearance: none;
   -moz-appearance: none;
 
-  border: 2px solid var(--color-primary-2);
+  border: 2px solid var(--login-checkbox-border-color);
   outline: none;
   cursor: pointer;
   position: relative;
@@ -90,57 +143,45 @@
 }
 
 .login-checkbox:checked{
-    background-color: var(--color-primary-2);   
+    background-color: var(--color-accent);   
 }
 
 .remember-me-link{
-    color: var(--color-primary-2);
+    color: var(--color-text);
 }
 
 .login-remember-forgot{
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 20vw; 
-  margin: 1vh auto; 
 }
 
 /*login button*/
 .login-button{
     height: 5vh;
-    width: 20vw;
+    width: 90%;
     margin-top: 5vh;
     margin-bottom: 1vh;
     border-radius:9999px;
     border: none;
-    background-color: var(--color-primary-2);
-    color: var(--color-text-light);
-    font-family: var(--font-main);
-
+    background-color: var(--color-accent);
+    font-size: 110%;
+    color: var(--color-button-text);
     transition: 0.3s ease;
 }
 
 .login-button.DisabledButton{
-        background-color: var(--color-primary-1);
+        background-color: var(--color-accent-hover);
     cursor: default;
 }
 
 .login-button.DisabledButton:hover{
-            background-color: var(--color-primary-1);
-    cursor: default;
-}
-
-.login-button.SignUpButton{
-    width: 10vw;
-}
-
-.login-button.SignUpButton.DisabledButton{
-    background-color: var(--color-primary-1);
+    background-color: var(--color-accent-hover);
     cursor: default;
 }
 
 .login-button:hover{
-    background-color: var(--color-primary-4);
+    background-color: var(--color-accent-hover);
     cursor: pointer;
 }
 
@@ -150,7 +191,13 @@
 }
 
 .login-signup-link{
-    color: var(--color-primary-2);   
+    color: var(--color-text);   
+}
+
+.ErrorMesssageWrapper{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }
 
 

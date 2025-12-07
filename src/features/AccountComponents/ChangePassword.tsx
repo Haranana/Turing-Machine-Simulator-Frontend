@@ -80,39 +80,46 @@ export default function ChangePassword(){
     }
 
     return(
-    <div className="page">
-        <div className="login-window">
-            <h1 className="login-header">Sign in</h1>
+    <div className="LoginPageWrapper">
+        <div className="login-page">
+            <h1 className="login-header">Recover password</h1>
             
-            <form onSubmit={handleSubmit}>
-                 <div className = "login-password-wrapper">
-                    <input className="login-text-field" type={password1Visible? "text" : "password"} name="password" id="login-password" placeholder="Password"
-                    onChange={(e)=>{setPassword1(e.target.value);  checkIfValidationPassed(e.target.value, password2);}} required/>
-                    <span  className="toggle-password" onClick={()=>{togglePassword(1);}}>
-                        {password1Visible?
-                        <EyeIcon id="login-password-icon" className="password-icon"/> :
-                        <EyeSlashIcon id="login-password-icon" className="password-icon"/>}
-                    </span>
+            <form className="login-form" onSubmit={handleSubmit}>
+                <div className = "login-form-row">
+                    <div className = "login-password-wrapper">
+                        <input className="login-text-field" type={password1Visible? "text" : "password"} name="password" id="login-password" placeholder="Password"
+                        onChange={(e)=>{setPassword1(e.target.value);  checkIfValidationPassed(e.target.value, password2);}} required/>
+                        <span  className="toggle-password" onClick={()=>{togglePassword(1);}}>
+                            {password1Visible?
+                            <EyeIcon id="login-password-icon" className="password-icon"/> :
+                            <EyeSlashIcon id="login-password-icon" className="password-icon"/>}
+                        </span>
+                    </div>
                 </div>
-                <div className = "login-password-wrapper">
-                    <input className="login-text-field" type={password2Visible? "text" : "password"} name="password" id="login-password" placeholder="Repeat password"
-                    onChange={(e)=>{setPassword2(e.target.value);  checkIfValidationPassed(password1, e.target.value);}} required/>
-                    <span  className="toggle-password" onClick={()=>{togglePassword(2);}}>
-                        {password2Visible?
-                        <EyeIcon id="login-password-icon" className="password-icon"/> :
-                        <EyeSlashIcon id="login-password-icon" className="password-icon"/>}
-                    </span>
+                <div className = "login-form-row">
+                    <div className = "login-password-wrapper">
+                        <input className="login-text-field" type={password2Visible? "text" : "password"} name="password" id="login-password" placeholder="Repeat password"
+                        onChange={(e)=>{setPassword2(e.target.value);  checkIfValidationPassed(password1, e.target.value);}} required/>
+                        <span  className="toggle-password" onClick={()=>{togglePassword(2);}}>
+                            {password2Visible?
+                            <EyeIcon id="login-password-icon" className="password-icon"/> :
+                            <EyeSlashIcon id="login-password-icon" className="password-icon"/>}
+                        </span>
+                    </div>
                 </div>
-                            
+                <div className = "login-form-row">       
                  <div className="ErrorMesssageWrapper">
                     <p className="ErrorMessage">{initialValidationErrorMessage}</p>
                 </div>
+                </div>     
+                <div className = "login-form-row">  
                <input
                 className={`login-button ${!initialValidationPassed ? "DisabledButton" : ""}`}
                 type="submit"
                 value="Change password"
                 disabled={!initialValidationPassed}
                 />
+                </div>
             </form>
         </div>
     </div>
