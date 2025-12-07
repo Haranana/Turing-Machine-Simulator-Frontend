@@ -1,18 +1,14 @@
 
 
 .alphabet-editor {
-    --cl-color-bg: var(--color-bg);
-    --cl-text-field-bg-color: var(--color-primary-01);
+    --cl-color-bg: var(--color-strong);
+    --cl-text-field-bg-color: var(--color-extreme);
     
-    --cl-color-button: var(--color-primary-1);
-    --cl-color-button-hover: var(--color-primary-2);
+    --cl-color-button: var(--color-extreme);
+    --cl-color-button-hover: var(--color-accent-hover);
 
-    --cl-border-color: var(--color-text-dark);
-    --cl-color-input-focus: var(--color-primary-1);
-
-    --cl-text-color-main: var(--color-text-dark);
-    --cl-text-color-bg: var(--color-text-grayish);
-    --cl-text-color-button: var(--color-text-light);
+    --cl-border-color: var(--color-medium);
+    --cl-color-input-focus: var(--color-medium);
 
   margin-top: 18px;
   margin-bottom: 12px;
@@ -22,10 +18,10 @@
   max-width: 600px;
   padding: 12px;
   border: 1px solid var(--cl-border-color);
-  border-radius: 6px;
+  border-radius: var(--border-radius-strong);
   background-color: var(--cl-color-bg);
   color: var(--cl-text-color);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-1);
   font-size: 14px;
 }
 
@@ -38,7 +34,7 @@
 .alphabet-chips-container {
   min-height: 40px;
   border: 1px solid var(--cl-border-color);
-  border-radius: 4px;
+  border-radius: var(--border-radius-mild);
   padding: 6px;
   background-color: var(--cl-text-field-bg-color);
 }
@@ -72,7 +68,7 @@
   border: none;
   outline: none;
   background: none;
-  color: #ff7b7b;
+  color: var(--color-red);
   cursor: pointer;
   font-size: 13px;
   line-height: 1;
@@ -92,11 +88,11 @@
 .alphabet-input {
   flex: 1;
   padding: 6px 8px;
-  border-radius: 4px;
+  border-radius: var(--border-radius-mild);
   border: 1px solid var(--cl-border-color);
   background-color: var(--cl-text-field-bg-color);
   color: var(--cl-text-color);
-  font-family: inherit;
+  font-family: var(--font-1);
   font-size: 14px;
 }
 
@@ -107,10 +103,10 @@
 }
 
 .alphabet-add-button {
+  font-family: var(--font-1);
   padding: 6px 12px;
-  border-radius: 4px;
-  /*border: 1px solid #4c9aff;*/
-  border: none;
+  border-radius: var(--border-radius-mild);
+  border: solid 2px var(--color-accent);
   background-color: var(--cl-color-button);
   color: var(--cl-text-color-button);
   font-size: 14px;
@@ -159,11 +155,11 @@
 }
 
 .PresetsDropdownSummary{
-    border: solid 1px var(--cl-border-color);
-    height: 100%;
+  border: solid 1px var(--cl-border-color);
+  height: 100%;
   padding-left: 2px;
   padding-right: 2px;
-  border-radius: 4px;
+  border-radius: var(--border-radius-mild);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -182,6 +178,8 @@
 }
 
 .PresetsDropdownButton{
+  font-family: var(--font-1);
+  color: var(--color-text);
   width: 100%;
   background-color: var(--cl-color-bg);
   border: none;
@@ -189,5 +187,5 @@
 }
 
 .PresetsDropdownButton:hover{
-  background-color: var(--cl-color-button);
+  background-color: var(--cl-border-color);
 }

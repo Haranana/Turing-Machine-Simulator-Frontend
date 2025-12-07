@@ -35,6 +35,7 @@
   --color-text:         var(--neutral-700);
   --color-text-mild:    var(--neutral-500);
   --color-text-muted:   var(--neutral-300);
+  --color-button-text: var(--white);
 
   --color-accent:       var(--accent-500);
   --color-accent-hover: var(--accent-400);

@@ -130,7 +130,7 @@ export default  function SettingsPage() {
     }
 
     return(
-        <div>
+        <div className='SettingsPage'>
                 <div className='SettingsSegment SimulationAliasesSegment'>
                     <div className='SegmentFirstColumn'>
                             <p className='SegmentTitle'>Simulation Aliases</p>
@@ -152,7 +152,7 @@ export default  function SettingsPage() {
                         </div>
 
                         <div className="SettingsTextFieldRow">
-                            <label className="SettingsTextFieldLabel" htmlFor="sep2-alias">Separator 2:</label>
+                            <label className="SettingsTextFieldLabel" htmlFor="sep2-alias">Transition arrow:</label>
                             <input
                             value={transitionArrowFieldValue}
                             className="SettingsTextField Sep2TextField"
@@ -246,7 +246,7 @@ export default  function SettingsPage() {
                         </div>
 
                         <div className="SettingsTextFieldRow">
-                            <label className="SettingsTextFieldLabel" htmlFor="StateReject">Reject state</label>
+                            <label className="SettingsTextFieldLabel" htmlFor="StateReject">Reject state*:</label>
                             <input
                             value={rejectFieldValue}
                             className="SettingsTextField StayTextField"

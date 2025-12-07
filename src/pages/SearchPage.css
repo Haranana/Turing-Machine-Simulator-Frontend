@@ -67,7 +67,7 @@
     align-content: center;
     align-items: center;
     justify-content: center;
-    color: var(--color-text);
+    color: var(--color-button-text);
     
     cursor: pointer;
     font-weight: bold;
