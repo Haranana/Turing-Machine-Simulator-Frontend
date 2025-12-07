@@ -1,4 +1,9 @@
 .SearchPage{
+    --bg-color: var(--color-extreme);
+    --page-color: var(--color-strong);
+    --search-bar-color: var(--color-medium);
+    --disabled-button-color: var(--color-strong);
+
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -6,61 +11,94 @@
 
     margin-left: 20%;
     margin-right: 20%;
+
     margin-top: 10%;
     min-width: 400px;
-    background-color: var(--color-primary-0);
+
+    background-color: var(--page-color);
+    border-radius: var(--border-radius-strong);
+    color: var(--color-text);
+
 }
 
 .SearchPageHeadline{
-    font-family: var(--font-secondary);
-    background-color: var(--color-primary-1);
+    font-family: var(--font-1);
+    font-weight: 400;
     width: 100%;
-    margin-top: 0px;
+    margin-top: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .SearchBarWrapper{
+    
     display: flex;
     flex-direction: row;
-    width: 30%;
+    width: 50%;
     min-width: 250px;
     height: 40px;
+    background-color: var(--search-bar-color);
+    border-radius: 30px;
+    margin-top: 50px;
+    margin-bottom: 50px;
 }
 
 .SearchBar{
-    font-family: var(--font-secondary);
+    font-family: var(--font-1);
     width: 75%;
     height: 100%;
     padding: 0;
     padding-left: 10px;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    color: var(--color-text);
 }
 
 .SearchButton{
     height: 100%;
-    width: 25%;
+    width: 15%;
     display: flex;
     flex-direction: row;
     cursor: pointer;
     border: none;
-    border-radius: 2px;
+    border-radius: 30px;
     align-content: center;
     align-items: center;
     justify-content: center;
-    color: var(--color-text-dark);
-    background-color: var(--color-primary-1);
+    color: var(--color-text);
+    
+    cursor: pointer;
     font-weight: bold;
+    background-color: var(--color-accent);
+   border: 3px solid var(--search-bar-color);
+}
+
+.SearchButton:hover{
+    background-color: var(--color-accent-hover);
+}
+
+.SearchButton:hover.DisabledSearchButton{
+    background-color: var(--color-accent);
+    cursor: default;
 }
 
 .SearchButton.DisabledSearchButton{
-            cursor: default;
-    color: var(--color-primary-1);
-    background-color: var(--color-primary-0)
+    /*background-color: var(--disabled-button-color);*/
+    cursor: default;
 }
 
 .searchError{
-    font-family: var(--font-secondary);
+    font-family: var(--font-1);
+    font-weight: bold;
     font-size: 110%;
-    color: rgb(170, 29, 29);
+    color: var(--color-red);
+}
+
+.SearchBarWrapper .icon{
+  width: 30px;
+  padding-right: 10px;
+  padding-left: 10px;
+  height: 100%;
 }

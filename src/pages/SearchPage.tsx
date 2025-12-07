@@ -5,6 +5,7 @@ import { useTuringMachineData } from "../features/GlobalData/GlobalData";
 import { useTuringMachineSettings } from "../features/GlobalData/GlobalData";
 import type { TuringMachineGetDto } from "../features/AccountComponents/AccountDataTypes";
 import toast from "react-hot-toast";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 
 export default function SearchPage(){
@@ -95,8 +96,9 @@ export default function SearchPage(){
     }
 
     return <div className="SearchPage">
-        <h1 className="SearchPageHeadline">Enter 5 characters long code and load shared Turing machine</h1>
+        <h1 className="SearchPageHeadline">Enter turing machine share code</h1>
         <div className="SearchBarWrapper">
+            <div className="SearchIcon"><MagnifyingGlassIcon className="icon"/></div>
             <input placeholder="5 character search code"  type="text" className="SearchBar" onChange={(e)=>onInputChange(e.target.value)}></input>    
             <button className={`SearchButton ${validationError!=null? "DisabledSearchButton" : ""}`} disabled={validationError!=null} onClick={()=>onSearchClicked()}>Load</button>
         </div>   
