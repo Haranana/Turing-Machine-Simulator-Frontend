@@ -1,6 +1,6 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AccountDataContext } from "./AccountDataContext";
-import { ChevronDownIcon, ChevronRightIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
+import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { useApiFetch } from "../../api/util";
 import { toast } from 'react-hot-toast';
 import Modal from "../Modal/Modal";
@@ -21,20 +21,57 @@ export default function SaveTuringMachine(){
     const [newTuringMachineName , setNewTuringMachineName] = useState<string>("");
     const [newTuringMachineDescription , setNewTuringMachineDescription] = useState<string>("");
 
-    const [initialValidationPassed, setInitialValidationPassed] = useState<boolean>(false);
+
 
     const [isSaveTmModalOpen, setSaveTmModalOpen] = useState<boolean>(false);
     const [tmToOverwrite, setTmToOverwrite] = useState<{id: number, name: string}|null>(null);
-    const [saveAsDashboardButtonPressed, setSaveAsDashboardButtonPressed] = useState<boolean>(false);
 
     function isAccountDataLoaded(){
         return accountData!=null&& accountData.id != null && accountData.email != null && accountData.status != null && accountData.createdAt != null;
     }
 
-    function initialValidation(name: string, description: string){
-        accountData!=null && name.length > 0 && name.length <= 30 && description.length > 0 && description.length <= 255 &&
-        accountData.id != null && accountData.email != null && accountData.status != null && accountData.createdAt != null ? setInitialValidationPassed(true) : setInitialValidationPassed(false);
-    }
+const [initialValidationPassed, setInitialValidationPassed] = useState<boolean>(false);
+const [initialValidationError, setInitialValidationError] = useState<string | null>(null);
+
+function initialValidation(name: string, description: string) {
+
+  setInitialValidationPassed(false);
+  setInitialValidationError(null);
+
+  if (!accountData) {
+    setInitialValidationError("Account data is null");
+    return;
+  }
+
+  if (!accountData.id || !accountData.email || !accountData.status || !accountData.createdAt) {
+    setInitialValidationError("Account data is incomplete");
+    return;
+  }
+
+  if (name.length === 0) {
+    setInitialValidationError("Name is required");
+    return;
+  }
+
+  if (name.length > 30) {
+    setInitialValidationError("Name must be at most 30 characters long");
+    return;
+  }
+
+  if (description.length === 0) {
+    setInitialValidationError("Description is required");
+    return;
+  }
+
+  if (description.length > 255) {
+    setInitialValidationError("Description must be at most 255 characters long");
+    return;
+  }
+
+
+  setInitialValidationPassed(true);
+  setInitialValidationError(null);
+}
 
     async function handleSaveAs(e: React.MouseEvent<HTMLButtonElement, MouseEvent>){
         e.preventDefault();
@@ -172,18 +209,16 @@ export default function SaveTuringMachine(){
         }
     }
 
+    useEffect(()=>{initialValidation("","")},[])
+
     return <>
     <div className="AccountPageSubpage SaveTuringMachineSubpage">
-        <div className="SaveTmSubpageDashboard">
-            <button className={`SaveTmDashboardButton SaveTmDashboardSaveAsButton`} onClick={()=>setSaveAsDashboardButtonPressed(!saveAsDashboardButtonPressed)}>
-                Save As
-                {saveAsDashboardButtonPressed? <ChevronRightIcon className="saveTmDashboardIcon"></ChevronRightIcon> : <ChevronDownIcon className="saveTmDashboardIcon"></ChevronDownIcon>}
-            </button>
-            <button className={`SaveTmDashboardButton SaveTmDashboardSaveButton ${tmDataName==null ? "DisabledButton" : ""}`} disabled={tmDataName==null} onClick={e=>handleSave(e)}>
-                Save </button>
-        </div>
-        {isAccountDataLoaded() && saveAsDashboardButtonPressed?
+        {isAccountDataLoaded() ?
+        
+        <>
+        <h1 className="CreateTuringMachineTitle">Create Turing Machine</h1>
          <form className="SaveTuringMachineForm">
+
             <label className="AccountInputFieldLabel">
             <textarea rows={1} className="TmNameInput AccountInputField"
               name="TmNameInput" id="TmNameInput" value={newTuringMachineName} placeholder="Name"
@@ -197,11 +232,13 @@ export default function SaveTuringMachine(){
               maxLength={255}>
             </textarea>
                 </label>
+            {!initialValidationPassed? <p className="CreateTuringMachineError">{initialValidationError}</p> : "" }
             <button className={`AccountPageSaveFormButton ${initialValidationPassed? "" : "DisabledButton"}`}
              disabled={!initialValidationPassed} onClick={e=>handleSaveAs(e)}>Save as<PencilSquareIcon/></button>
         </form>
+        </>
         :
-        ""
+        "User data couldn't be loaded."
         }
 
     </div>
