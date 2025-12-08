@@ -1,14 +1,20 @@
 
 .sidebar-wrap{
-  min-height: 100vh;
+  
   --sidebar-width: 6rem;
   --sidebar-color: var(--color-strong);
   --sidebar-element-hover-color: var(--color-medium);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;         
+  width: var(--sidebar-width);
 }
 
 .sidebar {
   width: var(--sidebar-width);
-  min-height: 100%;
+   height: 100%; 
   background: var( --sidebar-color);
   color: var(--color-text);
   display: flex;
@@ -21,10 +27,14 @@
   margin-top: 0;
   padding: 0;
   width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  flex: 1;  
 }
 
 .sidebar li {
-  margin-top: 8px;
+  margin-top: 20px;
   width: 100%;
 }
 
@@ -32,9 +42,20 @@
   color: var(--color-text);
   height: 75px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-decoration: none;
+}
+
+.disabledLinkButton .SidebarLinkTitle{
+  color: var(--color-text-muted);
+}
+
+.SidebarLinkTitle{
+  margin: 0px;
+  font-family: var(--font-1);
+  font-size: smaller;
 }
 
 .SidebarButton{
@@ -50,6 +71,11 @@
   cursor: pointer;
   background-color: transparent;
 }
+
+li.SidebarElement.StyleModeToggle{
+  margin-top: auto;
+}
+
 
 .sidebar .disabledLinkButton a{
   pointer-events: none;
@@ -72,7 +98,7 @@
   border-bottom: solid 5px var(--color-accent);
 }
 .icon{
-  max-width: 50px;
-  max-height: 50px;
+  width: 50px;
+  height: 50px;
 }
 

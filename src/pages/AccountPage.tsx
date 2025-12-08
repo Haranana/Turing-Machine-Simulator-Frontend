@@ -10,17 +10,26 @@ import type { AccountData } from '../features/AccountComponents/AccountDataConte
 import { toast } from 'react-hot-toast';
 import { AccountDataContext } from '../features/AccountComponents/AccountDataContext.ts';
 import { ArrowRightStartOnRectangleIcon , ChevronUpIcon , ChevronDownIcon } from '@heroicons/react/24/solid';
+import { useNavigate } from 'react-router-dom';
+import { useTuringMachineData, useTuringMachineSettings } from '../features/GlobalData/GlobalData.ts';
+import type { TuringMachineEditDto } from '../features/AccountComponents/AccountDataTypes.ts';
 
 export default  function AccountPage() {
 
-    const [currentSubPage, setCurrentSubPage] = useState<"load" | "save" | "edit">("load");
+       const {tmDataProgram , tmDataTapesAmount, tmDataName} = useTuringMachineData();
+       const {onlyComplete, rejectOnNonAccept , allowMultipleTapes,allowNondeterminism, inputAlphabet, tapeAlphabet, statesSet, onlyInputAlphabet, onlyTapeAlphabet, onlyStatesFromSet} = useTuringMachineSettings(s=>s.specialSettings);
+       const { symbolSeparator,transitionArrow,blank, left, right, stay} = useTuringMachineSettings(s=>s.aliases);
+       const {initialState, acceptState, rejectState} = useTuringMachineSettings(s=>s.specialStates);
+   
+    const [currentSubPage, setCurrentSubPage] = useState<"load" | "create"  | "edit">("load");
     const {logout} = useAuth();
+    const navigate = useNavigate();
     
     const apiFetch = useApiFetch();
 
     const subPages = {
         load: <LoadTuringMachine/>,
-        save: <SaveTuringMachine/>,
+        create: <SaveTuringMachine/>,
         edit: <EditProfile/>
         } as const;
 
@@ -44,15 +53,72 @@ export default  function AccountPage() {
 
     }, [apiFetch]);
 
+    async function onSaveClicked(){
+
+        if(tmDataName==null){
+            setCurrentSubPage("create");
+            return;
+        }
+        
+         const sendBody : TuringMachineEditDto = { 
+            name: tmDataName,
+            description: null,
+            program: tmDataProgram.join("\n"),
+            initialState: initialState,
+            acceptState: acceptState,
+            rejectState: rejectState,
+            blank: blank,
+            sep1: symbolSeparator,
+            sep2: transitionArrow,
+            moveRight: right,
+            moveLeft: left,
+            moveStay: stay,
+            tapesAmount: tmDataTapesAmount,
+
+            specialSettings: {
+                allowNondeterminism: allowNondeterminism,
+                allowMultipleTapes: allowMultipleTapes,
+                onlyComplete: onlyComplete,
+                rejectOnNonAccept: rejectOnNonAccept,
+        
+                statesSet: statesSet,
+                onlyStatesFromSet: onlyStatesFromSet,
+        
+                tapeAlphabet: tapeAlphabet,
+                onlyTapeAlphabet: onlyTapeAlphabet,
+        
+                inputAlphabet: inputAlphabet,
+                onlyInputAlphabet: onlyInputAlphabet,
+                }};
+
+                try{
+                    const res = await apiFetch("http://localhost:9090/api/tm/edit" , {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(
+                            sendBody
+                        )
+                    });
+                    if(res.status == 200 ){
+                        toast.success(`Turing Machine saved successfully`);
+                    }
+                    else{
+                        toast.error(`Turing Machine couldn't be saved`);
+                    }
+                }catch(e: any){
+                     toast.error(`Turing Machine couldn't be saved`);
+                }
+    }
+
     return(
         <div className="AccountPageWrapper">
             <div className='AccountPage'>
                 <div className='AccountPageDashboard'>
                     
                         <button className={`AccountDashboardButton ${currentSubPage=="load"? "SelectedDashboardButton" : "" }`} onClick={()=>setCurrentSubPage("load")}>Manage{currentSubPage=="load"? <ChevronUpIcon/> : <ChevronDownIcon/> }</button>
-                        <button className={`AccountDashboardButton ${currentSubPage=="save"? "SelectedDashboardButton" : "" }`} onClick={()=>setCurrentSubPage("save")}>Save {currentSubPage=="save"? <ChevronUpIcon/> : <ChevronDownIcon/> }</button>
+                        <button className={`AccountDashboardButton ${currentSubPage=="create"? "SelectedDashboardButton" : "" }`} onClick={()=>setCurrentSubPage("create")}>Create {currentSubPage=="create"? <ChevronUpIcon/> : <ChevronDownIcon/> }</button>
                         <button className={`AccountDashboardButton ${currentSubPage=="edit"? "SelectedDashboardButton" : "" }`} onClick={()=>setCurrentSubPage("edit")}>Account {currentSubPage=="edit"? <ChevronUpIcon/> : <ChevronDownIcon/> }</button>
-                    
+                        <button className={`AccountDashboardButton`} onClick={()=>onSaveClicked()} >Save</button>
                      <button className='AccountDashboardButton LogoutButton'onClick={()=>logout()}><ArrowRightStartOnRectangleIcon/></button>
                 </div>
                 {/*<hr className='LineSeparator'></hr>*/}
