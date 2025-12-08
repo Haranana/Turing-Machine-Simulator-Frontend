@@ -1,8 +1,40 @@
+.TapesPageWrapper{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.TapesPage{
+  margin-top: 30px;
+  width: 95%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  --tapes-color-bg: var(--color-strong);
+  --tapes-color-cell: var(--color-medium);
+  --tapes-color-cell-head: var(--color-extreme);
+  --tapes-color-cell-border: var(--color-strong);
+  --tapes-color-controls-button: var(--color-medium);
+  --tapes-color-load-button: var(--color-accent);
+  --tapes-text-field-color: var(--color-medium);
+  --tapes-color-head-border: var(--color-accent);
+
+  border-radius: var(--border-radius-extreme);
+
+  background-color: var(--tapes-color-bg);
+  font-family: var(--font-1);
+
+  
+}
+
 .SimulationData{
   display: flex;
   flex-direction: row;
   justify-content: center;
-  font-family: var(--font-main);
+  font-family: var(--font-1);
+  color: var(--color-text);
 }
 
 .SimulationDataParagraph{
@@ -14,9 +46,10 @@
 }
 
 .SimulationControls{
+  width: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  /*justify-content: space-around;*/
 }
 
 .JumpToControls{
@@ -61,19 +94,21 @@
 
 .TapeCell {
     box-sizing: border-box;
-  background-color: var(--color-primary-1);
-  color: var(--color-text-light);
-  border: solid 3px var(--color-bg);
+  background-color: var(--tapes-color-cell);
+  color: var(--color-text);
+  border: solid 3px var(--tapes-color-cell-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-family: var(--font-1);
   font-size: 22px;
   user-select: none;
+  border-radius: var(--border-radius-weak);
 }
 
 .TapeCellHead{
-  background-color:var(--color-primary-2) ; 
+  background-color:var(--tapes-color-cell-head);
+  border: 3px solid var(--tapes-color-head-border); 
 }
 
 .TapeControls{
@@ -95,7 +130,7 @@
 .SimulationControlsButton{
   min-width: 50px;
   min-height: 50px;
-  color: white;
+  color: var(--color-text);
   background-color: var(--color-primary-2);
   margin: 1px;
   cursor: pointer;
@@ -122,7 +157,7 @@
 .TapeActionsButton{
       min-width: 25px;
   min-height: 25px;
-  color: white;
+  color: var(--color-text);
   background-color: var(--color-primary-2);
   margin: 1px;
   cursor: pointer;
@@ -143,6 +178,7 @@
 
 .InputContainer {
   /*overflow: hidden;*/ /*breaks tooltip when hidden*/
+
   max-height: 0;
   opacity: 0;
   transition: max-height 250ms ease, opacity 200ms ease;
@@ -150,6 +186,7 @@
   display: flex;
   flex-direction: row;
   justify-content: left;
+
 }
 
 .InputContainer.InputContainerVisible{
@@ -167,19 +204,28 @@
   min-height: 25px;
 }
 
-.LoadSimulationButton{
-  background-color: var(--color-primary-2);
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  color: white;
+.LoadSimulationContainer{
   margin-top: 20px;
+  height: 40px;
   width: 15%;
-  min-height: 50px;
+  min-width: 100px;
+}
+
+.LoadSimulationButton{
+  background-color: var(--color-extreme);
+  border: solid 2px var(--color-accent);
+  cursor: pointer;
+  /*border: none;*/
+  font-weight: 600;
+  font-size: 105%;
+  border-radius: var(--border-radius-mild);
+  color: var(--color-text);
+  width: 100%;
+  height: 100%;
 }
 
 .LoadSimulationButton.DisabledButton{
-  background-color: var(--color-primary-1);
+  background-color: var(--color-accent-hover);
   cursor: default;
 }
 

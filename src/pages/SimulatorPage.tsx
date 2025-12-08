@@ -7,16 +7,13 @@ function prepData(){
         head: 0 ,
         tape: new Map<number, TapeSymbol>(),
         };
-    
-
-
     return tapeMockInput;
 }
 
 
 export default  function SimulatorPage() {
     return(
-        <div className="page">
+        <div className="TapesPageWrapper">
             <TapesController tapeState={prepData()}></TapesController>
         </div>
     );

@@ -45,6 +45,7 @@
    --border-radius-extreme: 48px;
   --border-radius-strong: 24px;
   --border-radius-mild: 12px;
+  --border-radius-weak: 6px;
 }
 
 html[data-theme="dark"] {

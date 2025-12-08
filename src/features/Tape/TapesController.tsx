@@ -555,7 +555,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
 
   return (
-    <div className="simulation-interface">
+    <div className="TapesPage">
 
       {isAuthenticated && tmDataName!=null?
         <div className="SimulationNameWrapper">
