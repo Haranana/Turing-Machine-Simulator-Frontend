@@ -50,7 +50,7 @@ export default function EditProfile(){
         }
     }
 
-    return <div className="AccountPageSubpage LoadTuringMachineSubpage">
+    return <div className="AccountPageSubpage EditAccountSubpage">
 
         <div className="editProfileRow">
             <div className="editProfileTextField">
@@ -67,8 +67,7 @@ export default function EditProfile(){
         </div>
 
         <div className="editProfileRow"><button className="editProfileButton changePasswordButton" onClick={onChangePasswordClicked}>Change password</button></div>
-        
-
+    
         <div className="editProfileRow"><button className="editProfileButton deleteAccountButton" onClick={onDeleteAccountClicked}>Delete account</button> </div>
         
         {/*<hr className='LineSeparator'></hr>*/}
