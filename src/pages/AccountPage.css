@@ -1,24 +1,52 @@
 .AccountPageWrapper{
+    margin-top: 50px;
+    
+    --account-color-bg: var(--color-extreme);
+    --account-color-subpage: var(--color-strong);
+    --account-db-button-color: var(--color-strong);
+    --account-db-button-border: solid 2px  var(--color-accent);
+    --account-color-border: var(--color-weak);
+
+
+    --tm-list-color-bg: var(--color-strong);
+
+
+    --tm-details-color-text-field: var(--color-medium);
+    --tm-details-color-description-bg : var(--color-extreme);
+
+    font-family: var(--font-1);
+
+}
+
+.AccountPage{
+    background-color: var(--account-color-page);
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.AccountPageSubpage{
+    background-color: var(--account-color-subpage);
+    border-radius: var(--border-radius-extreme);
 }
 
 .AccountPageDashboard{
     display: flex;
     flex-direction: row;
     justify-content: center;
-        height: 100px;
+    height: 100px;
     width: 100%;
 }
 
 .AccountDashboardButton{
-  color: var(--color-text-dark);
+    
+  color: var(--color-text);
+
   font: ui-monospace;
   background-color: transparent;
   cursor: pointer;
-  border: none;
-  border-radius: 5px;
+  
+  border-radius: var(--border-radius-strong);
 
     height: 50%;
     width: 9%;
@@ -29,13 +57,17 @@
   line-height: 1;    
   margin-left: 3%;
   margin-right: 3%;
+  border: 2px solid var(--account-color-border);
+  border-bottom: 3px solid var(--account-color-border);
+  background-color: var(--account-db-button-color);
   font-size: 120%;
   
 }
+
 .AccountDashboardButton.SelectedDashboardButton{
-    /*background-color: var(--color-primary-0);*/
-   
     font-weight: 600;
+    border: var(--account-db-button-border);
+    border-bottom: 3px solid var(--color-accent);
 }
 
 .AccountDashboardButton svg{
@@ -44,7 +76,8 @@
 }
 
 .AccountDashboardButton.LogoutButton{
-    background-color: rgb(187, 77, 77);
+    border: none;
+    background-color: var(--color-red);
     color: white;
     width: 3%;
 }
@@ -79,6 +112,7 @@
     align-items: center;
     color: var(--color-text-dark);
     background-color: var(--color-primary-1);
+    
 }
 
 .AccountPageSaveFormButton.DisabledButton{
@@ -104,7 +138,7 @@
 }
 
 .TmList{
-    background-color: white;
+    background-color: var(--tm-list-color-bg);
 }
 
 .TuringMachineRow{
@@ -112,8 +146,9 @@
     flex-direction: row;
     align-items: center;
     margin-bottom: 5px;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-size: 105%;
+    font-family: var(--font-1);
+    color: var(--color-text);
+   
 }
 
 .TmRowButton{
@@ -179,22 +214,26 @@
 }
 
 .TmListDashboard{
+    height: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: row;
     margin-bottom: 10px;
+     border-bottom: 2px solid var(--account-color-border);
+     
 }
 
 .TmListButton{
-        background-color: transparent;
+    color: var(--color-text);
+    background-color: transparent;
     border: none;
     font-size: 115%;
     font-weight: 500;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: var(--font-1);
     cursor: pointer;
     position: relative;
-    height: 100px;
+    
 }
 
 .TmListButtonIcon {
@@ -248,10 +287,8 @@
     align-items: center;
 }
 .saveTmDashboardIcon{
-
   width: 24px;
   height: 24px;
- 
 }
 
 .TmDetails {
@@ -267,15 +304,98 @@
 }
 
 .TmDetails.TmDetailsVisible{
-  max-height: 1000px;
+  max-height: 1400px;
   opacity: 1;
   box-sizing: border-box;
   margin-bottom: 30px;
+  pointer-events: all;
   margin-top: 30px;
 }
 
+.TmDetailsSegment{
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+}
+
+.TmDetailsSegment.TmDetailsTwoColumnSegment{
+    display: flex;
+    flex-direction: row;
+}
+
+.TmDetailsSegmentColumn{
+    display: flex;
+    flex-direction: column;
+}
+    
+.TmDetailsSegmentFirstColumn{
+    width: 60%;
+}
+
+.TmDetailsSegmentSecondColumn{
+    display: flex;
+    flex-direction: column;
+
+    width: 40%;
+}
+
+
+.TmDetailsRow{
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    color: var(--color-text);
+    height: 40px;
+}
+
+.TmDetailsRow.TmDetailsTextAreaRow{
+    height: auto;
+    min-height: 40px;
+}
+
+.TmDetailsTextTitle{
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    width: 60%;
+    margin: 0px;
+}
+
+.TmDetailsTextValue{
+    width: 40%;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    border-radius: var(--border-radius-mild);
+    padding-left: 5px;
+    padding-right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+
+.TmDetailsButton{
+    background-color: transparent;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    border-radius: var(--border-radius-mild);
+    padding-left: 0px;
+    
+}
+
+.TmDetailsButtonIcon{
+    color: var(--color-text);
+    padding-left: 0px;
+}
+
+
 .TmDetailsColumn1{
-    width: 35%;
+    width: 45%;
 }
 
 .TmDetailsColumn2{
@@ -285,19 +405,68 @@
 .TmDetailsColumn{
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
 }
 
-.TmDetailsDescription {
-   resize: none;    
-  overflow: auto;
+.TmDetailsDescriptionTitle{
+    justify-content: left;
 }
+
+.TmDetailsProgram{
+  background-color: var(--tm-details-color-description-bg);
+  color: var(--color-text);
+  border-radius: var(--border-radius-mild);
+  padding: 10px;
+  font: var(--font-1);
+
+  width: 100%;
+  max-width: 100%;
+
+  height: 100%;
+
+ 
+  resize: none;      
+  overflow-y: auto; 
+  overflow-x: hidden; 
+
+  margin: 4px 0;     
+  height: calc(100% - 8px);
+  
+}
+
+.TmDetailsProgram:focus{
+    outline: 2px solid var(--color-accent);
+}
+
+.TmDetailsDescription {
+  background-color: var(--tm-details-color-description-bg);
+  color: var(--color-text);
+  border-radius: var(--border-radius-mild);
+  padding: 10px;
+
+  width: 100%;
+  max-width: 100%;
+
+  height: 90px;
+
+ 
+  resize: none;      
+  overflow-y: auto; 
+  overflow-x: hidden; 
+  
+}
+
+.TmDetailsDescription:focus{
+    outline: 2px solid var(--color-accent);
+}
+
+
 
 .TmDetailsText{
     margin-top: 8px;
     margin-bottom: 8px;
-   font-family: var(--font-secondary);
+   font-family: var(--font-1);
+   color: var(--color-text);
 }
 
 .TmDetailsSeparator{
@@ -311,6 +480,7 @@
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
+    
 }
 
 .editProfileTextFieldTitle{

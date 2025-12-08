@@ -45,7 +45,8 @@ export default  function AccountPage() {
     }, [apiFetch]);
 
     return(
-        <div className="page AccountPageWrapper">
+        <div className="AccountPageWrapper">
+            <div className='AccountPage'>
                 <div className='AccountPageDashboard'>
                     
                         <button className={`AccountDashboardButton ${currentSubPage=="load"? "SelectedDashboardButton" : "" }`} onClick={()=>setCurrentSubPage("load")}>Manage{currentSubPage=="load"? <ChevronUpIcon/> : <ChevronDownIcon/> }</button>
@@ -54,10 +55,11 @@ export default  function AccountPage() {
                     
                      <button className='AccountDashboardButton LogoutButton'onClick={()=>logout()}><ArrowRightStartOnRectangleIcon/></button>
                 </div>
-                <hr className='LineSeparator'></hr>
+                {/*<hr className='LineSeparator'></hr>*/}
                 <AccountDataContext value={accountData}>
-                {subPages[currentSubPage]}
+                    {subPages[currentSubPage]}
                 </AccountDataContext>
+            </div>
         </div>
     );
 }

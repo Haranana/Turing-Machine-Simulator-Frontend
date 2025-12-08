@@ -17,6 +17,14 @@ type inputProp = {tm: TuringMachineGetDto, tmId: number, handleDeleted: ()=>void
         return DateTime[0]+" "+time;
     }   
 
+    export function descriptionToShortened(desc: string){
+        if(desc.length > 30){
+            return (desc.substring(0,30).concat("..."));
+        }else{
+            return desc;
+        }
+    }
+
 export default function TuringMachineToLoad(props: inputProp){
 
     const {tmDataName, setTmDataName, setTmDataTapesAmount, setTmDataProgram, setTmDataTapesInputs} = useTuringMachineData();
@@ -93,7 +101,7 @@ export default function TuringMachineToLoad(props: inputProp){
                 <span className="TmRowName TmRowTextField">{props.tm.name}</span>
             </div>
             <div className="TmRowDescWrapper TmRowTextWrapper">
-                <span className="TmRowDesc TmRowTextField">{props.tm.description}</span>
+                <span className="TmRowDesc TmRowTextField">{descriptionToShortened(props.tm.description)}</span>
             </div>
             <div className="TmRowUpdateWrapper TmRowTextWrapper">
                 <span className="TmRowUpdatedDate TmRowTextField">{dateToShowable(props.tm.updatedAt)}</span>

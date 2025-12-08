@@ -89,17 +89,17 @@ export default function LoadTuringMachine(){
             <div className="TmListButtonShowWrapper TmListEmptyWrapper"></div>
             <div className="TmListButtonNameWrapper TmListNonEmptyWrapper">
                 <button className="TmListButtonName TmListButton" onClick={()=>toggleSort("name")}>
-                    Name{sortByColumn=="name"? sortType=="asc"? <ArrowLongDownIcon className="TmListButtonIcon"/> : <ArrowLongUpIcon className="TmListButtonIcon"/> : ""}</button>
+                    Name{sortByColumn=="name"? sortType=="asc"? <ArrowLongDownIcon className="TmListButtonIcon"/> : <ArrowLongUpIcon className="TmDetailsButtonIcon"/> : ""}</button>
             </div>
 
             <div className="TmListButtonDescriptionWrapper TmListNonEmptyWrapper">
                 <button className="TmListButtonDescription TmListButton" onClick={()=>toggleSort("description")}>
-                    Description{sortByColumn=="description"? sortType=="asc"? <ArrowLongDownIcon className="TmListButtonIcon"/> : <ArrowLongUpIcon className="TmListButtonIcon"/> : ""}</button>
+                    Description{sortByColumn=="description"? sortType=="asc"? <ArrowLongDownIcon className="TmListButtonIcon"/> : <ArrowLongUpIcon className="TmDetailsButtonIcon"/> : ""}</button>
             </div>
 
             <div className="TmListButtonUpdatedAtWrapper TmListNonEmptyWrapper">
                 <button className="TmListButtonUpdatedAt TmListButton" onClick={()=>toggleSort("updatedAt")}>
-                    Last update{sortByColumn=="updatedAt"? sortType=="asc"? <ArrowLongDownIcon className="TmListButtonIcon"/> : <ArrowLongUpIcon className="TmListButtonIcon"/> : ""}</button>
+                    Last update{sortByColumn=="updatedAt"? sortType=="asc"? <ArrowLongDownIcon className="TmListButtonIcon"/> : <ArrowLongUpIcon className="TmDetailsButtonIcon"/> : ""}</button>
             </div>
             <div className="TmListButtonLoadWrapper TmListEmptyWrapper"></div>
             <div className="TmListButtonDeleteWrapper TmListEmptyWrapper"></div>
