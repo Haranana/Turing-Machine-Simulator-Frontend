@@ -615,7 +615,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
               onChange={(e) => onTapeInputChange(e.target.value, i)}
             />
             <button
-              className={`EnterInputButton SimulationControlsButton tooltip extraTooltipPadding ${isSimulationLoaded() ? "DisabledButton" : ""}`}
+              className={`EnterInputButton tooltip extraTooltipPadding ${isSimulationLoaded() ? "DisabledButton" : ""}`}
               onClick={() => enterInput(i)}
               disabled={isSimulationLoaded()}
               data-tooltip={isSimulationLoaded() ? "Cannot enter input when simulation is loaded" : "Enter input"}
@@ -637,7 +637,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
               >
           </input>
 
-          <button className={`SimulationControlsButton tooltip TapeActionsButton  ${!isSimulationLoaded()? "DisabledButton" : ""}`} onClick={()=>{if(jumpToRef.current!=null) jumpToSimulation(jumpToRef.current)}}
+          <button className={`JumpToButton tooltip  ${!isSimulationLoaded()? "DisabledButton" : ""}`} onClick={()=>{if(jumpToRef.current!=null) jumpToSimulation(jumpToRef.current)}}
             disabled = {!isSimulationLoaded()} data-tooltip={!isSimulationLoaded()? "Simulation not loaded" : "Jump to given step"}>
             Jump
           </button>

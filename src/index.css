@@ -26,6 +26,8 @@
   --accent-900: #581c87;
   --accent-950: #3b0764;
 
+ 
+
   --color-red: rgb(187, 77, 77);
 
   --color-extreme:           #ffffff;
@@ -40,6 +42,8 @@
 
   --color-accent:       var(--accent-500);
   --color-accent-hover: var(--accent-400);
+  --color-accent-muted: var(--accent-200);
+   --color-accent-transparent: #e9d5ffaa;
 
   --font-1: "Roboto Mono", monospace;
   --font-2: "Poppins", sans-serif;  
@@ -62,6 +66,8 @@ html[data-theme="dark"] {
 
   --color-accent:       var(--accent-500);
   --color-accent-hover: var(--accent-400);
+  --color-accent-muted: var(--accent-950);
+  --color-accent-transparent: #3c0764b0;
 }
 
 #main-body{
