@@ -7,6 +7,7 @@ import { type SimulationNode , type SimulationNodeMap } from '../features/Tape/s
 import ELK, {type ElkNode } from "elkjs/lib/elk.bundled.js";
 import { useSimulationData, useTuringMachineSettings } from "../features/GlobalData/GlobalData";
 import { NdSimulation } from '../features/Tape/Simulation';
+import { CheckIcon, ExclamationCircleIcon, StopIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
 const elk  = new ELK();
 
@@ -15,9 +16,11 @@ const nodeTypes : NodeTypes = {
 };
 
 export type SimNodeComponentData = {
-  nodes: SimulationNodeMap,
-  currentNode: number,
-  onTransitionChosen: (id: number) => void,
+  nodes: SimulationNodeMap;
+  currentNode: number;
+  onTransitionChosen: (id: number) => void;
+  statusClass: string;
+  status: "ACCEPT" | "REJECT" | "HALT" | "LIMIT" | "UNKNOWN";
 };
 
 export type RfNode = Node<SimNodeComponentData>;
@@ -55,10 +58,9 @@ export default function TreePage(){
     setSimulation(newSimulation);
 
     const startingGraphData = simulationToGraphChildren(newSimulation);
-    console.log("init graphData: ", startingGraphData);
-    //setGraphData(startingGraphData);
     graphData.current = startingGraphData;
-    graphDataToSelectedNodesAndEdges(startingGraphData);
+
+    const initialSelected = graphDataToSelectedNodesAndEdges(startingGraphData);
 
       const newElkGraph = {
         id: "root",
@@ -87,48 +89,85 @@ export default function TreePage(){
       const res = await elk.layout(newElkGraph);
 
       const elkNodes: RfNode[] =
-        res.children?.map(node => ({
-          id: node.id.toString(),
-          type: "simNode",
-          position: { x: node.x ?? 0, y: node.y ?? 0 },
-          data: {
-            nodes: newSimulation.nodes,
-            currentNode: Number(node.id),
-            onTransitionChosen: onTransitionChosen,
-          },
-          draggable: false,
-          className: isNodeSelected(Number(node.id))? "SelectedNode" : "",
-        })) ?? [];
+        res.children?.map(node => {
+          const simNode = newSimulation.nodes.get(Number(node.id))!;
+          const output = simNode.output;
 
-      const elkEdges: Edge[] = res.edges?.map((edge) => ({
-        id: edge.id,
-        source: edge.sources[0],
-        target: edge.targets[0],
-        type: "straight",
-        className: isEdgeSelected(Number(edge.id))? "SimulationEdge SelectedEdge" : "SimulationEdge",
-      })) ?? [];
+          const status: SimNodeComponentData["status"] =
+            output === "ACCEPT" ? "ACCEPT" :
+            output === "REJECT" ? "REJECT" :
+            output === "HALT"   ? "HALT"   :
+            output === "LIMIT"  ? "LIMIT"  :
+            "UNKNOWN";
+
+          const statusClass =
+            status === "ACCEPT" ? "NodeAccept" :
+            status === "REJECT" ? "NodeReject" :
+            status === "HALT"   ? "NodeHalt"   :
+            status === "LIMIT"  ? "NodeLoop"   :
+            "";
+
+          const selected = initialSelected.nodes.get(Number(node.id)) === true;
+
+          return {
+            id: node.id.toString(),
+            type: "simNode",
+            position: { x: node.x ?? 0, y: node.y ?? 0 },
+            data: {
+              nodes: newSimulation.nodes,
+              currentNode: Number(node.id),
+              onTransitionChosen,
+              statusClass,
+              status,
+            },
+            draggable: false,
+            className: `${statusClass} ${selected ? "SelectedNode" : ""}`.trim(),
+          };
+        }) ?? [];
+
+      const elkEdges: Edge[] =
+        res.edges?.map(edge => {
+          const selected = initialSelected.edges.get(Number(edge.id)) === true;
+
+          return {
+            id: edge.id,
+            source: edge.sources[0],
+            target: edge.targets[0],
+            type: "straight",
+            className: selected
+              ? "SimulationEdge SelectedEdge"
+              : "SimulationEdge",
+          };
+        }) ?? [];
 
       setNodes(elkNodes);
       setEdges(elkEdges);
-
-    }
+    };
     getLayout();
 
   }, [setNodes, setEdges, simulationDataNodes]);
 
   function updateNodesAndEdgedClasses(selectedNodes: Map<number, boolean> , selectedEdges: Map<number, boolean>){
     console.log("updateNodesAndEdgedClasses,  selectedNodes: ", selectedNodes, "\nselectedEdges: ", selectedEdges )
-        setNodes(prev => prev.map(n => (
-          { 
-            ...n,
-            className: selectedNodes.get(Number(n.id)) === true ? "SelectedNode" : "",
-          })));
+        setNodes(prev =>
+    prev.map(n => {
+      const selected = selectedNodes.get(Number(n.id)) === true;
+      const base = n.data.statusClass ?? "";
+      return {
+        ...n,
+        className: `${base} ${selected ? "SelectedNode" : ""}`.trim(),
+      };
+    })
+  );
 
-    setEdges(eds => eds.map(e => (
-      {
-        ...e,
-        className: selectedEdges.get(Number(e.id)) === true? "SimulationEdge SelectedEdge": "SimulationEdge",
-      })));  
+  setEdges(eds =>
+    eds.map(e => ({
+      ...e,
+      className: selectedEdges.get(Number(e.id)) === true
+        ? "SimulationEdge SelectedEdge"
+        : "SimulationEdge",
+    }))
+  );
   }
 
   //NdSimulation to GraphData to be used by elk to create graph layout
@@ -165,30 +204,30 @@ export default function TreePage(){
   }
 
   //creates starting values of selectedNodesAndEdges, based on path from zustand,
-  function graphDataToSelectedNodesAndEdges(currentGraphData: GraphData){
-    let nodes = new Map<number, boolean>()
-    let edges = new Map<number, boolean>()
+  function graphDataToSelectedNodesAndEdges(currentGraphData: GraphData): SelectedNodesAndEdges {
+  const nodes = new Map<number, boolean>();
+  const edges = new Map<number, boolean>();
 
-    const nodeInPath = (id: number) => simulationDataNodesPath.includes(id);
+  const nodeInPath = (id: number) => simulationDataNodesPath.includes(id);
 
-    const edgeInPath = (sourceId: number, targetId: number) => {
-      const sIn = simulationDataNodesPath.includes(sourceId);
-      const tIn = simulationDataNodesPath.includes(targetId);
-      return sIn && tIn;
-    };
+  const edgeInPath = (sourceId: number, targetId: number) => {
+    const sIn = simulationDataNodesPath.includes(sourceId);
+    const tIn = simulationDataNodesPath.includes(targetId);
+    return sIn && tIn;
+  };
 
-    currentGraphData.children.forEach((node)=>{
-      if(nodeInPath(node.id)) nodes.set(node.id, true);
-      else nodes.set(node.id, false);
-    });
+  currentGraphData.children.forEach(node => {
+    nodes.set(node.id, nodeInPath(node.id));
+  });
 
-    currentGraphData.edges.forEach((edge)=>{
-       if(edgeInPath(edge.sourceId, edge.targetId)) edges.set(edge.id, true);
-       else edges.set(edge.id, false);
-    });
+  currentGraphData.edges.forEach(edge => {
+    edges.set(edge.id, edgeInPath(edge.sourceId, edge.targetId));
+  });
 
-    setSelectedNodesAndEdges({nodes: nodes, edges: edges});
-  }
+  const selected: SelectedNodesAndEdges = { nodes, edges };
+  setSelectedNodesAndEdges(selected);
+  return selected;
+}
 
   function isNodeSelected(nodeId: number) {
   return selectedNodesAndEdges.nodes.get(nodeId) === true;
@@ -253,17 +292,13 @@ export default function TreePage(){
         else edges.set(edge.id, false);
       });
 
-      
       setSimulationDataNodesPath(newPath)
       setSelectedNodesAndEdges({nodes: nodes, edges: edges});
       updateNodesAndEdgedClasses(nodes, edges);
-      
     };
 
-  
-
   return (
-      <div style={{ width: "100%", height: "100%" }}>
+      <div className="ReactFlowWrapper">
         
         <ReactFlow
         nodeTypes={nodeTypes}
@@ -281,12 +316,31 @@ export default function TreePage(){
   );
 }
 
-
+function NodeStatusIcon({ status }: { status: SimNodeComponentData["status"] }) {
+  switch (status) {
+    case "ACCEPT":
+      return (
+        <CheckIcon/>
+      );
+    case "REJECT":
+      return (
+       <XMarkIcon/>
+      );
+    case "HALT":
+      return (
+        <StopIcon></StopIcon>
+      );
+    case "LIMIT":
+      return (
+        <ExclamationCircleIcon></ExclamationCircleIcon>
+      );
+    default:
+      return null;
+  }
+}
 
 export function SimulationNodeComponent(props : NodeProps<RfNode>){
-
     const [detailsVisible , setDetailVisible] = useState<boolean>(false);
-    const {rejectState, acceptState} = useTuringMachineSettings(s=>s.specialStates);
     
     function prepareDetails() : transitionData {
       const nodes = props.data.nodes;
@@ -298,13 +352,16 @@ export function SimulationNodeComponent(props : NodeProps<RfNode>){
       out.isLeaf = isLeaf;
 
       if(isLeaf){
-        if(currentNode.step[0].stateAfter == rejectState){
-          out.output = "Rejected"
-        }else if(currentNode.step[0].stateAfter == acceptState){
-          out.output = "Accepted"
-        }else{
-          out.output = "Unknown"
-        }
+          if(currentNode.output == "REJECT"){
+            out.output = "Rejected"
+          }else if(currentNode.output == "ACCEPT"){
+            out.output = "Accepted"
+          }else if(currentNode.output == "HALT"){
+            out.output = "No transition"
+          }else if(currentNode.output == "LIMIT"){
+            out.output = "Step limit exceeded"
+          }
+
       }else{
         currentNode.nextIds.forEach((childId)=>{
           const childNodeStep = nodes.get(childId)!.step;
@@ -332,11 +389,22 @@ export function SimulationNodeComponent(props : NodeProps<RfNode>){
       return out;
     }
 
-    return <div className="SimulationNode" onClick={()=>detailsVisible? setDetailVisible(false) : setDetailVisible(true)}>
+    return (
+    <div
+      className="SimulationNode"
+      onClick={() => setDetailVisible(v => !v)}
+    >
       <Handle type="source" className="simNodeHandle bottomHandle" position={Position.Bottom} />
-      {detailsVisible? <SimulationNodeComponentDetails { ...prepareDetails() } />: "" }
+      
+      <NodeStatusIcon status={props.data.status} />
+
+      {detailsVisible && (
+        <SimulationNodeComponentDetails {...prepareDetails()} />
+      )}
+
       <Handle className="simNodeHandle topHandle" type="target" position={Position.Top} />
     </div>
+  );
 }
 
 //viewable data can be list of transitions or in case of leaf an output
