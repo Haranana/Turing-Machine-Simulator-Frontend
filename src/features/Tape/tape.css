@@ -1,12 +1,23 @@
 .TapesPageWrapper{
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  width: 100%;            
+  max-width: 100%;
+}
+
+.TapeViewportOuter {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
 }
 
 .TapesPage{
   margin-top: 30px;
   width: 95%;
+  max-width: 95%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -167,15 +178,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;         
+  max-width: 100%;
 }
 
-/* Okno widoku – stała szerokość, ukrywa przepełnienie */
 .TapeViewport {
   overflow: hidden;
   background-color: var(--color-bg);
- /* box-shadow: 0 0 0 1px rgba(0,0,0,.15) inset;*/
-}
 
+}
 
 .TapeTrack {
   display: flex;
@@ -225,6 +236,7 @@
   flex-direction: row;
   justify-content: left;
   width: 100%;
+  margin-left: 15%;
 }
 
 .TapeActionsButton{
@@ -264,6 +276,7 @@
   border: none;
   padding-left: 15px;
   min-width: 250px;
+  margin-left: 8%;
   width: 15%;
   height: 35px;
   border-radius: var(--border-radius-strong);

@@ -19,6 +19,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   const {initialState, acceptState, rejectState} = useTuringMachineSettings(s=>s.specialStates);
   const {allowMultipleTapes, onlyInputAlphabet, inputAlphabet} = useTuringMachineSettings(s=>s.specialSettings);
 
+
   // Input taśmy, w przyszłości pewnie będzie zastąpiony listą stringów, dla każdej z taśm
   // Pole przechowuje wartosc tekstowa z inputu, niekoniecznie jest to zatwierdzony input programu
   const tapeInputRef = useRef<string[]>([""]);
@@ -40,6 +41,8 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   //ilość komórek na prawo i lewo od heada w taśmie
   const tapeRadiusRef = useRef<number>(radius);
+
+  const viewportOuterRef = useRef<HTMLDivElement | null>(null);
 
   // Taśma z załadowanym inputem ale bez wykonania żadnego ruchu
   let defaultTape : Map<number, TapeSymbol> = tapeState.tape;
@@ -94,7 +97,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       writtenChar: null,
       action: "STAY",
       animationType: "none",
-      radius: radius,
+      radius: tapeRadiusRef.current,
       cellPx: cellPx,
       animateMs: animateMs,
       callAfterAnimation: (id: number) => handleAnimEnd(id),
@@ -228,7 +231,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     writtenChar: null,
     action: "STAY" as TransitionAction,       
     animationType: "none" as AnimationType,   
-    radius,
+    radius: tapeRadiusRef.current,
     cellPx,
     animateMs,
     callAfterAnimation: handleAnimEnd,
@@ -280,80 +283,120 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     setSimulation(newSimulation);
   },[simulationDataNodes])
 
-
+  
   //updates states upon new tape creation
-  useEffect(() => {
-    setTapeData(prev => {
-      if (prev.length === tapesAmount) return prev;
-      if (prev.length > tapesAmount) return prev.slice(0, tapesAmount);
-      const startId = prev.length;
-      const missing = Array.from(
-        { length: tapesAmount - prev.length },
-        (_, k) => makeDefaultTapeInput(startId + k)
-      );
-      return [...prev, ...missing];
-    });
+const recalcRadius = useCallback(() => {
+  const el = viewportOuterRef.current;
+  if (!el) return;
 
-    setInputFieldVisibility(prev =>
-      prev.length >= tapesAmount
-        ? prev.slice(0, tapesAmount)
-        : [...prev, ...Array(tapesAmount - prev.length).fill(false)]
-    );
+  const availableWidth = el.getBoundingClientRect().width;
+  if (availableWidth <= 0) return;
 
-    setIsAnimating(prev =>
-      prev.length >= tapesAmount
-        ? prev.slice(0, tapesAmount)
-        : [...prev, ...Array(tapesAmount - prev.length).fill(false)]
-    );
+  const borderPx = 3; // TapeCell ma border: 3px
+  const effectiveCellWidth = cellSizeRef.current + 2 * borderPx;
 
-    tapeInputRef.current =
-      tapeInputRef.current.length >= tapesAmount
-        ? tapeInputRef.current.slice(0, tapesAmount)
-        : [
-            ...tapeInputRef.current,
-            ...Array(tapesAmount - tapeInputRef.current.length).fill(""),
-          ];
-  }, [tapesAmount]);
+  const cellsVisible = Math.max(
+    3,
+    Math.floor(availableWidth / effectiveCellWidth)
+  );
+  const newRadius = Math.floor((cellsVisible - 1) / 2);
 
+  if (newRadius === tapeRadiusRef.current) return;
+
+  tapeRadiusRef.current = newRadius;
+
+  setTapeData(prev =>
+    prev.map(t => ({
+      ...t,
+      radius: newRadius,
+    }))
+  );
+}, []);
+
+useEffect(() => {
+  recalcRadius();
+}, [recalcRadius]);
+
+useEffect(() => {
+  window.addEventListener("resize", recalcRadius);
+  return () => window.removeEventListener("resize", recalcRadius);
+}, [recalcRadius]);
+
+useEffect(() => {
+  const el = viewportOuterRef.current;
+  if (!el || typeof ResizeObserver === "undefined") {
+    return;
+  }
+
+  const observer = new ResizeObserver(() => {
+    recalcRadius();
+  });
+
+  observer.observe(el);
+
+  return () => {
+    observer.disconnect();
+  };
+}, [recalcRadius]);
+
+
+
+  
   function addTape(){
-    if(tapesAmount >= 5) return;
-    const newlyAddedId = tapesAmount;
-    const realTapesAmount = tapesAmount+1;
-    const newInput = [...tmDataTapesInputs, ""];
+    if (tapesAmount >= 5) return;
 
+    const realTapesAmount = tapesAmount + 1;
     setTapesAmount(realTapesAmount);
     setTmDataTapesAmount(realTapesAmount);
-    setTmDataTapesInputs(newInput);
-    
-    
-    setInputFieldVisibility(prev=>[...prev,false]);
-    setIsAnimating(prev=>[...prev,false]);
-    setTapeData(prev=>[...prev,{
-      tapeId: newlyAddedId,
-      tapeState: { head: 0, tape: new Map(defaultTape) },
-      writtenChar: null,
-      action: "STAY",
-      animationType: "none",
-      radius: radius,
-      cellPx: cellPx,
-      animateMs: animateMs,
-      callAfterAnimation: (id: number) => handleAnimEnd(id),}]);
+    setTmDataTapesInputs([...tmDataTapesInputs, ""]);
   }
 
   function removeTape(){
-    if(tapesAmount<=1) return;
-    const realTapesAmount = tapesAmount-1;
-    setTapesAmount(realTapesAmount);
-    setTmDataTapesAmount(realTapesAmount);
-    
-    setInputFieldVisibility(prev=>prev.slice(0,-1));
-    setIsAnimating(prev=>prev.slice(0,-1));
-    setTapeData(prev=>prev.slice(0,-1));
+     if (tapesAmount <= 1) return;
+
+  const realTapesAmount = tapesAmount - 1;
+  setTapesAmount(realTapesAmount);
+  setTmDataTapesAmount(realTapesAmount);
+  setTmDataTapesInputs(tmDataTapesInputs.slice(0, -1));
   }
 
   function isEndingStep(step: number){
     return step === stepsAmount() - 1;
   }
+
+  useEffect(() => {
+  setTapeData(prev => {
+    if (prev.length === tapesAmount) return prev;
+    if (prev.length > tapesAmount) return prev.slice(0, tapesAmount);
+
+    const startId = prev.length;
+    const missing = Array.from(
+      { length: tapesAmount - prev.length },
+      (_, k) => makeDefaultTapeInput(startId + k)
+    );
+    return [...prev, ...missing];
+  });
+
+  setInputFieldVisibility(prev =>
+    prev.length >= tapesAmount
+      ? prev.slice(0, tapesAmount)
+      : [...prev, ...Array(tapesAmount - prev.length).fill(false)]
+  );
+
+  setIsAnimating(prev =>
+    prev.length >= tapesAmount
+      ? prev.slice(0, tapesAmount)
+      : [...prev, ...Array(tapesAmount - prev.length).fill(false)]
+  );
+
+  tapeInputRef.current =
+    tapeInputRef.current.length >= tapesAmount
+      ? tapeInputRef.current.slice(0, tapesAmount)
+      : [
+          ...tapeInputRef.current,
+          ...Array(tapesAmount - tapeInputRef.current.length).fill(""),
+        ];
+}, [tapesAmount]);
 
   //receives value in (0,1) and converts it to ms with chosen formula
   function setAnimationSpeed(x : number){
@@ -434,7 +477,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
         writtenChar: null, 
         action : null,
         animationType: "jump",
-        radius,
+        radius: tapeRadiusRef.current,
         cellPx,
         animateMs: animationSpeedRef.current,
         callAfterAnimation: handleAnimEnd,
@@ -484,7 +527,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
           writtenChar: null,
           action: null,
           animationType: "jump",
-          radius,
+          radius: tapeRadiusRef.current,
           cellPx,
           animateMs: animationSpeedRef.current,
           callAfterAnimation: handleAnimEnd,
@@ -519,11 +562,10 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     })));
   };
 
-  const viewportStyle: React.CSSProperties = {
-    width: `${(2 * radius + 1) * cellPx}px`,
-    height: `${cellPx + 2 * 8}px`,
-  };
-
+const viewportStyle: React.CSSProperties = {
+  width: `${(2 * tapeRadiusRef.current + 1) * cellPx}px`,
+  height: `${cellPx + 2 * 8}px`,
+};
   function getCurrentState(){
     if(simulation==null) return "";
     //const currentStep : number = stepRef.current;
@@ -570,10 +612,12 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       </div>
 
       {Array.from({ length: tapesAmount }).map((_, i) => (
-        <div className="TapeWrapper" key={i}>
+    <div className="TapeWrapper" key={i}>
+        <div className="TapeViewportOuter" ref={i === 0 ? viewportOuterRef : null}>
           <div className="TapeViewport" style={viewportStyle}>
             {tapeData[i] ? <TapeComponent tapeInput={tapeData[i]} /> : null}
           </div>
+        </div>
 
           <div className="TapeActions">
         

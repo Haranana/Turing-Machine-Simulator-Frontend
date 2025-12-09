@@ -1,14 +1,14 @@
 
 .sidebar-wrap{
   
-  --sidebar-width: 6rem;
+  
   --sidebar-color: var(--color-strong);
   --sidebar-element-hover-color: var(--color-medium);
 
-  position: fixed;
+   position: fixed;
   top: 0;
   left: 0;
-  bottom: 0;         
+  bottom: 0;
   width: var(--sidebar-width);
 }
 

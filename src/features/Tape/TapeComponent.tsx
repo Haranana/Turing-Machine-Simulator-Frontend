@@ -206,11 +206,6 @@ const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
     willChange: "transform",
   };
 
-  const viewportStyle: React.CSSProperties = {
-    width: `${(2 * tapeInput.radius + 1) * tapeInput.cellPx}px`,
-    height: `${tapeInput.cellPx + 2 * 8}px`,
-  };
-
   return (
     <div className="TapeTrack" ref={trackRef} style={trackStyle} onTransitionEnd={handleTransitionEnd}>
             {cells}

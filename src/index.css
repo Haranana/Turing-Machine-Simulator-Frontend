@@ -1,5 +1,7 @@
 :root {
 
+  --sidebar-width: 6rem;
+
   --white: white;
   --black: black;
   
@@ -77,17 +79,17 @@ html[data-theme="dark"] {
 }
 
 .main-layout{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 6rem;
+  width: 100%;
+  min-height: 100vh;
+  padding-left: var(--sidebar-width);
 }
 
-.outlet-wrap{
-    background-color: var(--color-extreme);
-  flex: 1;
-  margin-left: var(--sidebar-width);
-  height: 100vh;        
+.outlet-wrap {
+  padding-left: var(--sidebar-width); 
+  background-color: var(--color-extreme);
+  min-height: 100vh;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .tooltip { position: relative; }
