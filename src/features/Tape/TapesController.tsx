@@ -639,7 +639,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
           <button className={`JumpToButton tooltip  ${!isSimulationLoaded()? "DisabledButton" : ""}`} onClick={()=>{if(jumpToRef.current!=null) jumpToSimulation(jumpToRef.current)}}
             disabled = {!isSimulationLoaded()} data-tooltip={!isSimulationLoaded()? "Simulation not loaded" : "Jump to given step"}>
-            Jump
+              Jump
           </button>
 
         </div>
