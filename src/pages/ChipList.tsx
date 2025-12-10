@@ -65,11 +65,11 @@ export default function ChipList({name,singleCharacterMode, defaultValues , defa
 
   }
 
-  function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
+  function handleInputChange(e: ChangeEvent<HTMLTextAreaElement>) {
     setInput(e.target.value);
   }
 
-  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+  function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter") {
       e.preventDefault();
       addSymbol();
@@ -119,8 +119,8 @@ export default function ChipList({name,singleCharacterMode, defaultValues , defa
       </div>
 
       <div className="alphabet-input-row">
-        <input
-          type="text"
+
+        <textarea
           value={input}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}

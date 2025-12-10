@@ -1,3 +1,9 @@
+.SearchPageWrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .SearchPage{
     --bg-color: var(--color-extreme);
     --page-color: var(--color-strong);
@@ -9,11 +15,11 @@
     justify-content: center;
     align-items: center;
 
-    margin-left: 20%;
-    margin-right: 20%;
-
     margin-top: 10%;
-    min-width: 400px;
+    min-width: 350px;
+    padding: 20px;
+    margin: 3vw;
+
 
     background-color: var(--page-color);
     border-radius: var(--border-radius-strong);
@@ -29,6 +35,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+     text-align: center
 }
 
 .SearchBarWrapper{
@@ -94,6 +101,7 @@
     font-weight: bold;
     font-size: 110%;
     color: var(--color-red);
+     text-align: center
 }
 
 .SearchBarWrapper .icon{

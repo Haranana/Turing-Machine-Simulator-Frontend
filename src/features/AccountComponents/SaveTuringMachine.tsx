@@ -216,7 +216,11 @@ function initialValidation(name: string, description: string) {
         {isAccountDataLoaded() ?
         
         <>
-        <h1 className="CreateTuringMachineTitle">Create Turing Machine</h1>
+       
+            <h1 className="CreateTuringMachineTitle">Create Turing Machine</h1>
+       
+            
+        
          <form className="SaveTuringMachineForm">
 
             <label className="AccountInputFieldLabel">

@@ -95,7 +95,8 @@ export default function SearchPage(){
         toast.success("Turing Machine loaded successfully");
     }
 
-    return <div className="SearchPage">
+    return <div className="SearchPageWrapper">
+    <div className="SearchPage">
         <h1 className="SearchPageHeadline">Enter turing machine share code</h1>
         <div className="SearchBarWrapper">
             <div className="SearchIcon"><MagnifyingGlassIcon className="icon"/></div>
@@ -103,5 +104,5 @@ export default function SearchPage(){
             <button className={`SearchButton ${validationError!=null? "DisabledSearchButton" : ""}`} disabled={validationError!=null} onClick={()=>onSearchClicked()}>Load</button>
         </div>   
         {validationError!=null?  <p className="searchError">{validationError}</p> : ""}
-    </div>
+    </div></div>
 }

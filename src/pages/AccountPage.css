@@ -42,6 +42,7 @@
     
   color: var(--color-text);
 
+
   font: ui-monospace;
   background-color: transparent;
   cursor: pointer;
@@ -50,6 +51,7 @@
 
     height: 50%;
     width: 9%;
+    min-width: 50px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -60,7 +62,7 @@
   border: 2px solid var(--account-color-border);
   border-bottom: 3px solid var(--account-color-border);
   background-color: var(--account-db-button-color);
-  font-size: 120%;
+  font-size: 100%;
   
 }
 
@@ -132,9 +134,13 @@
     height: 80px;
 }
 
+
+
+
 .CreateTuringMachineTitle{
     color: var(--color-text);
     font-family: var(--font-1);
+    text-align: center
 }
 
 .CreateTuringMachineError{
@@ -177,6 +183,7 @@
     display: flex;
     flex-direction: column;
     width: 75%;
+    min-width: 400px;
 }
 
 .TmList{
@@ -190,12 +197,20 @@
     margin-bottom: 5px;
     font-family: var(--font-1);
     color: var(--color-text);
+    height: 60px;
    
 }
 
 .TmRowButton{
-    width: 40px;
-    height: 40px;
+    margin: 3px;
+    min-width: 10px;
+    min-height: 10px;
+    
+    max-width: 40px;
+    max-height: 40px;
+    
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -203,31 +218,50 @@
     border: none;
 }
 
+.TmRowButton svg{
+    min-width: 10px;
+    min-height: 10px;
+}
+
 .TmRowIcon{
-    width: 30px;
-    height: 30px;
+    
+    min-width: 10px;
+    min-height: 10px;
+    max-width: 30px;
+    max-height: 30px;
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 5px;
     border: none;
-}
+
+    }
 
 .TmRowButton:hover{
     cursor: pointer;
 }
 
 .TmRowButton.TmRowLoadButton{
+     font-size: clamp(0.2rem, 1vw + 0.3rem, 1.0rem);
     background-color: transparent;
     color:  var(--color-text-dark);
     font-weight: bold;
+    padding: 5px;
 }
 
 .TmRowButton.TmRowLoadButton:hover{
-    background-color: var(--color-primary-0);
+    background-color: var(--color-medium);
+
 }
 
 .TmRowButton.TmRowShowButton{
+    background-color: transparent;
+    color: var(--color-text-dark);
+}
+
+.TmRowButton.TmRowVisibilityWrapper{
     background-color: transparent;
     color: var(--color-text-dark);
 }
@@ -237,9 +271,18 @@
     color: white;
 }
 
+.TmRowButtonWrapper{
+    width: 5%;
+        display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
 .TmRowButtonWrapper.TmRowDeleteWrapper{
-    width: 10%;
-    height: 10%;
+    aspect-ratio: 1 / 1;
+    width: 5%;
+    
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -251,6 +294,9 @@
 }
 
 .TmRowTextWrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 25%;
     height: 100%;
 }
@@ -266,11 +312,16 @@
      
 }
 
+.TmRowTextField{
+    text-align: center;
+    font-size: clamp(0.2rem, 1vw + 0.3rem, 1.0rem);
+}
+
 .TmListButton{
     color: var(--color-text);
     background-color: transparent;
     border: none;
-    font-size: 115%;
+    font-size: clamp(0.2rem, 1vw + 0.3rem, 1.0rem);
     font-weight: 500;
     font-family: var(--font-1);
     cursor: pointer;
@@ -291,11 +342,19 @@
 }
 
 .TmListNonEmptyWrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 25%;
 }
 
+.TmListNonEmptyWrapper.TmListButtonNameWrapper{
+    min-width: 100px;
+} 
+
 .TmListEmptyWrapper{
     width: 10%;
+   
 }
 
 .TmListEmptyWrapper.TmListButtonShowWrapper{
@@ -363,6 +422,7 @@
 .TmDetailsSegment.TmDetailsTwoColumnSegment{
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .TmDetailsSegmentColumn{
@@ -388,6 +448,7 @@
     align-content: center;
     color: var(--color-text);
     height: 40px;
+     margin-top: 10px;
 }
 
 .TmDetailsRow.TmDetailsTextAreaRow{
@@ -401,6 +462,7 @@
     justify-content: left;
     width: 60%;
     margin: 0px;
+   
 }
 
 .TmDetailsTextValue{
@@ -519,7 +581,7 @@
 }
 
 .editProfileTextField{
-    width: 50%;
+    width: 100%;
     min-width: 300px;
     display: flex;
     flex-direction: row;
@@ -574,19 +636,23 @@
 
 .EditAccountSubpage{
     padding: 20px;
-    padding-top: 30px;
     display: flex;
     flex-direction: column;
-    width: 75%;
+    justify-content: center;
+    align-items: center;
+    width: 40%;
+    min-width: 350px;
 }
 
 .editProfileRow{
     font-family: var(--font-1);
     color: var(--color-text);
     margin-bottom: 10px;
-    height: 60px;
+    min-height: 40px;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-items: left;
+    width: 100%;
+  
 }
