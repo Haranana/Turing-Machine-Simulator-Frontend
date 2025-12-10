@@ -7,19 +7,29 @@ import { Sitemap } from '../../assets/Sitemap';
 import { useSimulationData } from '../GlobalData/GlobalData';
 import { useEffect, useState } from 'react';
 import { boolean } from 'zod';
+import { getInitialTheme, THEME_KEY, type Theme } from '../../public/ThemeManager';
 
 export default function Sidebar(){
 
-    type Theme = "light" | "dark";
+    
+
+
+   
     type Pages = "none" | "tapes" | "console" | "tree" | "search" | "account" | "settings";
     const {simulationDataNodes} = useSimulationData();
     const [currentSimulationIsNonDet , setCurrentSimulationIsNonDet] = useState<boolean>(false); //false if no simulation is currently loaded in
-    const [theme, setTheme] = useState<Theme>("light");
+    const [theme, setTheme] = useState<Theme>(() => getInitialTheme());
     const [chosenPage, setChosenPage] = useState<Pages>("none")
 
-    function applyTheme(theme: Theme) {
-        setTheme(theme);
-        document.documentElement.setAttribute("data-theme", theme);
+    useEffect(() => {
+        document.documentElement.dataset.theme = theme;
+        window.localStorage.setItem(THEME_KEY, theme);
+    }, [theme]);
+
+    function toggleTheme() {
+        const newTheme = theme==="light"? "dark" : "light";
+        setTheme(newTheme);
+        document.documentElement.setAttribute("data-theme", newTheme);
     }
     
     useEffect(()=>{
@@ -81,7 +91,7 @@ export default function Sidebar(){
                 </Link>
             </li>
 
-            <li className='SidebarElement StyleModeToggle'><button className='SidebarButton'  onClick={()=>applyTheme(theme==="dark"? "light" : "dark")}>{theme === "light"? <SunIcon className = "icon"/> : <MoonIcon className = "icon"/> } </button></li>
+            <li className='SidebarElement StyleModeToggle'><button className='SidebarButton'  onClick={()=>toggleTheme()}>{theme === "light"? <SunIcon className = "icon"/> : <MoonIcon className = "icon"/> } </button></li>
         </ul>
     </nav>
 );
