@@ -43,7 +43,7 @@
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+    align-items: stretch;  
 
   width: max-content;   
   min-width: 160px;    
@@ -90,6 +90,14 @@
   margin-bottom: 4px;
   margin-left: 0px;
   margin-right: 0px;
+}
+
+.SimulationNodeDetails.OutputDetails{
+  align-items: center;
+}
+
+.SimulationNodeDetailsRowText.TextOutput{
+  text-align: center;
 }
 
 

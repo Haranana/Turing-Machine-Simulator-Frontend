@@ -77,17 +77,23 @@ export default function ChipList({name,singleCharacterMode, defaultValues , defa
   }
 
   function removeSymbol(symbol: string) {
-    setSymbols(prev => prev.filter(s => s !== symbol));
+    const newSymbols = symbols.filter(s => s !== symbol)
+    setSymbols(newSymbols);
+    if(onDataChanged!=undefined) onDataChanged(newSymbols);
   }
   
   function loadPreset(preset: string){
     if(presetAlphabets.has(preset)){
-      setInput([...presetAlphabets.get(preset)!.values()].join(""));
+      const newInput = [...presetAlphabets.get(preset)!.values()].join("")
+      setInput(newInput);
+
+      
     }
   }
 
   function clearList(){
     setSymbols([]);
+    if(onDataChanged!=undefined) onDataChanged([]);
   }
 
   return (
@@ -140,7 +146,7 @@ export default function ChipList({name,singleCharacterMode, defaultValues , defa
         <button
           type="button"
           className="alphabet-add-button"
-          onClick={clearList}
+          onClick={()=>clearList()}
         >
           Clear
         </button>

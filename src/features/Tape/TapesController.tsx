@@ -146,21 +146,21 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       const currentStep = stepRef.current;
     const currentStepDir = stepDirRef.current;
 
-    // skąd czytać krok: przy cofaniu bierz poprzedni
+
     const readIndex = currentStepDir === -1 ? currentStep - 1 : currentStep;
     const stepsData = simulation.getSteps(readIndex);
     if(stepsData == null || stepsData.length != tapesAmount) return;
 
     for (let i = 0; i < tapesAmount; i++) {
 
-      // strażnik na brzegach – nic nie rób, jeśli poza zakresem
+
       if (readIndex < 0 || readIndex >= stepsAmount()) continue;
 
-      //const stepData = simulation.steps[i][readIndex];
+
       const stepData = stepsData[i];
       
 
-      // akcja do animacji (+ ewentualne odwrócenie dla reverse)
+
       let currentAction = stepData.transitionAction;
       if (currentStepDir === -1) {
         if (currentAction === "LEFT") currentAction = "RIGHT";

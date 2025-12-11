@@ -416,9 +416,9 @@ export type transitionData = {
 }
 export function SimulationNodeComponentDetails( {transitions , isLeaf, output, onTransitionChosen}: transitionData ){
 
-    return <div className="SimulationNodeDetails">
+    return <div className={`SimulationNodeDetails ${isLeaf? "OutputDetails" : ""} `}>
         {
-          isLeaf? <p className='SimulationNodeDetailsRowText'>Output: {output}</p> :
+          isLeaf? <p className='SimulationNodeDetailsRowText TextOutput'>Output: {output}</p> :
           Array.from(transitions.entries()).map(([k,v])=>
             <div key={k} className='SimulationNodeDetailsRow' onClick={()=>{
              console.log("[compDet]: wybrano: ",{k}); onTransitionChosen(k);
