@@ -403,53 +403,74 @@ useEffect(() => {
     const newAnimationSpeed = 1600 - 1600 * x;
     animationSpeedRef.current = newAnimationSpeed;
   }
+useEffect(() => {
+  if (!isPlaying || !hasAllAnimationsEnded() || simulation == null) return;
 
-  useEffect(() => {
-    if (!isPlaying || !hasAllAnimationsEnded() || simulation == null) return;
-    const currentStep = stepRef.current;
-    
-    if(currentStep >= stepsAmount() || simulation.getNextSteps(currentStep) == null ) {
-      setIsPlaying(false);
-      return;
+  const currentStep = stepRef.current;
+
+  if (currentStep >= stepsAmount()) {
+    setIsPlaying(false);
+    return;
+  }
+
+  stepDirRef.current = 1;
+  updateTape(); 
+
+
+  const nextStep = currentStep + 1;
+  stepRef.current = nextStep;
+
+
+  if (nextStep >= stepsAmount()) {
+
+    const last = simulation.getLastStep(0);
+    if (last && last.stateAfter) {
+      stateRef.current = last.stateAfter;
     }
-   
-    stepDirRef.current = 1;
-    updateTape();
-
-    if(!isEndingStep(currentStep)){
-    stepRef.current = currentStep + 1;
-    const currentStepNode = simulation.getStep(currentStep + 1 , 0);
-    stateRef.current = currentStepNode!.stateBefore;
-  } else {
-
     setIsPlaying(false);
-  }
-      
-  }, [isPlaying, isAnimating]); 
-
-  const canMoveForward = () => {
-    const currentStep = stepRef.current;
-    return simulation != null && currentStep < stepsAmount() && simulation.getNextSteps(currentStep) != null;
+  } else {
+  
+    const currentStepNode = simulation.getStep(nextStep, 0);
+    if (currentStepNode) {
+      stateRef.current = currentStepNode.stateBefore;
+    }
   }
 
-  const doNextSimulationStep = () => {
-    const currentStep = stepRef.current;
-    if(currentStep >= stepsAmount() || simulation == null || simulation.getNextSteps(currentStep) == null) return;
-    if(!hasAllAnimationsEnded()) return;
-    setIsPlaying(false);
+}, [isPlaying, isAnimating]);
 
-    stepDirRef.current = 1;
+const canMoveForward = () => {
+  const currentStep = stepRef.current;
+  return simulation != null && currentStep < stepsAmount();
+};
 
-    updateTape();
-    if(!isEndingStep(currentStep)){
-    stepRef.current = currentStep + 1;
-    const currentStepNode = simulation.getStep(currentStep + 1 , 0);
-    stateRef.current = currentStepNode!.stateBefore;
-  } else {
+
+const doNextSimulationStep = () => {
+  const currentStep = stepRef.current;
+
+  if (simulation == null) return;
+  if (currentStep >= stepsAmount()) return;         
+  if (!hasAllAnimationsEnded()) return;
 
   setIsPlaying(false);
+  stepDirRef.current = 1;
+
+  updateTape(); 
+
+  const nextStep = currentStep + 1;
+  stepRef.current = nextStep;
+
+  if (nextStep >= stepsAmount()) {
+    const last = simulation.getLastStep(0);
+    if (last && last.stateAfter) {
+      stateRef.current = last.stateAfter;
+    }
+  } else {
+    const currentStepNode = simulation.getStep(nextStep, 0);
+    if (currentStepNode) {
+      stateRef.current = currentStepNode.stateBefore;
+    }
   }
-  }
+};
 
   const doPrevSimulationStep = () => {
     const currentStep = stepRef.current;
