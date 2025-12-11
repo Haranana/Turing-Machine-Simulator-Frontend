@@ -5,7 +5,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
 }
+
+
 .login-page{
     --login-page-color: var(--color-strong);
     --login-input-color: var(--color-medium);
@@ -26,7 +29,7 @@
     padding-top: 7vh;
     font-family: var(--font-1);
 
-    box-shadow: 3px 3px 7px 7px rgba(0, 0, 0, 0.316);
+    box-shadow: var(--box-shadow-dark);
 
     border-radius: var(--border-radius-extreme);
     background-color: var(--login-page-color);
@@ -60,10 +63,11 @@
 
 /*text fields*/
 .login-text-field{
+    min-height: 30px;
     height: 5vh;
     width: 100%;
-    margin-top: 1vh;
-    margin-bottom: 1vh;
+    margin-top: 10px;
+    margin-bottom: 10px;
     border-radius:9999px;
     border:none;
     background-color: var(--login-input-color);
@@ -83,6 +87,7 @@
 .login-password-wrapper{
     display: flex;
     flex-direction: row;
+    align-items: center;
     background-color: var(--login-input-color);
     height: 5vh;
     width: 100%;
@@ -91,7 +96,7 @@
 }
 
 .login-password-wrapper .login-text-field{
-     margin-top: 0px;
+  
     background-color: transparent;
     width: 80%;
 }
@@ -199,5 +204,3 @@
     flex-direction: row;
     justify-content: center;
 }
-
-

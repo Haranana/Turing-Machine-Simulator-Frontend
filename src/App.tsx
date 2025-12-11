@@ -52,11 +52,13 @@ return (
         toastOptions={{
         className: 'Toast',
         style: {
-          background: 'var(--color-bg-2)',
-          color: 'var(--color-text-dark)',
-          borderRadius: '10px',
+          background: 'var(--color-strong)',
+          color: 'var(--color-text)',
+          fontFamily: 'var(--font-1)',
+          borderRadius: 'var(--border-radius-strong)',
           padding: '10px 12px',
-          boxShadow: '0 8px 24px rgba(0,0,0,.25)',
+          boxShadow: 'var(--box-shadow-dark)',
+          fontSize: '90%'
         },
         duration: 3000,
         success: { className: 'Toast Toast--success' },

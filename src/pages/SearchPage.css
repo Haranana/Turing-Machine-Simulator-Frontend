@@ -19,6 +19,7 @@
     min-width: 350px;
     padding: 20px;
     margin: 3vw;
+    box-shadow: var(--box-shadow-dark);
 
 
     background-color: var(--page-color);
@@ -110,3 +111,4 @@
   padding-left: 10px;
   height: 100%;
 }
+

@@ -24,7 +24,7 @@ export default function LoginPage(){
         const passwordTrimmed = password1.trim();
 
         try {
-            const res = await fetch(`http://localhost:9090/api/auth/login`, {
+            const res : Response = await fetch(`http://localhost:9090/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: email.trim(), password: passwordTrimmed }),
@@ -32,7 +32,7 @@ export default function LoginPage(){
 
             if (!res.ok) {
                 if (res.status === 401) setErrorMessage("Nieprawidłowy e-mail lub hasło.");
-                else setErrorMessage(`Błąd logowania (${res.status}).`);
+                else setErrorMessage(`Błąd logowania (${res.json.toString}).`);
                 return;
             }
 

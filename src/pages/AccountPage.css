@@ -19,6 +19,7 @@
 }
 
 .AccountPage{
+    
     background-color: var(--account-color-page);
     display: flex;
     flex-direction: column;
@@ -26,6 +27,7 @@
 }
 
 .AccountPageSubpage{
+    box-shadow: var(--box-shadow-dark);
     background-color: var(--account-color-subpage);
     border-radius: var(--border-radius-extreme);
 }
@@ -656,3 +658,115 @@
     width: 100%;
   
 }
+
+.ListFooter{
+     height: 30px;
+     display: flex;
+     position: relative;
+     justify-content: flex-start;
+     align-items: center;
+     width: 100%;
+     margin: 10px;
+}
+
+.LoadedMachinesCountWrapper{
+
+
+        height: 100%;
+   display: flex;
+   flex-direction: row;
+   justify-content: center;
+   align-items: center;
+   color: var(--color-text);
+   border-radius: var(--border-radius-strong);
+   background-color: var(--color-extreme);
+   border: 2px solid var(--color-medium);
+   margin-left: 10px;
+   
+   width: fit-content;
+   padding-left: 10px;
+   padding-right: 10px;
+   font-size: clamp(0.2rem, 1vw + 0.3rem, 1.0rem);
+}
+
+
+.PageControls{
+
+    
+    height: 100%;
+   display: flex;
+   flex-direction: row;
+   justify-content: center;
+   align-items: center;
+   color: var(--color-text);
+   border-radius: var(--border-radius-strong);
+   background-color: var(--color-extreme);
+   border: 2px solid var(--color-medium);
+   
+   width: fit-content;
+   padding-left: 10px;
+   padding-right: 10px;
+
+   position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(0.2rem, 1vw + 0.3rem, 1.0rem);
+   
+}
+
+.PageControlsButton{
+    background-color: transparent;
+    color: var(--color-text);
+    border: none;
+    background-color: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.PageControlsButton:hover{
+    cursor: pointer;
+}
+
+.PageControlsButton>svg{
+    width: 20px;
+    height: 20px;
+}
+
+.PageControlsButton>svg.DisabledIcon{
+    color: transparent;
+
+}
+
+.PageControlsButton.Disabled{
+    cursor: default;
+}
+
+.PageControlsPages{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 2px;
+}
+
+
+.PageButton{
+    margin-left: 4px;
+    margin-right: 4px;
+    aspect-ratio: 1,1;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    border-radius: 9999px;
+}
+.PageButton.active{
+    border-bottom: 2px solid var(--color-accent);
+}
+.PageButton:hover{
+    background-color: var(--color-medium);
+    cursor: pointer;
+}
+

@@ -72,20 +72,20 @@ export default function EditProfile(){
         
         {/*<hr className='LineSeparator'></hr>*/}
         <Modal open={isChangePasswordModalOpen} onClose={()=>{setChangePasswordModalOpen(false)}}>
-                        <div className="ChangePasswordTextWrapper">
+                        <div className="DefaultModalTextWrapper ChangePasswordTextWrapper">
                             <h2>E-mail sent!</h2>
                             <p>To change your password please log in into your mail and follow instructions in message send by us</p>
                         </div>
-                        <div className="ChangePasswordButtonWrapper">
+                        <div className="DefaultModalButtonWrapper ChangePasswordButtonWrapper">
                             <button className="ModalButton ChangePasswordOkButton" onClick={()=>{setChangePasswordModalOpen(false);}}>Ok</button>
                         </div>
         </Modal>
         <Modal open={isDeleteAccountModalOpen} onClose={()=>{setDeleteAccountModalOpen(false)}}>
-                        <div className="DeleteAccountTextWrapper">
+                        <div className="DefaultModalTextWrapper DeleteAccountTextWrapper">
                             <h2>E-mail sent!</h2>
                             <p>To delete your account please log in into your mail and follow instructions in message send by us</p>
                         </div>
-                        <div className="DeleteAccountButtonWrapper">
+                        <div className="DefaultModalButtonWrapper DeleteAccountButtonWrapper">
                             <button className="ModalButton DeleteAccountOkButton" onClick={()=>{setDeleteAccountModalOpen(false);}}>Ok</button>
                         </div>
         </Modal>

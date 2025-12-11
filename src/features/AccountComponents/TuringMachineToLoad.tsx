@@ -8,7 +8,7 @@ import Modal from "../Modal/Modal";
 import { useState } from "react";
 import TuringMachineToLoadDetails from "./TuringMachineToLoadDetails";
 
-type inputProp = {tm: TuringMachineGetDto, tmId: number, handleDeleted: ()=>void}
+type inputProp = {tm: TuringMachineGetDto, tmId: number, handleDeleted: ()=>void, handleVisibilityChanged: ()=>void}
 
     export function dateToShowable(date: string){
         const DateTime: string[] = date.split("T");
@@ -92,6 +92,22 @@ export default function TuringMachineToLoad(props: inputProp){
         props.handleDeleted();
     }
 
+    async function changeVisibility(){
+            try{
+            const res = await apiFetch(`http://localhost:9090/api/tm/visibility/${encodeURIComponent(props.tm.name)}` , {
+                method: "POST",
+            })
+            if(res.status == 200){
+                toast.success("Turing Machine Visibility changed successfully");
+                props.handleVisibilityChanged();
+            }else{
+                toast.error(`Turing Machine visibility couldn't be changed\n${res.status} ${res.statusText}\n${res.text}`);
+            }
+        }catch(e: any){
+            toast.error(`Error: Turing Machine visibility couldn't be changed\n${e}`);
+        }
+    }
+
     return <>
         <div className="TuringMachineRow">
             <div className="TmRowShowWrapper TmRowButtonWrapper" >
@@ -113,7 +129,7 @@ export default function TuringMachineToLoad(props: inputProp){
                 <button className="TmRowDeleteButton TmRowButton" onClick={()=>{setDeleteTmModalOpen(true)}}><TrashIcon></TrashIcon></button>
             </div>
             <div className="TmRowVisibilityWrapper TmRowButtonWrapper">
-                {props.tm.isPublic? <span className="TmRowVisiblityIcon TmRowIcon"><EyeIcon /></span>  : <span className="TmRowVisiblityIcon TmRowIcon"><EyeSlashIcon/></span>}
+                {props.tm.isPublic? <span className="TmRowVisiblityIcon TmRowIcon" onClick={()=>changeVisibility()}><EyeIcon /></span>  : <span onClick={()=>changeVisibility()} className="TmRowVisiblityIcon TmRowIcon"><EyeSlashIcon/></span>}
             </div>
         </div>
         <TuringMachineToLoadDetails tm={props.tm} tmId={props.tmId} isVisible={areDetailsVisible}/>

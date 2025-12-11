@@ -418,11 +418,11 @@ export function SimulationNodeComponentDetails( {transitions , isLeaf, output, o
 
     return <div className="SimulationNodeDetails">
         {
-          isLeaf? <p className='SimulationNodeDetailsRow'>Output: {output}</p> :
+          isLeaf? <p className='SimulationNodeDetailsRowText'>Output: {output}</p> :
           Array.from(transitions.entries()).map(([k,v])=>
-            <p key={k} className='SimulationNodeDetailsRow' onClick={()=>{
+            <div key={k} className='SimulationNodeDetailsRow' onClick={()=>{
              console.log("[compDet]: wybrano: ",{k}); onTransitionChosen(k);
-            }}>{k}: {v}</p>
+            }}><p className="SimulationNodeDetailsRowText">{k}: {v}</p></div>
           )
         }
     </div>

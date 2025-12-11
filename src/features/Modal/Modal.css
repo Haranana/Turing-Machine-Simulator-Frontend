@@ -19,20 +19,51 @@ position: fixed;
   z-index: 1001;
   width: 90vw;
   max-width: 640px;
-  background: white; 
-  color: #111;
-  border-radius: 10px; 
+  background: var(--color-strong); 
+  border-radius: var(--border-radius-extreme);
+  color: var(--color-text);
   padding: 20px;
   padding-bottom: 30px;
-  box-shadow: 0 15px 60px rgba(0,0,0,.4);
+  box-shadow: var(--box-shadow-dark);
 }
 
+.DefaultModalTextWrapper{
+    font-family: var(--font-1)
+}
+
+.DefaultModalTextWrapper>h2{
+  text-align: center;
+}
+
+.DefaultModalTextWrapper>p{
+    text-align: center;
+    font-size: 100%;
+}
+
+.DefaultModalButtonWrapper{
+      display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 4vh;
+}
+
+.DefaultModalButtonWrapper>button{
+  font-family: var(--font-1);
+}
+
+
+
 .DeleteTmModalTextWrapper{
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: var(--font-1)
 }
 
 .DeleteTmModalTextWrapper p{
-    font-size: 120%;
+  text-align: center;
+    font-size: 100%;
+}
+
+.DeleteTmModalTextWrapper h2{
+   text-align: center;
 }
 
 .DeleteTmModalButtonsWrapper{
@@ -43,13 +74,14 @@ position: fixed;
 }
 
 .DeleteTmModalDeleteButton{
-    background-color: rgb(154, 60, 60);
-     color: white;
+    background-color: var(--color-red);
+     color: var(--color-text);
+     font-family: var(--font-1);
     margin-right: 20px;
 }
 
 .DeleteTmModalCancelButton{
-
+  font-family: var(--font-1);
 }
 
 .ModalButton{

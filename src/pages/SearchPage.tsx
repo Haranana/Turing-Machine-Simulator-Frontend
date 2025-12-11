@@ -49,7 +49,7 @@ export default function SearchPage(){
                 console.log("got machines: ", res.status);
                 const tm: TuringMachineGetDto = await res.json();
                 await loadSimulation(tm);
-                toast.success(`turing machine ${tm.name} successfully loaded`);
+                
             }else{
                 toast.error(`turing machine couldn't be loaded`);
             }
@@ -91,8 +91,7 @@ export default function SearchPage(){
         setTapeAlphabet(tm.specialSettings.tapeAlphabet);
         setStatesSet(tm.specialSettings.statesSet);
 
-        toast.success("Turing Machine loaded successfully");
-        toast.success("Turing Machine loaded successfully");
+        toast.success(`turing machine ${tm.name} successfully loaded`);
     }
 
     return <div className="SearchPageWrapper">

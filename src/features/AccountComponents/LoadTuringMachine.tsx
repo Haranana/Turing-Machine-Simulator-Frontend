@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { AccountDataContext } from "./AccountDataContext";
-import {  ArrowLongDownIcon, ArrowLongUpIcon } from "@heroicons/react/24/solid";
+import {  ArrowLongDownIcon, ArrowLongUpIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { useApiFetch } from "../../api/util";
 import {type TuringMachineGetDto, type PageableQuery , type Page} from "./AccountDataTypes";
 import TuringMachineToLoad from "./TuringMachineToLoad";
@@ -20,35 +20,37 @@ export default function LoadTuringMachine(){
     const [listReloadNeeded, setListReloadNeeded] = useState<number>(0);
     const tmToDeleteNameRef = useRef<String | null>(null);
     const {setTmDataName} = useTuringMachineData();
+    const [page, setPage] = useState<number>(0);
+    const PAGE_SIZE = 20;   
     
-    useEffect(()=>{
-        
-        const buildTmList = async () => {
-            try{
-                const pq = buildPageQuery({page: 0, size: 10, sort: [{ property: sortByColumn, direction: sortType }]});
-                const res = await apiFetch(`http://localhost:9090/api/tm?${pq}` , {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json" },
-                });
-                if(res.status == 200){
-                    //console.log("got machines: ", res.status);
-                    const page: Page<TuringMachineGetDto> = await res.json();
-                    setTuringMachinesData(page);
-                    //console.log(page);
-                    //console.log("Machine program: ", page.content[0].program.split("\n"));
-                    
-                }else{
-                    //console.log("error while getting machine has occured: ", res.status);
-                    toast.error(`Turing Machine couldn't be loaded\n${res.status} ${res.statusText}\n${res.text}`);
-                }
-            }catch(e: any){
-                //console.log("exception while getting machine has occured: ", e);
-                toast.error(`Error: Turing Machine couldn't be loaded\n${e}`);
-            }
-        }
-        buildTmList();
-    },[sortByColumn, sortType, listReloadNeeded] )
+    useEffect(() => {
+    const buildTmList = async () => {
+        try {
+            const pq = buildPageQuery({
+                page: page,
+                size: PAGE_SIZE,
+                sort: [{ property: sortByColumn, direction: sortType }]
+            });
 
+            const res = await apiFetch(`http://localhost:9090/api/tm?${pq}`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (res.status === 200) {
+
+                const pageData: Page<TuringMachineGetDto> = await res.json();
+                setTuringMachinesData(pageData);
+            } else {
+                toast.error(`Turing Machine couldn't be loaded\n${res.status}`);
+            }
+        } catch (e: any) {
+            toast.error(`Error: Turing Machine couldn't be loaded\n${e}`);
+        }
+    };
+
+    buildTmList();
+    }, [sortByColumn, sortType, listReloadNeeded, page]);
 
     function isAccountDataLoaded(){
         return accountData!=null&& accountData.id != null && accountData.email != null && accountData.status != null && accountData.createdAt != null;
@@ -59,7 +61,17 @@ export default function LoadTuringMachine(){
         setListReloadNeeded(k => k + 1); 
     }
 
+    function nextPage() {
+    if (TuringMachinesData && !TuringMachinesData.last) {
+        setPage(p => p + 1);
+    }
+    }
 
+    function prevPage() {
+        if (TuringMachinesData && !TuringMachinesData.first) {
+            setPage(p => p - 1);
+        }
+    }
 
     function buildPageQuery(p?: PageableQuery): string {
         const params = new URLSearchParams();
@@ -106,18 +118,56 @@ export default function LoadTuringMachine(){
 
         </div>
         {isAccountDataLoaded() && TuringMachinesData!=null?
-
+        <>
         <div className="TmList">
             {
-               TuringMachinesData.content.map( (tm, index) => <TuringMachineToLoad key={index} tm={tm} tmId={index} handleDeleted={handleDeleted}></TuringMachineToLoad>)
+               TuringMachinesData.content.map( (tm, index) => <TuringMachineToLoad key={index} tm={tm} tmId={index} handleDeleted={handleDeleted} handleVisibilityChanged={()=>setListReloadNeeded((prev)=>(prev+1))}></TuringMachineToLoad>)
             }
         </div>
-        :
-        "Account data not loaded :("
+        
+        <div className="ListFooter">
+
+        <div className="LoadedMachinesCountWrapper">
+            <p className="LoadedMachinesCountText">machines: {TuringMachinesData.totalElements}/100</p>
+        </div>
+
+        <div className="PageControls">
+        <button className={`PageControlsButton ${TuringMachinesData.last? "Disabled" : ""} `}  disabled={TuringMachinesData.first} onClick={prevPage}> 
+            {TuringMachinesData.first? <ChevronLeftIcon className="DisabledIcon"/>  : <ChevronLeftIcon/> }
+             </button>
+
+        <div className="PageControlsPages">
+            {Array.from({ length: TuringMachinesData.totalPages }, (_, i) => {
+                if (i < 3 || i === TuringMachinesData.totalPages - 1) {
+                return (
+                    <div
+                    key={i}
+                    className={`PageButton ${i === page ? "active" : ""}`}
+                    onClick={() => setPage(i)}
+                    >
+                    {i + 1}
+                    </div>
+                );}
+
+                if (i === 4) {
+                    return (<div key="ellipsis">... </div> );
+                }
+
+                return null;
+            })}
+        </div>
+
+        <button className={`PageControlsButton ${TuringMachinesData.last? "Disabled" : ""} `} disabled={TuringMachinesData.last} onClick={nextPage} >
+            {TuringMachinesData.last? <ChevronRightIcon className="DisabledIcon" />: <ChevronRightIcon />}
+        </button>
+
+        </div></div></>
+        : "Account data not loaded :("
         }
 
         {/* <button onClick={()=>{tmToDeleteNameRef.current = TuringMachinesData?.content.at(0)?.name?? "Turing machine";  setDeleteTmModalOpen(true);}}>
         Test Modal</button>*/}
+
 
     </div>
 }

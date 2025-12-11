@@ -2,6 +2,8 @@
 
   --sidebar-width: 6rem;
 
+  --box-shadow-dark: 3px 3px 7px 7px rgba(0, 0, 0, 0.316);
+
   --white: white;
   --black: black;
   
@@ -71,6 +73,8 @@ html[data-theme="dark"] {
   --color-accent-muted: var(--accent-950);
   --color-accent-transparent: #3c0764b0;
 }
+
+
 
 #main-body{
     margin: 0;

@@ -1,11 +1,10 @@
 import './page.css';
 import './SettingsPage.css'
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useTuringMachineSettings } from '../features/GlobalData/GlobalData';
 import ChipList from './ChipList';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
-import { boolean } from 'zod';
 
 
 
@@ -134,7 +133,7 @@ export default  function SettingsPage() {
                 <div className='SettingsSegment SimulationAliasesSegment'>
                     <div className='SegmentFirstColumn'>
                             <p className='SegmentTitle'>Simulation Aliases</p>
-                            <p className='SegmentDescription'>Choose what symbol or word should indicate separator, move left, move right and stay in your Turing machine program.</p>
+                            <p className='SegmentDescription'>Set what symbol or word should indicate separators, blank and moves in code.</p>
                     </div>
                     <div className="SegmentSecondColumn"> 
                         <div className="SettingsTextFieldRow">
@@ -228,7 +227,7 @@ export default  function SettingsPage() {
                 <div className='SettingsSegment SpecialStatesSegment'>
                     <div className='SegmentFirstColumn'>
                             <p className='SegmentTitle'>Special States</p>
-                            <p className='SegmentDescription'>Choose how would you want to refer to special states inside your code.</p>
+                            <p className='SegmentDescription'>Set how would you want to refer to initial, accept and reject states inside code.</p>
                     </div>
                     <div className="SegmentSecondColumn"> 
                         <div className="SettingsTextFieldRow">
@@ -278,7 +277,7 @@ export default  function SettingsPage() {
                 <div className='SettingsSegment SpecialSettingsSegment'>
                     <div className='SegmentFirstColumn'>
                             <p className='SegmentTitle'>Special Settings</p>
-                            <p className='SegmentDescription'>Loremus Ipsemus</p>
+                            <p className='SegmentDescription'>Set advanced settings of turing machine simulator</p>
                     </div>
                     <div className="SegmentSecondColumn">
                         <div className="SettingsTextFieldRow">
@@ -384,7 +383,7 @@ export default  function SettingsPage() {
                         }
                     </div>
                 </div>    
-                
+                            
                 <div className='SaveSettingsDiv'>
                     <button className={`SaveSettings`} onClick={validateAndSave}>Save</button>
                     {/*saveError!=null? <p className='SettingsSaveError'>Error: {saveError}</p> : "" */}

@@ -56,7 +56,8 @@ export function buildSimulationExport(): SimulationExport{
   const { tmDataProgram , tmDataTapesInputs, tmDataTapesAmount } = useTuringMachineData.getState();
   const {symbolSeparator, transitionArrow, blank, left, right, stay} = useTuringMachineSettings.getState().aliases;
   const {initialState, acceptState, rejectState } = useTuringMachineSettings.getState().specialStates;
-
+  const {rejectOnNonAccept} = useTuringMachineSettings.getState().specialSettings;
+  
   const program = localCodeToGlobal(tmDataProgram ,symbolSeparator, left, right, stay, tmDataTapesAmount);
   return { 
       initialState: initialState,
@@ -67,7 +68,8 @@ export function buildSimulationExport(): SimulationExport{
       sep2: transitionArrow,
       blank: blank,
       input:tmDataTapesInputs,
-      tapesAmount:tmDataTapesAmount
+      tapesAmount:tmDataTapesAmount,
+      rejectOnNonAccept: rejectOnNonAccept,
     };
 }
 

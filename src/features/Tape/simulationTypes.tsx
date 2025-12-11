@@ -28,6 +28,7 @@ export type SimulationExport = {
   blank: string,
   input : string[],
   tapesAmount: number,
+  rejectOnNonAccept: boolean,
 }
 
 //schema types (persist and zod friendly)
@@ -117,6 +118,7 @@ export const SendSimulationDtoSchema = z.object({
   blank       : z.string(),
   input       : z.array(z.string()),
   tapesAmount : z.number(),
+  rejectOnNonAccept: z.boolean(),
 });
 export type SendSimulationDto = z.infer<typeof SendSimulationDtoSchema>;
 

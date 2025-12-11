@@ -408,7 +408,7 @@ useEffect(() => {
     if (!isPlaying || !hasAllAnimationsEnded() || simulation == null) return;
     const currentStep = stepRef.current;
     
-    if(currentStep >= stepsAmount()) {
+    if(currentStep >= stepsAmount() || simulation.getNextSteps(currentStep) == null ) {
       setIsPlaying(false);
       return;
     }
@@ -427,9 +427,14 @@ useEffect(() => {
       
   }, [isPlaying, isAnimating]); 
 
+  const canMoveForward = () => {
+    const currentStep = stepRef.current;
+    return simulation != null && currentStep < stepsAmount() && simulation.getNextSteps(currentStep) != null;
+  }
+
   const doNextSimulationStep = () => {
     const currentStep = stepRef.current;
-    if(currentStep >= stepsAmount() || simulation == null) return;
+    if(currentStep >= stepsAmount() || simulation == null || simulation.getNextSteps(currentStep) == null) return;
     if(!hasAllAnimationsEnded()) return;
     setIsPlaying(false);
 
@@ -715,15 +720,15 @@ const viewportStyle: React.CSSProperties = {
             <StopIcon />
           </button>
 
-          <button className={`StepForwardButton tooltip SimulationControlsButton ${!isSimulationLoaded() || (stepRef.current >= stepsAmount())? "DisabledButton" : ""}`} 
-          disabled={!isSimulationLoaded() || (stepRef.current >=stepsAmount())} onClick={doNextSimulationStep}
-          data-tooltip={!isSimulationLoaded()? "Simulation not loaded" : (stepRef.current >= stepsAmount())? "Cannot step forward" :  "Next step"}>
+          <button className={`StepForwardButton tooltip SimulationControlsButton ${!canMoveForward()? "DisabledButton" : ""}`} 
+          disabled={!canMoveForward()} onClick={doNextSimulationStep}
+          data-tooltip={!isSimulationLoaded()? "Simulation not loaded" : !canMoveForward()? "Cannot step forward" :  "Next step"}>
             <ChevronRightIcon/>
           </button>
         
-          <button className={`ToEndButton tooltip SimulationControlsButton ${!isSimulationLoaded() || (stepRef.current >= stepsAmount())? "DisabledButton" : ""}`}
-           disabled={!isSimulationLoaded() || (stepRef.current >= stepsAmount())} onClick={()=>jumpToSimulation(stepsAmount()-1)}
-            data-tooltip={!isSimulationLoaded()? "Simulation not loaded" : (stepRef.current >= stepsAmount())? "Already at the end" :  "Jump to the end"} >
+          <button className={`ToEndButton tooltip SimulationControlsButton ${!canMoveForward()? "DisabledButton" : ""}`}
+           disabled={!canMoveForward()} onClick={()=>jumpToSimulation(stepsAmount()-1)}
+            data-tooltip={!isSimulationLoaded()? "Simulation not loaded" : !canMoveForward()? "Already at the end" :  "Jump to the end"} >
             <ChevronDoubleRightIcon/>
           </button>
         </div>
