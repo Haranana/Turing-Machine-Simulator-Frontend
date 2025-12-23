@@ -1,11 +1,10 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AccountDataContext } from "./AccountDataContext";
 import {  ArrowLongDownIcon, ArrowLongUpIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { useApiFetch } from "../../api/util";
 import {type TuringMachineGetDto, type PageableQuery , type Page} from "./AccountDataTypes";
 import TuringMachineToLoad from "./TuringMachineToLoad";
 import { toast } from 'react-hot-toast';
-import Modal from "../Modal/Modal";
 import { useTuringMachineData } from "../GlobalData/GlobalData";
 
 
@@ -13,12 +12,10 @@ export default function LoadTuringMachine(){
 
     const accountData = useContext(AccountDataContext);
     const apiFetch = useApiFetch();
-    const [simulationListLoaded, setSimulationListLoaded] = useState<boolean>(false); 
     const [sortByColumn, setSortByColumn] = useState<"name" | "description" | "createdAt" | "updatedAt">("name");
     const [sortType, setSortType] = useState<"asc" | "desc">("asc");
     const [TuringMachinesData, setTuringMachinesData] = useState<Page<TuringMachineGetDto> | null>(null);
     const [listReloadNeeded, setListReloadNeeded] = useState<number>(0);
-    const tmToDeleteNameRef = useRef<String | null>(null);
     const {setTmDataName} = useTuringMachineData();
     const [page, setPage] = useState<number>(0);
     const PAGE_SIZE = 20;   

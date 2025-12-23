@@ -44,7 +44,7 @@ export default  function SettingsPage() {
     const [inputAlphabetDetailsOpen, setInputAlphabetDetailsOpen] = useState<boolean>(onlyInputAlphabet? true : false );
     const [statesDetailsOpen, setStatesDetailsOpen] = useState<boolean>(onlyStatesFromSet? true : false );
 
-    const [saveError, setSaveError] = useState<string | null>(null);
+    const [_, setSaveError] = useState<string | null>(null);
 
     const validateAndSave: () => void = () => {
         const trimmedSymbolSeparator = symbolSeparatorFieldValue.trim();

@@ -24,7 +24,7 @@ export default function SaveTuringMachine(){
 
 
     const [isSaveTmModalOpen, setSaveTmModalOpen] = useState<boolean>(false);
-    const [tmToOverwrite, setTmToOverwrite] = useState<{id: number, name: string}|null>(null);
+    const [_, setTmToOverwrite] = useState<{id: number, name: string}|null>(null);
 
     function isAccountDataLoaded(){
         return accountData!=null&& accountData.id != null && accountData.email != null && accountData.status != null && accountData.createdAt != null;
@@ -140,6 +140,7 @@ function initialValidation(name: string, description: string) {
         //if tmToOverwrite is not null then we overwrite some tm, 
         //otherwise use id of lastly loaded tm
         //otherwise there's not any tm loaded, so error (just probably route to save as in the future)
+        /*
         let tmToSaveName: string| null = null;
         let tmToSaveDescription: string| null = null;
 
@@ -153,7 +154,7 @@ function initialValidation(name: string, description: string) {
         }else{ //oops
               toast.error(`No Turing Machine Loaded\nuse Save as to create new one!`);
               return;
-        }
+        }*/
 
         if(tmDataName == null){
             toast.error("No turing machine is currently loaded,\nplease create new one by using Save as option");

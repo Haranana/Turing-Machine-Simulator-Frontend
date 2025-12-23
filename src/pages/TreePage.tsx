@@ -5,7 +5,7 @@ import {useEffect, useRef, useState } from "react";
 import { ReactFlow,Background,useNodesState,useEdgesState,type Node,type Edge, type NodeProps, type NodeTypes, Handle, Position} from "@xyflow/react";
 import { type SimulationNode , type SimulationNodeMap } from '../features/Tape/simulationTypes';
 import ELK, {type ElkNode } from "elkjs/lib/elk.bundled.js";
-import { useSimulationData, useTuringMachineSettings } from "../features/GlobalData/GlobalData";
+import { useSimulationData } from "../features/GlobalData/GlobalData";
 import { NdSimulation } from '../features/Tape/Simulation';
 import { CheckIcon, ExclamationCircleIcon, StopIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
@@ -40,10 +40,10 @@ export default function TreePage(){
   const [nodes, setNodes, onNodesChange] = useNodesState<RfNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const {simulationDataNodes, simulationDataNodesPath, setSimulationDataNodesPath} = useSimulationData();
-  const [simulation, setSimulation] = useState<NdSimulation | null>(null);
-  const [selectedNodesAndEdges , setSelectedNodesAndEdges] = useState<SelectedNodesAndEdges>({nodes: new Map<number, boolean>() , edges: new Map<number, boolean>()})
+  const [_, setSimulation] = useState<NdSimulation | null>(null);
+  const [__ , setSelectedNodesAndEdges] = useState<SelectedNodesAndEdges>({nodes: new Map<number, boolean>() , edges: new Map<number, boolean>()})
   const graphData = useRef<GraphData>({children: [], edges: []});
-  const [elkGraph, setElkGraph] = useState<ElkNode>();
+  const [___, setElkGraph] = useState<ElkNode>();
 
   //call at start of the component (just after simulationData is loaded)
   //create simulation based on zustand data
@@ -229,6 +229,7 @@ export default function TreePage(){
   return selected;
 }
 
+/*
   function isNodeSelected(nodeId: number) {
   return selectedNodesAndEdges.nodes.get(nodeId) === true;
 }
@@ -236,6 +237,7 @@ export default function TreePage(){
   function isEdgeSelected(edgeId: number) {
     return selectedNodesAndEdges.edges.get(edgeId) === true;
   }
+*/
 
   //creates path based on chosen transition
     //any transition can be selected, so each time onTransitionChosen is called

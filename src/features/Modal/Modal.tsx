@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect} from "react";
 import "../Modal/Modal.css";
 type ModalProps = {
   open: boolean;

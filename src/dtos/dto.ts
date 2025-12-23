@@ -1,5 +1,5 @@
 
-import { CreatedSimulationSchema, NdTmReturnDtoSchema, SendSimulationDtoSchema, SimulationNodesRecordSchema, type SendSimulationDto, type SimulationExport, type SimulationNodeMap, type SimulationNodeRecord } from "../features/Tape/simulationTypes.tsx";
+import { SendSimulationDtoSchema, SimulationNodesRecordSchema, type SendSimulationDto, type SimulationExport, type SimulationNodeRecord } from "../features/Tape/simulationTypes.tsx";
 
 import { useTuringMachineSettings } from "../features/GlobalData/GlobalData.ts";
 import { useTuringMachineData } from "../features/GlobalData/GlobalData.ts";

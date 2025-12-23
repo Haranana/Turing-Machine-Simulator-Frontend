@@ -19,7 +19,7 @@ export default function SignUpPage(){
         e.preventDefault();
         const emailTrimmed = email.trim();
         const pas1Trimmed = password1.trim();
-        const pas2Trimmed = password2.trim();
+        //const pas2Trimmed = password2.trim();
 
         try {
             const res = await fetch(`http://localhost:9090/api/auth/register`, {

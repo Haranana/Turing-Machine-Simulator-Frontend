@@ -29,13 +29,13 @@ export const TapeComponent = ({tapeInput}: Props) => {
   const [offsetPx, setOffsetPx] = useState<number>(0);
 
   // Czy aktualnie trwa animacja (dla przycisków).
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [_, setIsAnimating] = useState(false);
 
   // Flaga na “snap bez transition”
   const [noTransition, setNoTransition] = useState(false);
 
   // Odtwarzanie
-  const [isPlaying, setIsPlaying] = useState(false);
+  //const [isPlaying, setIsPlaying] = useState(false);
 
   // maszyna stanów: idle -> anim -> snap -> idle ..., używana do animacji
   const [phase, setPhase] = useState<Phase>("idle");
@@ -127,7 +127,7 @@ export const TapeComponent = ({tapeInput}: Props) => {
     }
 
     if(animationType==="reverse" && dir===0){
-      setTapeValues(prev => {
+      setTapeValues(_ => {
             const newMap = new Map(tapeInput.tapeState.tape);
             return newMap;
         });
@@ -137,7 +137,7 @@ export const TapeComponent = ({tapeInput}: Props) => {
     }
     
     if(animationType==="normal" ){
-        setTapeValues(prev => {
+        setTapeValues(_ => {
             const newMap = new Map(tapeInput.tapeState.tape);
             
             if(tapeInput.writtenChar!=null) newMap.set(head, tapeInput.writtenChar);  
@@ -149,7 +149,7 @@ export const TapeComponent = ({tapeInput}: Props) => {
           return;  
         }
 
-    }else if(animationType==="none"){
+    }/*else if(animationType==="none"){
        setTapeValues(prev => {
             const newMap = new Map(tapeInput.tapeState.tape);
             
@@ -159,7 +159,7 @@ export const TapeComponent = ({tapeInput}: Props) => {
 
         tapeInput.callAfterAnimation(tapeInput.tapeId);
           return;  
-    }
+    }*/
 
     setPhase("anim");
     setIsAnimating(true);
@@ -189,7 +189,7 @@ const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
 
       if (animationTypeRef.current === "reverse") {
 
-         setTapeValues(prev => {
+         setTapeValues(_ => {
             const newMap = new Map(tapeInput.tapeState.tape);
             return newMap;
         });

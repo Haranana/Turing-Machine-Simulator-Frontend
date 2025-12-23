@@ -1,4 +1,4 @@
-import React, { useState, type KeyboardEvent,type ChangeEvent } from "react";
+import { useState, type KeyboardEvent,type ChangeEvent } from "react";
 import "./ChipList.css";
 import "./../index.css"
 

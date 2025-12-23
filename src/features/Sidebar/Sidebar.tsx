@@ -6,15 +6,9 @@ import './sidebar.css';
 import { Sitemap } from '../../assets/Sitemap';
 import { useSimulationData } from '../GlobalData/GlobalData';
 import { useEffect, useState } from 'react';
-import { boolean } from 'zod';
 import { getInitialTheme, THEME_KEY, type Theme } from '../../public/ThemeManager';
 
 export default function Sidebar(){
-
-    
-
-
-   
     type Pages = "none" | "tapes" | "console" | "tree" | "search" | "account" | "settings";
     const {simulationDataNodes} = useSimulationData();
     const [currentSimulationIsNonDet , setCurrentSimulationIsNonDet] = useState<boolean>(false); //false if no simulation is currently loaded in

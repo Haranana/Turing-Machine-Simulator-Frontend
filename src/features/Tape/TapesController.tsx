@@ -14,9 +14,9 @@ import { useSimulationData, useTuringMachineData, useTuringMachineSettings } fro
 export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
 
   const { isAuthenticated } = useAuth();
-  const {tmDataProgram, tmDataName, tmDataProgramHasError, tmDataTapesInputs, setTmDataTapesInputs, tmDataTapesAmount, setTmDataTapesAmount} = useTuringMachineData();
+  const {tmDataName, tmDataProgramHasError, tmDataTapesInputs, setTmDataTapesInputs, tmDataTapesAmount, setTmDataTapesAmount} = useTuringMachineData();
   const {simulationDataNodes , setSimulationDataNodes, simulationDataNodesPath, setSimulationDataNodesPath} = useSimulationData();
-  const {initialState, acceptState, rejectState} = useTuringMachineSettings(s=>s.specialStates);
+  const {initialState} = useTuringMachineSettings(s=>s.specialStates);
   const {allowMultipleTapes, onlyInputAlphabet, inputAlphabet} = useTuringMachineSettings(s=>s.specialSettings);
 
 
@@ -27,9 +27,10 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   const [tapesAmount, setTapesAmount] = useState<number>(tmDataTapesAmount);
 
     // Taśma używana w symilacji
+    /*
   const [tapeValues] = useState<Map<number, TapeSymbol>[]>(
     [tapeState.tape]
-  );
+  );*/
 
   const [isInputFieldVisible , setInputFieldVisibility] = useState<boolean[]>([false]);
 
@@ -123,7 +124,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     setIsAnimating(prev=>prev.map(()=>value));
   }
 
-  function validateInput(value: string, id: number){
+  function validateInput(value: string, _: number){
   
     if(!onlyInputAlphabet) return true;
 
@@ -360,9 +361,10 @@ useEffect(() => {
   setTmDataTapesInputs(tmDataTapesInputs.slice(0, -1));
   }
 
+  /*
   function isEndingStep(step: number){
     return step === stepsAmount() - 1;
-  }
+  }*/
 
   useEffect(() => {
   setTapeData(prev => {

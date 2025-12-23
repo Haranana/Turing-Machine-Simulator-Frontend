@@ -10,7 +10,6 @@ import type { AccountData } from '../features/AccountComponents/AccountDataConte
 import { toast } from 'react-hot-toast';
 import { AccountDataContext } from '../features/AccountComponents/AccountDataContext.ts';
 import { ArrowRightStartOnRectangleIcon , ChevronUpIcon , ChevronDownIcon } from '@heroicons/react/24/solid';
-import { useNavigate } from 'react-router-dom';
 import { useTuringMachineData, useTuringMachineSettings } from '../features/GlobalData/GlobalData.ts';
 import type { TuringMachineEditDto } from '../features/AccountComponents/AccountDataTypes.ts';
 
@@ -23,7 +22,6 @@ export default  function AccountPage() {
    
     const [currentSubPage, setCurrentSubPage] = useState<"load" | "create"  | "edit">("load");
     const {logout} = useAuth();
-    const navigate = useNavigate();
     
     const apiFetch = useApiFetch();
 

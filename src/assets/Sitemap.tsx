@@ -1,5 +1,3 @@
-import React from 'react'
-
 export const Sitemap = () => {
   return (
     <svg className='icon'  aria-hidden="true"

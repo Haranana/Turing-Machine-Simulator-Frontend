@@ -6,7 +6,6 @@ import { useEffect, useRef } from "react";
 import { Editor, useMonaco } from "@monaco-editor/react";
 import type monaco from "monaco-editor";
 import { useTuringMachineData, useTuringMachineSettings } from "../features/GlobalData/GlobalData";
-import { boolean } from "zod";
 
 const LANGUAGE_ID = "tm";
 
@@ -17,8 +16,8 @@ export default function ConsolePage() {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
   const { symbolSeparator, transitionArrow, left, stay, right, blank } = useTuringMachineSettings(s=>s.aliases);
-  const {onlyComplete, onlyTapeAlphabet, onlyStatesFromSet, tapeAlphabet, allowMultipleTapes, allowNondeterminism, statesSet } = useTuringMachineSettings(s=>s.specialSettings);
-  const { tmDataProgram, setTmDataProgram, setTmDataProgramHasError, setTmDataTapesInputs, tmDataTapesAmount } = useTuringMachineData();
+  const {onlyComplete, onlyTapeAlphabet, onlyStatesFromSet, tapeAlphabet, allowNondeterminism, statesSet } = useTuringMachineSettings(s=>s.specialSettings);
+  const { tmDataProgram, setTmDataProgram, setTmDataProgramHasError, tmDataTapesAmount } = useTuringMachineData();
   const {acceptState, rejectState} = useTuringMachineSettings(s=>s.specialStates);
 
   function stripTerminators(lines: string[]): string[] {
@@ -252,7 +251,7 @@ function validateModel(
     }
 
     const stateBefore = beforePieces[0];
-    const reads = beforePieces.slice(1);
+    //const reads = beforePieces.slice(1);
 
     if (!stateBefore.trim()) {
       markers.push({
@@ -281,7 +280,7 @@ function validateModel(
     }
 
     const stateAfter = afterPieces[0];
-    const writes = afterPieces.slice(1, 1 + tapesAmount);
+    //const writes = afterPieces.slice(1, 1 + tapesAmount);
     const moves = afterPieces.slice(1 + tapesAmount);
 
     //is state directly after transition arrow

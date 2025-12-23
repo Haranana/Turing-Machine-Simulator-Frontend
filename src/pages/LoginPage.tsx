@@ -27,7 +27,7 @@ export default function LoginPage(){
             const res : Response = await fetch(`http://localhost:9090/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: email.trim(), password: passwordTrimmed }),
+                body: JSON.stringify({ email: emailTrimmed, password: passwordTrimmed }),
             });
 
             if (!res.ok) {
