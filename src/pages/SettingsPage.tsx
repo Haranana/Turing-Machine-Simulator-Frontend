@@ -228,6 +228,7 @@ export default  function SettingsPage() {
                     <div className='SegmentFirstColumn'>
                             <p className='SegmentTitle'>Special States</p>
                             <p className='SegmentDescription'>Set how would you want to refer to initial, accept and reject states inside code.</p>
+                            <p className='SegmentDescription SmallSegmentDescription'>*Reject state is optional.</p>
                     </div>
                     <div className="SegmentSecondColumn"> 
                         <div className="SettingsTextFieldRow">

@@ -8,6 +8,7 @@ import ELK, {type ElkNode } from "elkjs/lib/elk.bundled.js";
 import { useSimulationData } from "../features/GlobalData/GlobalData";
 import { NdSimulation } from '../features/Tape/Simulation';
 import { CheckIcon, ExclamationCircleIcon, StopIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { Sitemap } from '../assets/Sitemap';
 
 const elk  = new ELK();
 
@@ -337,7 +338,7 @@ function NodeStatusIcon({ status }: { status: SimNodeComponentData["status"] }) 
         <ExclamationCircleIcon></ExclamationCircleIcon>
       );
     default:
-      return null;
+      return <Sitemap />;
   }
 }
 

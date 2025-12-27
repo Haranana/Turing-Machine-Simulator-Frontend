@@ -35,6 +35,11 @@
     font-family: var(--font-1);
 }
 
+.SegmentDescription.SmallSegmentDescription{
+    font-size: 0.8rem;
+    font-family: var(--font-1);
+}
+
 
 
 .SegmentSecondColumn{

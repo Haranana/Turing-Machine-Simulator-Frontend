@@ -22,7 +22,6 @@ type StoredAuth = {
 function loadAuth(): { token: string | null; tokenType: string | null; expiresAt: number | null;} {
   try {
 
-    // session storage (no remember me)
     const raw = sessionStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(STORAGE_KEY);
 
     if (!raw) return { token: null, tokenType: null, expiresAt: null };
