@@ -16,6 +16,7 @@ import AccountActivatedPage from './pages/AccountActivatedPage'
 import ChangePassword from './features/AccountComponents/ChangePassword'
 import DeleteAccount from './features/AccountComponents/DeleteAccount'
 import SearchPage from './pages/SearchPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
 
 export default  function App() {
 
@@ -30,6 +31,7 @@ return (
               <Route path="index" element={<SimulatorPage />} />
               <Route path="console" element={<ConsolePage />} />
               <Route path="tree" element={<TreePage></TreePage>}/>
+              <Route path="forgotPassword" element={<ForgotPasswordPage/>}/>
               <Route path="password/change" element={<ChangePassword/>}/>
               <Route path='account/delete' element={<DeleteAccount/>}/>
               <Route path='search' element={<SearchPage/>}/>

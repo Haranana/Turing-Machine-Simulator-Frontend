@@ -24,7 +24,10 @@
     flex-direction: column;
     align-items: center;
 
-    min-width: 450px;
+    width: 450px;
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
 
     padding-top: 7vh;
     font-family: var(--font-1);
@@ -93,6 +96,7 @@
     width: 100%;
     border-radius:9999px;
     width: 100%;
+    margin-bottom: 10px;
 }
 
 .login-password-wrapper .login-text-field{
@@ -203,4 +207,9 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
+}
+
+.ErrorMesssageWrapper>p{
+    color: var(--color-red);
+    font-size: 1.2rem;
 }

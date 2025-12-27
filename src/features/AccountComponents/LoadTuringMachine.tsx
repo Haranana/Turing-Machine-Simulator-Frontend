@@ -159,7 +159,7 @@ export default function LoadTuringMachine(){
         </button>
 
         </div></div></>
-        : "Account data not loaded :("
+        : <div className="DataNotLoadedDiv">Error: Account data couldn't be loaded</div> 
         }
 
         {/* <button onClick={()=>{tmToDeleteNameRef.current = TuringMachinesData?.content.at(0)?.name?? "Turing machine";  setDeleteTmModalOpen(true);}}>

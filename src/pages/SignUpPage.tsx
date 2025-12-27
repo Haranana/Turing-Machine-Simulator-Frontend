@@ -2,6 +2,9 @@ import "./page.css"
 import "./login-page.css" 
 import {EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid"
 import { useState } from "react";
+import { toast } from 'react-hot-toast';
+import { useNavigate } from "react-router-dom";
+import Modal from "../features/Modal/Modal";
 
 export default function SignUpPage(){
 
@@ -12,6 +15,8 @@ export default function SignUpPage(){
     const [password2, setPassword2] = useState<string>("");
     const [initialValidationPassed, setInitialValidationPassed] = useState<boolean>(false);
     const [initialValidationErrorMessage, setInitialValidationErrorMessage] = useState<string | null>(null);
+    const navigate = useNavigate();
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
 
     async function handleSubmit(e: React.MouseEvent){
@@ -32,21 +37,28 @@ export default function SignUpPage(){
                 setEmail("");
                 setPassword1("");
                 setPassword2("");
+                //toast.success("Account succesfully created")
+                setIsModalOpen(true);
+
             } else if (res.status === 400) {
-                const text = await res.text();
-                setInitialValidationPassed(true);
-                setInitialValidationErrorMessage(text || "Nieprawidłowe dane (400).");
+                //const text = await res.text();
+                //setInitialValidationPassed(true);
+                //setInitialValidationErrorMessage(text || "Nieprawidłowe dane (400).");
+                toast.error("Incorrect data")
             } else if (res.status === 409) {
-                setInitialValidationPassed(true);
-                setInitialValidationErrorMessage("Użytkownik o tym e-mailu już istnieje.");
+                //setInitialValidationPassed(true);
+                //setInitialValidationErrorMessage("Użytkownik o tym e-mailu już istnieje.");
+                toast.error("Account with given e-mail already exists")
             } else {
-                const text = await res.text();
-                setInitialValidationPassed(true);
-                setInitialValidationErrorMessage(text || `Błąd serwera (${res.status}).`);
+                toast.error("Account with given e-mail already exists")
+                //const text = await res.text();
+                //setInitialValidationPassed(true);
+                //setInitialValidationErrorMessage(text || `Błąd serwera (${res.status}).`);
             }
             } catch (e: any) {
-                setInitialValidationPassed(true);
-            setInitialValidationErrorMessage(e.message ?? "Błąd sieci.");
+                //setInitialValidationPassed(true);
+                //setInitialValidationErrorMessage(e.message ?? "Błąd sieci.");
+                toast.error("Network error")
             }
         }
     
@@ -87,6 +99,7 @@ export default function SignUpPage(){
     }
 
     return(
+        <>
     <div className="LoginPageWrapper">
         <div className="login-page">
             <h1 className="login-header">Create an account</h1>
@@ -111,7 +124,7 @@ export default function SignUpPage(){
                 
                 <div className = "login-form-row">
                     <div className = "login-password-wrapper">
-                    <input className="login-text-field" type={password2Visible? "text" : "password"} name="password" id="login-password" placeholder="Repeat password"
+                    <input className="login-text-field" type={password2Visible? "text" : "password"} name="password" id="login-password-confirm" placeholder="Repeat password"
                     onChange={(e)=>{setPassword2(e.target.value);  checkIfValidationPassed(email, password1, e.target.value);}} required/>
                     <span  className="toggle-password" onClick={()=>{togglePassword(2);}}>
                         {password2Visible?
@@ -134,5 +147,15 @@ export default function SignUpPage(){
             </form>
         </div>
     </div>
+            <Modal open={isModalOpen} onClose={()=>{setIsModalOpen(false)}}>
+                            <div className="DefaultModalTextWrapper ChangePasswordTextWrapper">
+                                <h2>Account created</h2>
+                                <p>To change log in your new account, please activate it by clicking link sent to your email</p>
+                            </div>
+                            <div className="DefaultModalButtonWrapper ChangePasswordButtonWrapper">
+                                <button className="ModalButton ChangePasswordOkButton" onClick={()=>{ navigate("/login", { replace: true });}}>Ok</button>
+                            </div>
+            </Modal>
+            </>
     );
 }

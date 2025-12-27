@@ -4,6 +4,7 @@ import {Link, useNavigate} from 'react-router-dom';
 import { useAuth } from "../auth/AuthContext";
 import {EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid"
 import { useState } from "react";
+import { toast } from 'react-hot-toast';
 
 
 export default function LoginPage(){
@@ -12,7 +13,7 @@ export default function LoginPage(){
     const [email, setEmail] = useState<string>("");
     const [password1, setPassword1] = useState<string>("");
     const [initialValidationPassed, setInitialValidationPassed] = useState<boolean>(false);
-    const [errorMessage ,setErrorMessage] = useState<string | null>(null);
+    const [errorMessage ,_] = useState<string | null>(null);
     const [rememberMe, setRememberMe] = useState<boolean>(false);
     const {login} = useAuth();
     const navigate = useNavigate();
@@ -31,8 +32,13 @@ export default function LoginPage(){
             });
 
             if (!res.ok) {
-                if (res.status === 401) setErrorMessage("Nieprawidłowy e-mail lub hasło.");
-                else setErrorMessage(`Błąd logowania (${res.json.toString}).`);
+                if( res.status === 403) {
+                    toast.error("Account is disabled");
+                }
+                else{
+                    toast.error("Incorrect e-mail or password");
+                } 
+
                 return;
             }
 
@@ -42,11 +48,11 @@ export default function LoginPage(){
                 expiresInSeconds: number;
             };
 
-            console.log("login with: ", rememberMe);
+            //console.log("login with: ", rememberMe);
             login(data.accessToken, data.tokenType, data.expiresInSeconds, rememberMe);
             navigate("/account", { replace: true });
             } catch (e: any) {
-                setErrorMessage(e?.message ?? "Błąd sieci.");
+                toast.error(e?.message);
             } 
      }
 

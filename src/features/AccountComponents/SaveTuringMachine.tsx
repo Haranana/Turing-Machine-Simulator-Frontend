@@ -243,18 +243,18 @@ function initialValidation(name: string, description: string) {
         </form>
         </>
         :
-        "User data couldn't be loaded."
+        <div className="DataNotLoadedDiv">Error: Account data couldn't be loaded</div> 
         }
 
     </div>
     <Modal open={isSaveTmModalOpen} onClose={()=>{setSaveTmModalOpen(false); setTmToOverwrite(null)}}>
-                    <div className="ModalTextWrapper OverwriteTmModalTextWrapper">
+                    <div className="DefaultModalTextWrapper ModalTextWrapper OverwriteTmModalTextWrapper">
                         <h2>overwrite {newTuringMachineName} ?</h2>
                         <p>Turing machine named {newTuringMachineName} already exists, would you like to overwrite it?
                             You will Not be able to restore old Turing Machine once it's saved over.
                         </p>
                     </div>
-                    <div className="ModalButtonsWrapper OverwriteTmModalButtonsWrapper">
+                    <div className="ModalButtonsWrapper DefaultModalButtonWrapper OverwriteTmModalButtonsWrapper">
                         <button className="ModalButton OverwriteTmModalButton OverwriteTmModalDeleteButton" 
                         onClick={(e)=>{handleSave(e);setSaveTmModalOpen(false)}}>Overwrtie</button>
                         <button className="ModalButton DeleteTmModalButton DeleteTmModalCancelButton" 

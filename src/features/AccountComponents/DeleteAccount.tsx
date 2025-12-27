@@ -3,12 +3,13 @@
 import { useState } from "react";
 import Modal from "../Modal/Modal";
 import { useAuth } from "../../auth/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function DeleteAccount(){
     const [isConfirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState<boolean>(true);
     const [deletionResult, setDeletionResult] = useState<"successful" | "error" | "loading" | "stopped">("loading");
     const {logout} = useAuth();
+    const navigate = useNavigate();
 
     async function onConfirm(){
 
@@ -47,29 +48,38 @@ export default function DeleteAccount(){
 
 
 
-        return(<div className="DeleteAccountConfirmPage">
-            {deletionResult==="successful"?  
-            <div className="DeleteAccountConfirmPageSuccess"> <h1>Account has been successfully deleted</h1>
-            <span>Return to main page by clicking <Link className="DeleteAccountConfirmIndexLink" to="/index" title='index'>here</Link></span> </div>
-            : deletionResult==="error"?
-            <div className="DeleteAccountConfirmPageError"> <h1>Account couldn't be deleted</h1>
-            <span>Return to main page by clicking <Link className="DeleteAccountConfirmIndexLink" to="/index" title='index'>here</Link></span> </div>
-             : 
-            deletionResult==="loading"?
-            <div className="DeleteAccountConfirmPageLoading"> <h1>Loading...</h1> </div>
-             : 
-            <div className="DeleteAccountConfirmPageError"> <h1>Account deletion stopped</h1>
-            <span>Return to main page by clicking <Link className="DeleteAccountConfirmIndexLink" to="/index" title='index'>here</Link></span> </div>}
+        return(        <>                
+            <Modal open={!isConfirmDeleteModalOpen} onClose={()=>{ navigate("/login", { replace: true });}}>
+                        
+                            {deletionResult==="successful"?  
+                                <div className="DefaultModalTextWrapper"> <h2>Account has been successfully deleted</h2>
+                                <p>Return to login page by clicking <Link className="DeleteAccountConfirmIndexLink" to="/login" title='index'>here</Link></p>
+                                 </div>
+                            : deletionResult==="error"?
+                            <div className="DefaultModalTextWrapper"> <h2>Account couldn't be deleted</h2>
+                            <p>Return to login page by clicking <Link className="DeleteAccountConfirmIndexLink" to="/login" title='index'>here</Link></p> 
+                            </div>
+                            :  deletionResult==="loading"? 
+                            <div className="DefaultModalTextWrapper"> <h2>Loading...</h2> </div>
+                            : <div className="DefaultModalTextWrapper"> <h2>Account deletion stopped</h2>
+                            <p>Return to login page by clicking <Link className="DeleteAccountConfirmIndexLink" to="/login" title='index'>here</Link></p>  </div>}                        
+                        <div className="DefaultModalButtonWrapper">                           
+                                <button className="ModalButton " onClick={()=>{ navigate("/login", { replace: true });}}>Ok</button>                                                   
+                        </div>
+                      
+            </Modal>
             <Modal open={isConfirmDeleteModalOpen} onClose={()=>{onDecline()}}>
-                        <div className="DeleteAccountConfirmTextWrapper">
+                        <div className="DefaultModalTextWrapper DeleteAccountConfirmTextWrapper">
                             <h2>Account deletion</h2>
                             <p>Are you sure you want to delete your account and every saved turing machine? This action is irreversible. </p>
                         </div>
-                        <div className="DeleteAccountConfirmButtonWrapper">
-                            <button className="ModalButton DeleteAccountConfirmOkButton" onClick={()=>{onConfirm()}}>Ok</button>
+                        <div className="DefaultModalButtonWrapper">                           
+                                <button className="ModalButton DeleteAccountConfirmOkButton" onClick={()=>{onConfirm()}}>Delete</button>                                                   
+                                <button className="ModalButton" onClick={()=>{onConfirm()}}>Cancel</button>
                         </div>
-        </Modal>
-        </div>
+                      
+            </Modal>
+        </>
 
         
     );

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Modal from "../features/Modal/Modal";
 
 export default function AccountActivatedPage(){
     //const [activationResponse, setActivationResponse] = useState<String>("");
     const [activated, setActivated] = useState<"active" | "error" | "loading">("loading");
+    const navigate = useNavigate();
 
     useEffect(()=>{
         let params = new URLSearchParams(document.location.search);
@@ -29,8 +31,22 @@ export default function AccountActivatedPage(){
 
     },[]);
 
-    return <div className="AccountActivatedPage">
+    return <>
+    {/* 
+    <div className="AccountActivatedPage">
         {activated==="active"?  <span>Account has been successfully activated, please log in  <Link className="accountActivatedLoginLink" to="/login" title='Login'>here</Link></span> 
         : activated==="loading"?  <span>Loading</span> :  <span>Something went wrong</span>}
-    </div>
+        
+    </div>*/}
+                <Modal open={true} onClose={()=>{ navigate("/login", { replace: true });}}>
+                                <div className="DefaultModalTextWrapper ChangePasswordTextWrapper">
+                                    
+                                     {activated==="active"?<><h2>Account created</h2>  <p>Account has been successfully activated, please log in  <Link className="accountActivatedLoginLink" to="/login" title='Login'>here</Link></p> </> 
+                                    : activated==="loading"?  <p>Loading...</p> :  <p>Something went wrong</p>}
+                                </div>
+                                <div className="DefaultModalButtonWrapper ChangePasswordButtonWrapper">
+                                    <button className="ModalButton ChangePasswordOkButton" onClick={()=>{ navigate("/login", { replace: true });}}>Ok</button>
+                                </div>
+                </Modal>
+                </>
 }

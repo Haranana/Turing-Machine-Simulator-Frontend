@@ -3,6 +3,7 @@ import "./../../pages/login-page.css"
 import {EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid"
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 export default function ChangePassword(){
 
@@ -82,7 +83,7 @@ export default function ChangePassword(){
     return(
     <div className="LoginPageWrapper">
         <div className="login-page">
-            <h1 className="login-header">Recover password</h1>
+            <h1 className="login-header">Change password</h1>
             
             <form className="login-form" onSubmit={handleSubmit}>
                 <div className = "login-form-row">
@@ -119,6 +120,9 @@ export default function ChangePassword(){
                 value="Change password"
                 disabled={!initialValidationPassed}
                 />
+                </div>
+                                <div className="login-form-row login-signup">
+                    <span><Link className="login-signup-link" to="/login" title='Login'>return to login page</Link></span>
                 </div>
             </form>
         </div>

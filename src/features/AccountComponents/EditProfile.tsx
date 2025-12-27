@@ -50,8 +50,13 @@ export default function EditProfile(){
         }
     }
 
-    return <div className="AccountPageSubpage EditAccountSubpage">
+        function isAccountDataLoaded(){
+        return accountData!=null&& accountData.id != null && accountData.email != null && accountData.status != null && accountData.createdAt != null;
+    }
 
+    return <>
+    <div className="AccountPageSubpage EditAccountSubpage">
+     {isAccountDataLoaded() ? <>
         <div className="editProfileRow">
             <div className="editProfileTextField">
                 <p className="editProfileTextFieldTitle">Email: </p>
@@ -69,7 +74,11 @@ export default function EditProfile(){
         <div className="editProfileRow"><button className="editProfileButton changePasswordButton" onClick={onChangePasswordClicked}>Change password</button></div>
     
         <div className="editProfileRow"><button className="editProfileButton deleteAccountButton" onClick={onDeleteAccountClicked}>Delete account</button> </div>
+        </> : 
+        <div className="DataNotLoadedDiv">Error: Account data couldn't be loaded</div> }
         
+    </div>
+
         {/*<hr className='LineSeparator'></hr>*/}
         <Modal open={isChangePasswordModalOpen} onClose={()=>{setChangePasswordModalOpen(false)}}>
                         <div className="DefaultModalTextWrapper ChangePasswordTextWrapper">
@@ -89,5 +98,6 @@ export default function EditProfile(){
                             <button className="ModalButton DeleteAccountOkButton" onClick={()=>{setDeleteAccountModalOpen(false);}}>Ok</button>
                         </div>
         </Modal>
-    </div>
+
+    </>
 }
