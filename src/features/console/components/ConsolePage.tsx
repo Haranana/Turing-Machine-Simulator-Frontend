@@ -442,7 +442,8 @@ function validateModel(
       }
     })
 
-    const expectedUniqueTransitions = Math.pow(usedSymbols.size , tapesAmount);
+    const expectedSymbols = onlyTapeAlphabet? tapeAlphabet.length : usedSymbols.size;
+    const expectedUniqueTransitions = Math.pow(expectedSymbols , tapesAmount);
 
     let foundNonComplete = false;
     UniqueTransitionsPerState.forEach( (transitions,state) => {

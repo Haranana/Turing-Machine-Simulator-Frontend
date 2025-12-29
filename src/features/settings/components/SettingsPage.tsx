@@ -39,9 +39,9 @@ export default  function SettingsPage() {
     const [onlyInputAlphabetFieldValue , setOnlyInputAlphabetFieldValue] = useState<boolean>(onlyInputAlphabet);
     const [onlyStatesFromSetFieldValue , setOnlyStatesFromSetFieldValue] = useState<boolean>(onlyStatesFromSet);
 
-    const [tapeAlphabetDetailsOpen, setTapeAlphabetDetailsOpen] = useState<boolean>(onlyTapeAlphabet? true : false );
-    const [inputAlphabetDetailsOpen, setInputAlphabetDetailsOpen] = useState<boolean>(onlyInputAlphabet? true : false );
-    const [statesDetailsOpen, setStatesDetailsOpen] = useState<boolean>(onlyStatesFromSet? true : false );
+    const [tapeAlphabetDetailsOpen, setTapeAlphabetDetailsOpen] = useState<boolean>(false );
+    const [inputAlphabetDetailsOpen, setInputAlphabetDetailsOpen] = useState<boolean>(false );
+    const [statesDetailsOpen, setStatesDetailsOpen] = useState<boolean>(false );
 
     const [_, setSaveError] = useState<string | null>(null);
 
@@ -125,6 +125,14 @@ export default  function SettingsPage() {
 
         toast.success('Changes saved');
         setSaveError(null);
+    }
+
+    //adds blank to the alphabet if it's missing
+    const onTapeAlphabetSetFieldValue: (alp: string[]) => void = (alp: string[]) =>{
+        if(alp.find(v=>v.trim()==blank) == undefined){
+            alp.push(blank);
+        }
+        setTapeAlphabetFieldValue(alp);
     }
 
     return(
@@ -360,7 +368,7 @@ export default  function SettingsPage() {
                             defaultValues={tapeAlphabetFieldValue} 
                             defaultValuesMessage="Blank is included by default. Make sure that tape alphabet is overset of input alphabet" 
                             defaultInputMessage="Write alphabet elements here"
-                            onDataChanged={setTapeAlphabetFieldValue}></ChipList> : ""
+                            onDataChanged={ onTapeAlphabetSetFieldValue}></ChipList> : ""
                         }
 
                         <div className="SettingsTextFieldRow">

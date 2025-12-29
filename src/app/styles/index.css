@@ -1,6 +1,7 @@
 :root {
 
   --sidebar-width: 6rem;
+  --sidebar-height-mobile: 4.5rem;
 
   --box-shadow-dark: 3px 3px 7px 7px rgba(0, 0, 0, 0.316);
 
@@ -130,4 +131,12 @@ html[data-theme="dark"] {
    justify-content: center;
 
    margin: 20px;
+}
+
+@media (max-width: 768px){
+  .outlet-wrap{
+    padding-left: 0;
+    padding-top: var(--sidebar-height-mobile);
+    min-height: 100vh;
+  }
 }
