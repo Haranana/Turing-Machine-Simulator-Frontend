@@ -1,4 +1,4 @@
-import "@simulation/styles/simulation.css";
+import "@simulation/styles/Simulation.css";
 
 import { useState, useRef, useMemo, useEffect } from "react";
 
