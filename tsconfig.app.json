@@ -21,7 +21,32 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@features/*": ["src/features/*"],
+
+      "@account/*": ["src/features/account/*"],
+      "@auth/*": ["src/features/auth/*"],
+      "@console/*": ["src/features/console/*"],
+      "@search/*": ["src/features/search/*"],
+      "@settings/*": ["src/features/settings/*"],
+      "@tm/*": ["src/features/tm/*"],
+
+      "@simulation/*": ["src/features/tm/simulation/*"],
+      "@tree/*": ["src/features/tm/tree/*"],
+
+      "@api/*": ["src/shared/api/*"],
+      "@shared/*": ["src/shared/*"],
+      "@chiplist/*": ["src/shared/ui/chiplist/*"],
+      "@modal/*": ["src/shared/ui/modal/*"],
+      "@sidebar/*": ["src/shared/ui/sidebar/*"],
+      "@state/*": ["src/shared/state/*"],
+      "@sitemap/*": ["src/shared/ui/sitemap/*"]
+    }
+  
   },
   "include": ["src"]
 }
