@@ -36,6 +36,7 @@ export function SimulationNodeComponent(props : NodeProps<RfNode>){
     const [detailsVisible , setDetailVisible] = useState<boolean>(false);
     
     function prepareDetails() : transitionData {
+      
       const nodes = props.data.nodes;
       const currentNodeId = props.data.currentNode;
       const currentNode = nodes.get(currentNodeId)!;
@@ -58,16 +59,17 @@ export function SimulationNodeComponent(props : NodeProps<RfNode>){
       }else{
         currentNode.nextIds.forEach((childId)=>{
           const childNodeStep = nodes.get(childId)!.step;
-          let transition: string = "";
-          transition += childNodeStep[0].stateBefore + ", ";
 
+          let transition: string = "";
+          //transition += childNodeStep[0].stateBefore + ", ";
+          transition += nodes.get(childId)!.stateBefore + " , ";
           childNodeStep.forEach((tape)=>{
             transition+=tape.readChar+", ";
           });
           transition+=" => ";
 
-          transition += childNodeStep[0].stateAfter + ", ";
-
+          //transition += childNodeStep[0].stateAfter + ", ";
+          transition += nodes.get(childId)!.stateAfter + " , ";
           childNodeStep.forEach((tape)=>{
             transition+=tape.writtenChar+", ";
           });

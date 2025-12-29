@@ -1,3 +1,5 @@
+
+
 :root {
 
   --sidebar-width: 6rem;
@@ -73,8 +75,8 @@ html[data-theme="dark"] {
   --color-accent-hover: var(--accent-400);
   --color-accent-muted: var(--accent-950);
   --color-accent-transparent: #3c0764b0;
-}
 
+}
 
 
 #main-body{
