@@ -36,7 +36,7 @@ export class NdSimulation{
         Object.entries(newNodes).forEach(([k, nodeRecord]) => {
         const id = Number(k);
 
-        const revivedSteps: SimulationStep[] = nodeRecord.step.map(step => ({
+        const revivedSteps: SimulationStep[] = nodeRecord.steps.map(step => ({
             ...step,
             tapeBefore: reviveTapeState(step.tapeBefore),
         }));
@@ -99,6 +99,26 @@ export class NdSimulation{
         const steps : SimulationStep[] | null = this.nodes.get(this.path[stepId])==null? null : this.nodes.get(this.path[stepId])!.step; 
         return steps == null? null : steps[tapeId];
     }
+
+    getStateBeforeForStep(step: number) : string | null{
+        const stepId = step + 1;
+
+        if( !(stepId >=1 && stepId < this.path.length)) return null;
+
+        const state : string | null = this.nodes.get(this.path[stepId])==null? null : this.nodes.get(this.path[stepId])!.stateBefore; 
+        return state == null? null : state;
+    }
+
+    getStateAfterForStep(step: number) : string | null{
+        const stepId = step + 1;
+
+        if( !(stepId >=1 && stepId < this.path.length)) return null;
+
+        const state : string | null = this.nodes.get(this.path[stepId])==null? null : this.nodes.get(this.path[stepId])!.stateAfter; 
+        return state == null? null : state;
+    }
+
+
 
     getOutput(step: number) : string | null{
         const stepId = step + 1;
@@ -163,6 +183,12 @@ export class NdSimulation{
         if(this.isEmpty()) return null;
 
         return this.nodes.get(this.path[this.pathLength()])!.step[tapeId];
+    }
+
+    getLastState() : string | null{
+        if(this.isEmpty()) return null;
+
+        return this.nodes.get(this.path[this.pathLength()])!.stateAfter;
     }
 
 

@@ -189,18 +189,23 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   async function loadSimulation(){
 
     const simulationExport : SimulationExport = buildSimulationExport();
+    
     try{
+      
       const simulationNodeRecord : SimulationNodeRecord = await sendSimulation(simulationExport);
+     
       SchemaToSimulation(simulationNodeRecord);
+
       toast.success(`Simulation loaded successfully`);
     }catch(err){
       toast.error(`Error: simulation couldn't be loaded`);
+      console.log(err);
 
     }
   }
 
   function SchemaToSimulation(schema: SimulationNodeRecord){
-        stepRef.current = 0;
+    stepRef.current = 0;
     stepDirRef.current = 0;
     stateRef.current = initialState;
     outputRef.current = "";
@@ -411,15 +416,17 @@ useEffect(() => {
   if (nextStep >= stepsAmount()) {
 
     const last = simulation.getLastStep(0);
-    if (last && last.stateAfter) {
-      stateRef.current = last.stateAfter;
+    const lastState = simulation.getLastState();
+    if (last && lastState) {
+      stateRef.current = lastState;
     }
     setIsPlaying(false);
   } else {
   
     const currentStepNode = simulation.getStep(nextStep, 0);
+    const currentStepStateBefore = simulation.getStateBeforeForStep(nextStep)!;
     if (currentStepNode) {
-      stateRef.current = currentStepNode.stateBefore;
+      stateRef.current = currentStepStateBefore;
     }
   }
 
@@ -448,13 +455,15 @@ const doNextSimulationStep = () => {
 
   if (nextStep >= stepsAmount()) {
     const last = simulation.getLastStep(0);
-    if (last && last.stateAfter) {
-      stateRef.current = last.stateAfter;
+    const lastState = simulation.getLastState();
+    if (last && lastState) {
+      stateRef.current = lastState;
     }
   } else {
     const currentStepNode = simulation.getStep(nextStep, 0);
+    const currentStepStateBefore = simulation.getStateBeforeForStep(nextStep)!;
     if (currentStepNode) {
-      stateRef.current = currentStepNode.stateBefore;
+      stateRef.current = currentStepStateBefore;
     }
   }
 };
@@ -469,8 +478,9 @@ const doNextSimulationStep = () => {
 
     updateTape();
     stepRef.current=currentStep-1;
-    const currentStepNode = simulation.getStep(currentStep-1 , 0);
-    stateRef.current = currentStepNode!.stateBefore 
+    //const currentStepNode = simulation.getStep(currentStep-1 , 0);
+    const currentStepStateBefore = simulation.getStateBeforeForStep(currentStep-1)!;
+    stateRef.current = currentStepStateBefore;
   }
 
   function placeInputOnTape(newInput: string, tapeId: number)
@@ -554,13 +564,13 @@ const doNextSimulationStep = () => {
   const jumpToSimulation = (step: number) => {
     
     if(simulation == null || simulation.getSteps(step) == null) return;
-    const stepsNode : SimulationStep[]= simulation.getSteps(step)!;
+    const stepsNode : SimulationStep[] = simulation.getSteps(step)!;
 
     setIsPlaying(false);
     setAllIsAnimating(false);
 
     stepRef.current = step;
-    stateRef.current = stepsNode[0].stateBefore;
+    stateRef.current = simulation.getStateBeforeForStep(step)!;
     
     setTapeData(prev=>prev.map((_,i)=>({
       tapeState: stepsNode[i].tapeBefore,
@@ -579,11 +589,11 @@ const viewportStyle: React.CSSProperties = {
   width: `${(2 * tapeRadiusRef.current + 1) * cellPx}px`,
   height: `${cellPx + 2 * 8}px`,
 };
-  function getCurrentState(){
+  function getCurrentState() : string{
     if(simulation==null) return "";
     //const currentStep : number = stepRef.current;
     
-    const out = isCurrentStepLeaf()? simulation.getLastStep(0)!.stateAfter : stateRef.current;
+    const out = isCurrentStepLeaf()? simulation.getLastState()! : stateRef.current;
     return out;
     //return currentStep === stepsAmount()? simulation.getLastStep(0)!.stateAfter : stateRef.current;
   }

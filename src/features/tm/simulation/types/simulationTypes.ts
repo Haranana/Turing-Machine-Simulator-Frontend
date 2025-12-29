@@ -48,11 +48,9 @@ export type TapeStateRecord = z.infer<typeof TapeStateRecordSchema>;
 
 export const SimulationStepRecordSchema = z.object({
   tapeIndex: z.number(),
-  transitionAction: TransitionActionSchema,        // skoro i tak masz TransitionActionSchema
+  transitionAction: TransitionActionSchema,        
   readChar: z.string().nullable(),
-  writtenChar: z.string().nullable(),
-  stateBefore: StateNameSchema,                   // zamiast z.string()
-  stateAfter: StateNameSchema.nullable(),         // zamiast z.string().nullable()
+  writtenChar: z.string().nullable(),     
   tapeBefore: TapeStateRecordSchema,
 });
 
@@ -61,6 +59,7 @@ export type SimulationStepRecord = z.infer<typeof SimulationStepRecordSchema>;
 export const CreatedSimulationSchema = z.object({
   steps: z.array(z.array(SimulationStepRecordSchema)),
 });
+
 export type ReceiveSimulationDto = z.infer<typeof CreatedSimulationSchema>;
 
 export const NdTmStepSchema = z.object({
@@ -100,7 +99,9 @@ export const SimulationNodeSchema = z.object({
   id: z.number(),
   prevId: z.number().nullable(),
   nextIds: z.array(z.number()),
-  step: z.array(SimulationStepRecordSchema),
+  steps: z.array(SimulationStepRecordSchema),
+  stateBefore: StateNameSchema.nullable(),                  
+  stateAfter: StateNameSchema.nullable(),    
   output: z.string().nullable(),
 })
 
@@ -178,9 +179,7 @@ export type SimulationStep = {
   transitionAction: TransitionAction;
   readChar: string | null;
   writtenChar: string | null;
-  stateBefore: string;
-  stateAfter: string | null;
-  tapeBefore: TapeState; // <-- tu już Map
+  tapeBefore: TapeState; 
 };
 
 export type SimulationNode = {
@@ -188,5 +187,7 @@ export type SimulationNode = {
   prevId: number | null;
   nextIds: number[];
   step: SimulationStep[]; 
+  stateBefore: string | null;
+  stateAfter: string | null;
   output: string | null
 };

@@ -86,7 +86,7 @@ export async function sendSimulation(objToSend: SimulationExport) : Promise<Simu
   const simulationSendDto : SendSimulationDto = objToSendSchema.data;
 
   const payload = JSON.stringify(simulationSendDto);
-  const apiResponse = await fetch("http://localhost:9090/api/simulations/nd", {
+  const apiResponse = await fetch("http://localhost:9090/api/simulations", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: payload,
@@ -98,10 +98,10 @@ export async function sendSimulation(objToSend: SimulationExport) : Promise<Simu
 
   const responseJson = await apiResponse.json();
   console.log("got: ", responseJson);
-  return SimulationNodesRecordSchema.parse(responseJson.nodes); 
+  const out = SimulationNodesRecordSchema.parse(responseJson.nodes); 
+  console.log("after parse");
+  return out;
 }
-
-
 
 //Fetch wrapper with added authorization
 export function useApiFetch() {
