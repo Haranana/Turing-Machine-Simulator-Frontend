@@ -4,6 +4,7 @@ import {EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid"
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "@api/apiUtils";
 
 export default function ChangePassword(){
 
@@ -28,7 +29,7 @@ export default function ChangePassword(){
 
         try {
             const res = await fetch(
-            `http://localhost:9090/api/account/password/change?token=${encodeURIComponent(token)}`,
+            `${API_BASE_URL}/api/account/password/change?token=${encodeURIComponent(token)}`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

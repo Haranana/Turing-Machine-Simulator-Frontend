@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import Modal from "@modal/Modal";
 import { useAuth } from "@auth/hooks/AuthContext";
+import { API_BASE_URL } from "@api/apiUtils";
 
 
 export default function DeleteAccount(){
@@ -22,7 +23,7 @@ export default function DeleteAccount(){
         }
 
         try {
-            const res = await fetch(`http://localhost:9090/api/account/delete/confirm?token=${encodeURIComponent(token)}`, {
+            const res = await fetch(`${API_BASE_URL}/api/account/delete/confirm?token=${encodeURIComponent(token)}`, {
                 method: "POST",
             });
 

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from 'react-hot-toast';
 
 import { useAuth } from "@auth/hooks/AuthContext";
+import { API_BASE_URL } from "@api/apiUtils";
 
 export default function LoginPage(){
 
@@ -25,7 +26,7 @@ export default function LoginPage(){
         const passwordTrimmed = password1.trim();
 
         try {
-            const res : Response = await fetch(`http://localhost:9090/api/auth/login`, {
+            const res : Response = await fetch(`${API_BASE_URL}/api/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: emailTrimmed, password: passwordTrimmed }),

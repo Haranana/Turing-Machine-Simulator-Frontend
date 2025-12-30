@@ -7,6 +7,7 @@ import type { TuringMachineGetDto } from "@account/types/AccountDataTypes"
 import { useApiFetch } from "@api/apiUtils";
 import Modal from "@modal/Modal";
 import TuringMachineToLoadDetails from "@account/components/TmViewDetails";
+import { API_BASE_URL } from "@api/apiUtils";
 
 type inputProp = {tm: TuringMachineGetDto, tmId: number, handleDeleted: ()=>void, handleVisibilityChanged: ()=>void}
 
@@ -75,7 +76,7 @@ export default function TuringMachineToLoad(props: inputProp){
 
     async function deleteTuringMachine(){
         try{
-            const res = await apiFetch(`http://localhost:9090/api/tm/${props.tm.name}` , {
+            const res = await apiFetch(`${API_BASE_URL}/api/tm/${props.tm.name}` , {
                 method: "DELETE",
             })
             if(res.status == 200 || res.status == 204){
@@ -94,7 +95,7 @@ export default function TuringMachineToLoad(props: inputProp){
 
     async function changeVisibility(){
             try{
-            const res = await apiFetch(`http://localhost:9090/api/tm/visibility/${encodeURIComponent(props.tm.name)}` , {
+            const res = await apiFetch(`${API_BASE_URL}/api/tm/visibility/${encodeURIComponent(props.tm.name)}` , {
                 method: "POST",
             })
             if(res.status == 200){

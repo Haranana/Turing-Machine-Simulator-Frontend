@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 
 import Modal from "@modal/Modal";
+import { API_BASE_URL } from "@api/apiUtils";
 
 export default function SignUpPage(){
 
@@ -28,7 +29,7 @@ export default function SignUpPage(){
         //const pas2Trimmed = password2.trim();
 
         try {
-            const res = await fetch(`http://localhost:9090/api/auth/register`, {
+            const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: emailTrimmed, password: pas1Trimmed }),

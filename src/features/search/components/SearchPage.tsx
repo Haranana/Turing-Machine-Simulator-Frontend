@@ -6,6 +6,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 import { useTuringMachineData, useTuringMachineSettings } from "@state/GlobalData";
 import type { TuringMachineGetDto } from "@account/types/AccountDataTypes";
+import { API_BASE_URL } from "@api/apiUtils";
 
 export default function SearchPage(){
 
@@ -41,7 +42,7 @@ export default function SearchPage(){
 
     async function onSearchClicked(){
         try{
-            const res = await fetch( `http://localhost:9090/api/tm/public/${encodeURIComponent(inputRef.current)}` , {
+            const res = await fetch( `${API_BASE_URL}/api/tm/public/${encodeURIComponent(inputRef.current)}` , {
                 method: "GET",
             });
             if(res.ok){

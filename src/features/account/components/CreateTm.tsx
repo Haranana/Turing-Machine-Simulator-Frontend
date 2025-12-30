@@ -7,6 +7,7 @@ import { useApiFetch } from "@api/apiUtils";
 import Modal from "@modal/Modal";
 import type { TuringMachineEditDto, TuringMachineGetDto, TuringMachineSaveDto } from "@account/types/AccountDataTypes";
 import { useTuringMachineData, useTuringMachineSettings } from "@state/GlobalData";
+import { API_BASE_URL } from "@api/apiUtils";
 
 
 export default function SaveTuringMachine(){
@@ -107,7 +108,7 @@ function initialValidation(name: string, description: string) {
                     }
                 };
         try{
-            const res = await apiFetch("http://localhost:9090/api/tm" , {
+            const res = await apiFetch(`${API_BASE_URL}/api/tm` , {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(
@@ -193,7 +194,7 @@ function initialValidation(name: string, description: string) {
                     }
                 };
         try{
-            const res = await apiFetch("http://localhost:9090/api/tm/edit" , {
+            const res = await apiFetch(`${API_BASE_URL}/api/tm/edit` , {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(

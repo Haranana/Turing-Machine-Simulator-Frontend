@@ -5,7 +5,9 @@ import { SendSimulationDtoSchema, SimulationNodesRecordSchema, type SendSimulati
 import { useTuringMachineSettings, useTuringMachineData } from "@state/GlobalData.ts";
 import { useAuth } from "@auth/hooks/AuthContext";
 
-export const API_BASE = "http://localhost:9090";
+const v = import.meta.env.VITE_API_BASE_URL;
+if (!v) throw new Error("VITE_API_BASE_URL is not set");
+export const API_BASE_URL = v.replace(/\/+$/, "");
 
 function localCodeToGlobal(
   codeLines: string[],
@@ -86,7 +88,7 @@ export async function sendSimulation(objToSend: SimulationExport) : Promise<Simu
   const simulationSendDto : SendSimulationDto = objToSendSchema.data;
 
   const payload = JSON.stringify(simulationSendDto);
-  const apiResponse = await fetch("http://localhost:9090/api/simulations", {
+  const apiResponse = await fetch(`${API_BASE_URL}/api/simulations`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: payload,

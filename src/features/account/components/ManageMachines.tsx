@@ -7,6 +7,7 @@ import { useApiFetch } from "@api/apiUtils";
 import {type TuringMachineGetDto, type PageableQuery , type Page} from "@account/types/AccountDataTypes";
 import TuringMachineToLoad from "@account/components/TmView";
 import { useTuringMachineData } from "@state/GlobalData";
+import { API_BASE_URL } from "@api/apiUtils";
 
 export default function LoadTuringMachine(){
 
@@ -29,7 +30,7 @@ export default function LoadTuringMachine(){
                 sort: [{ property: sortByColumn, direction: sortType }]
             });
 
-            const res = await apiFetch(`http://localhost:9090/api/tm?${pq}`, {
+            const res = await apiFetch(`${API_BASE_URL}/api/tm?${pq}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
             });

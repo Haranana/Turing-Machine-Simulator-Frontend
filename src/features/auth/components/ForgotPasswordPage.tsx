@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from 'react-hot-toast';
 
 import Modal from "@modal/Modal";
+import { API_BASE_URL } from "@api/apiUtils";
 
 export default function ForgotPasswordPage(){
     const [email, setEmail] = useState<string>("");
@@ -18,7 +19,7 @@ export default function ForgotPasswordPage(){
         const emailTrimmed = email.trim();
 
         try {
-            const res = await fetch(`http://localhost:9090/api/account/password/token`, {
+            const res = await fetch(`${API_BASE_URL}/api/account/password/token`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: emailTrimmed}),

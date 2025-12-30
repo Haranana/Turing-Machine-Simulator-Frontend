@@ -13,6 +13,7 @@ import { AccountDataContext } from '../hooks/AccountDataContext.ts';
 import { ArrowRightStartOnRectangleIcon , ChevronUpIcon , ChevronDownIcon } from '@heroicons/react/24/solid';
 import { useTuringMachineData, useTuringMachineSettings } from '@state/GlobalData.ts';
 import type { TuringMachineEditDto } from '../types/AccountDataTypes.ts';
+import { API_BASE_URL } from "@api/apiUtils";
 
 export default  function AccountPage() {
 
@@ -37,7 +38,7 @@ export default  function AccountPage() {
     useEffect(()=>{
         const run = async ()=>{
             try {
-                const res = await apiFetch("http://localhost:9090/api/account", {method: "GET"})
+                const res = await apiFetch(`${API_BASE_URL}/api/account`, {method: "GET"})
                 if (res.status == 200 ) {
                     const data = (await res.json()) as AccountData;
                     setAccountData(data);
@@ -91,7 +92,7 @@ export default  function AccountPage() {
                 }};
 
                 try{
-                    const res = await apiFetch("http://localhost:9090/api/tm/edit" , {
+                    const res = await apiFetch(`${API_BASE_URL}/api/tm/edit` , {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(

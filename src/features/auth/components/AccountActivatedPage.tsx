@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import Modal from "@modal/Modal";
+import { API_BASE_URL } from "@api/apiUtils";
 
 export default function AccountActivatedPage(){
     //const [activationResponse, setActivationResponse] = useState<String>("");
@@ -18,7 +19,7 @@ export default function AccountActivatedPage(){
 
         const run = async ()=>{
             try {
-                const res = await fetch(`http://localhost:9090/api/account/activate?token=${encodeURIComponent(token)}`, {method: "POST"})
+                const res = await fetch(`${API_BASE_URL}/api/account/activate?token=${encodeURIComponent(token)}`, {method: "POST"})
                 if (res.status == 200 ) {
                     setActivated("active")
                 }else{

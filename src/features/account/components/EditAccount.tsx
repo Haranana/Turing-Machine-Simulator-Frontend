@@ -5,6 +5,7 @@ import { AccountDataContext } from "@account/hooks/AccountDataContext";
 import Modal from "@modal/Modal";
 import { useApiFetch } from "@api/apiUtils";
 import { dateToShowable } from "@account/components/TmView";
+import { API_BASE_URL } from "@api/apiUtils";
 
 export default function EditProfile(){
 
@@ -17,7 +18,7 @@ export default function EditProfile(){
         if (!accountData) return;
 
         try {
-            const res = await fetch("http://localhost:9090/api/account/password/token", {
+            const res = await fetch(`${API_BASE_URL}/api/account/password/token`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: accountData.email }),
@@ -37,7 +38,7 @@ export default function EditProfile(){
         if (!accountData) return;
 
         try {
-            const res = await apiFetch("http://localhost:9090/api/account/delete/token", {
+            const res = await apiFetch(`${API_BASE_URL}/api/account/delete/token`, {
                 method: "POST",
             });
 
