@@ -17,7 +17,7 @@ export default function ConsolePage() {
   const { symbolSeparator, transitionArrow, left, stay, right, blank } = useTuringMachineSettings(s=>s.aliases);
   const {onlyComplete, onlyTapeAlphabet, onlyStatesFromSet, tapeAlphabet, allowNondeterminism, statesSet } = useTuringMachineSettings(s=>s.specialSettings);
   const { tmDataProgram, setTmDataProgram, setTmDataProgramHasError, tmDataTapesAmount } = useTuringMachineData();
-  const {acceptState, rejectState} = useTuringMachineSettings(s=>s.specialStates);
+  const {acceptState, rejectState, initialState} = useTuringMachineSettings(s=>s.specialStates);
 
   function stripTerminators(lines: string[]): string[] {
     return lines.map(l => l.replace(/;\s*$/, ""));
@@ -402,6 +402,7 @@ function validateModel(
       reachableStates.add(line.stateAfter);
   })
 
+  reachableStates.add(initialState);
   usedStates.forEach((usedState,_)=>{
     if(!reachableStates.has(usedState.state)){
       markers.push({

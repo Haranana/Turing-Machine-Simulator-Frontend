@@ -100,10 +100,11 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     return simulation.pathLength();
   }
 
+  /*
   function isCurrentStepLeaf(){
     if(simulation == null) return false;
     return simulation.isLeaf(stepRef.current);
-  }
+  }*/
 
   function setAllIsAnimating(value: boolean){
     setIsAnimating(prev=>prev.map(()=>value));
@@ -414,6 +415,17 @@ useEffect(() => {
 
 
   if (nextStep >= stepsAmount()) {
+    if(!simulation.isLeaf(currentStep)){
+      toast(
+         "Reached branching in simulation tree.\nPlease choose which branch to follow\nin Tree subpage to continue simulation.",
+         {
+          style: {
+            textAlign: "center",
+          },
+          duration: 6000,          
+         }
+      )
+    }
 
     const last = simulation.getLastStep(0);
     const lastState = simulation.getLastState();
@@ -454,17 +466,33 @@ const doNextSimulationStep = () => {
   stepRef.current = nextStep;
 
   if (nextStep >= stepsAmount()) {
+    if(!simulation.isLeaf(currentStep)){
+      toast(
+         "Reached branching in simulation tree.\nPlease choose which branch to follow\nin Tree subpage to continue simulation.",
+         {
+          style: {
+            textAlign: "center",
+          },
+          duration: 6000,
+          
+         }
+
+      )
+    }
+
     const last = simulation.getLastStep(0);
     const lastState = simulation.getLastState();
     if (last && lastState) {
       stateRef.current = lastState;
     }
+   
   } else {
     const currentStepNode = simulation.getStep(nextStep, 0);
     const currentStepStateBefore = simulation.getStateBeforeForStep(nextStep)!;
     if (currentStepNode) {
       stateRef.current = currentStepStateBefore;
     }
+    
   }
 };
 
@@ -591,16 +619,13 @@ const viewportStyle: React.CSSProperties = {
 };
   function getCurrentState() : string{
     if(simulation==null) return "";
-    //const currentStep : number = stepRef.current;
-    
-    const out = isCurrentStepLeaf()? simulation.getLastState()! : stateRef.current;
+    const out = stateRef.current;
     return out;
-    //return currentStep === stepsAmount()? simulation.getLastStep(0)!.stateAfter : stateRef.current;
   }
 
-  function getCurrentOutput(_: number){
+  function getCurrentOutput(step : number){
     if(simulation==null) return "";
-    const out = simulation.getOutput(stepRef.current)
+    const out = simulation.getOutput(step-1)
     return out == null? "" : out;
   }
 
@@ -708,8 +733,8 @@ const viewportStyle: React.CSSProperties = {
             <ChevronLeftIcon/>
           </button>
         
-          <button className={`PlayButton tooltip SimulationControlsButton ${!isSimulationLoaded() || isPlaying? "DisabledButton" : ""}`} disabled={!isSimulationLoaded() || isPlaying}  onClick={playSimulation}
-          data-tooltip={!isSimulationLoaded()? "Simulation not loaded" : (isPlaying)? "Already playing" :  "Play simulation"}>
+          <button className={`PlayButton tooltip SimulationControlsButton ${!canMoveForward()? "DisabledButton" : ""}`} disabled={!canMoveForward()}  onClick={playSimulation}
+          data-tooltip={!isSimulationLoaded()? "Simulation not loaded" : isPlaying? "Already playing" : !canMoveForward()? "Cannot step forward"  :  "Play simulation"}>
             <PlayIcon />
           </button>
 
