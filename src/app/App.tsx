@@ -41,7 +41,7 @@ return (<>
             <Route path="login" element={<LoginPage/>}/>
               <Route path="signup" element={<SignUpPage/>} />
               <Route path="settings" element={<SettingsPage />} />
-              <Route path="activate" element={<AccountActivatedPage></AccountActivatedPage>} />
+              <Route path="activate/*" element={<AccountActivatedPage></AccountActivatedPage>} />
             </Route>
 
             <Route path="*" element={<NotFoundPage></NotFoundPage>} />

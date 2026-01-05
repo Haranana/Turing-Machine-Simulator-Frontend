@@ -83,7 +83,7 @@ export default function ConsolePage() {
     ],
       colors: {
         "editorCursor.foreground": "#919191ff",
-        "editor.foreground": cssVar("--color-text-muted"),
+        "editor.foreground": cssVar("--color-text"),
       },
     });
 

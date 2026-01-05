@@ -152,7 +152,7 @@ export default function SignUpPage(){
             <Modal open={isModalOpen} onClose={()=>{setIsModalOpen(false)}}>
                             <div className="DefaultModalTextWrapper ChangePasswordTextWrapper">
                                 <h2>Account created</h2>
-                                <p>To change log in your new account, please activate it by clicking link sent to your email</p>
+                                <p>To log in to your new account, please activate it by clicking link sent to your email</p>
                             </div>
                             <div className="DefaultModalButtonWrapper ChangePasswordButtonWrapper">
                                 <button className="ModalButton ChangePasswordOkButton" onClick={()=>{ navigate("/login", { replace: true });}}>Ok</button>
