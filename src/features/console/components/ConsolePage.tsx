@@ -61,11 +61,35 @@ export default function ConsolePage() {
     return lines.map(l=> (l.trimEnd().endsWith(';') || l.trim().length == 0 || l.trim().startsWith("//"))? l : l+";");
   }
 
+  function cssVar(name: string) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
   useEffect(() => {
     if (!monacoInstance) return;
 
+        // Theme
+    monacoInstance.editor.defineTheme("tm-theme", {
+      base: "vs",
+      inherit: true,
+      rules: [
+      { token: "comment",   foreground: "6A9955", fontStyle: "italic" }, // Comment green
+      { token: "function",  foreground: "C586C0", fontStyle: "bold"   }, // Action – purple
+      { token: "constant",  foreground: "D7BA7D"                       }, // Transition arrow  2 gold
+      { token: "string",    foreground: "2B91AF", fontStyle: "bold"   }, // States – turkus
+      { token: "variable",  foreground: "D16969"                       }, // Read and written symbol – red
+      { token: "delimiter", foreground: "C8C8C8"                       }, // Symbol separator (przecinek) – light gray
+      { token: "invalid",   foreground: "FF0000", fontStyle: "bold"   }, // Error
+    ],
+      colors: {
+        "editorCursor.foreground": "#919191ff",
+        "editor.foreground": cssVar("--color-text-muted"),
+      },
+    });
+
     monacoInstance.editor.setTheme("tm-theme");
     monacoInstance.languages.register({ id: LANGUAGE_ID });
+
     const reComment = /\/\/.*/;
     const reAction = new RegExp(
       `(${esc(left)}|${esc(stay)}|${esc(right)})`
@@ -84,23 +108,7 @@ export default function ConsolePage() {
     
     
 
-    // Theme
-    monacoInstance.editor.defineTheme("tm-theme", {
-      base: "vs",
-      inherit: true,
-      rules: [
-      { token: "comment",   foreground: "6A9955", fontStyle: "italic" }, // Comment green
-      { token: "function",  foreground: "C586C0", fontStyle: "bold"   }, // Action – purple
-      { token: "constant",  foreground: "D7BA7D"                       }, // Transition arrow  2 gold
-      { token: "string",    foreground: "2B91AF", fontStyle: "bold"   }, // States – turkus
-      { token: "variable",  foreground: "D16969"                       }, // Read and written symbol – red
-      { token: "delimiter", foreground: "C8C8C8"                       }, // Symbol separator (przecinek) – light gray
-      { token: "invalid",   foreground: "FF0000", fontStyle: "bold"   }, // Error
-    ],
-      colors: {
-        "editorCursor.foreground": "#919191ff",
-      },
-    });
+
 
     const disp = monacoInstance.languages.registerCompletionItemProvider(LANGUAGE_ID, {
       triggerCharacters: [symbolSeparator, transitionArrow, " "],
@@ -154,12 +162,14 @@ export default function ConsolePage() {
 
       let stateSuggestions : monaco.languages.CompletionItem[] = [];
       for (const state of states) {
-        stateSuggestions.push({
-          label: state,
-          kind: monacoInstance.languages.CompletionItemKind.EnumMember,
-          insertText: state,
-          range,
-        });
+        if(state!= acceptState && state!=rejectState && state!=initialState){
+          stateSuggestions.push({
+            label: state,
+            kind: monacoInstance.languages.CompletionItemKind.EnumMember,
+            insertText: state,
+            range,
+          });
+        }
       }
 
       const acceptSuggestion : monaco.languages.CompletionItem = {
@@ -170,31 +180,32 @@ export default function ConsolePage() {
       }
 
       const initSuggestion : monaco.languages.CompletionItem = {
-        label: acceptState,
+        label: initialState,
         kind: monacoInstance.languages.CompletionItemKind.EnumMember,
-        insertText: acceptState,
+        insertText: initialState,
         range,
       }
 
       const rejectSuggestion: monaco.languages.CompletionItem | null = rejectState? {
-        label: acceptState,
+        label: rejectState,
         kind: monacoInstance.languages.CompletionItemKind.EnumMember,
-        insertText: acceptState,
+        insertText: rejectState,
         range,
       } : null;
 
       
       symbols.add(blank);
       let symbolSuggestions : monaco.languages.CompletionItem[] = [];
-      if(onlyTapeAlphabet){
-      for (const symbol of symbols) {
-        symbolSuggestions.push({
-          label: symbol,
-          kind: monacoInstance.languages.CompletionItemKind.Variable,
-          insertText: symbol,
-          range,
-        });
-      }}else{
+      if(!onlyTapeAlphabet){
+        for (const symbol of symbols) {
+          symbolSuggestions.push({
+            label: symbol,
+            kind: monacoInstance.languages.CompletionItemKind.Variable,
+            insertText: symbol,
+            range,
+          });
+        }
+      }else{
         tapeAlphabet.forEach(symbol => {
             symbolSuggestions.push({
             label: symbol,
@@ -224,7 +235,7 @@ export default function ConsolePage() {
         case "stateBefore":
           return {suggestions: [...stateSuggestions, initSuggestion]};
         case "stateAfter":
-          return {suggestions:  rejectSuggestion? [...stateSuggestions, acceptSuggestion,rejectSuggestion] : [...stateSuggestions, acceptSuggestion] };
+          return {suggestions:  rejectSuggestion? [...stateSuggestions, acceptSuggestion, rejectSuggestion] : [...stateSuggestions, acceptSuggestion] };
         case "read":
           return {suggestions: symbolSuggestions};
         case "write":
