@@ -116,7 +116,7 @@ export function SimulationNodeComponentDetails( {transitions , isLeaf, output, o
           isLeaf? <p className='SimulationNodeDetailsRowText TextOutput'>Output: {output}</p> :
           Array.from(transitions.entries()).map(([k,v])=>
             <div key={k} className='SimulationNodeDetailsRow' onClick={()=>{
-             console.log("[compDet]: wybrano: ",{k}); onTransitionChosen(k);
+              onTransitionChosen(k);
             }}><p className="SimulationNodeDetailsRowText">{k}: {v}</p></div>
           )
         }
