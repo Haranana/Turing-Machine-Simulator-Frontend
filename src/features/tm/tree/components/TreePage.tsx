@@ -36,7 +36,6 @@ export default function TreePage(){
   useEffect(() => {
     if(!simulationDataNodes) return;
     const newSimulation = new NdSimulation(simulationDataNodes)
-    //console.log("current path: ", simulationPath);
     setSimulation(newSimulation);
 
     const startingGraphData = simulationToGraphChildren(newSimulation);
@@ -130,7 +129,6 @@ export default function TreePage(){
   }, [setNodes, setEdges, simulationDataNodes]);
 
   function updateNodesAndEdgedClasses(selectedNodes: Map<number, boolean> , selectedEdges: Map<number, boolean>){
-    console.log("updateNodesAndEdgedClasses,  selectedNodes: ", selectedNodes, "\nselectedEdges: ", selectedEdges )
         setNodes(prev =>
     prev.map(n => {
       const selected = selectedNodes.get(Number(n.id)) === true;
@@ -211,25 +209,12 @@ export default function TreePage(){
   return selected;
 }
 
-/*
-  function isNodeSelected(nodeId: number) {
-  return selectedNodesAndEdges.nodes.get(nodeId) === true;
-}
-
-  function isEdgeSelected(edgeId: number) {
-    return selectedNodesAndEdges.edges.get(edgeId) === true;
-  }
-*/
-
   //creates path based on chosen transition
     //any transition can be selected, so each time onTransitionChosen is called
     //path must be cleared and build from the root
     const onTransitionChosen = (nodesMapChildId: number) => {
-      console.log("[otc]: chosen:", nodesMapChildId);
 
-     
       if(simulationDataNodes==null){
-        console.log("simulation is null lmao");
         return;
       }
        const simulation = new NdSimulation(simulationDataNodes);
@@ -263,8 +248,6 @@ export default function TreePage(){
         const tIn = newPath.includes(targetId);
         return sIn && tIn;
       };
-
-      console.log("graphData: ", graphData);
 
       graphData.current.children.forEach((node)=>{
         if(nodeInPath(node.id)) nodes.set(node.id, true);

@@ -200,8 +200,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
       toast.success(`Simulation loaded successfully`);
     }catch(err){
       toast.error(`Error: simulation couldn't be loaded`);
-      console.log(err);
-
     }
   }
 

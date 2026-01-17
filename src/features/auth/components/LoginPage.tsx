@@ -49,7 +49,6 @@ export default function LoginPage(){
                 expiresInSeconds: number;
             };
 
-            //console.log("login with: ", rememberMe);
             login(data.accessToken, data.tokenType, data.expiresInSeconds, rememberMe);
             navigate("/account", { replace: true });
             } catch (e: any) {

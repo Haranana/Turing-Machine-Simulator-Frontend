@@ -45,8 +45,7 @@ export default function SearchPage(){
             const res = await fetch( `${API_BASE_URL}/api/tm/public/${encodeURIComponent(inputRef.current)}` , {
                 method: "GET",
             });
-            if(res.ok){
-                console.log("got machines: ", res.status);
+            if(res.ok){               
                 const tm: TuringMachineGetDto = await res.json();
                 await loadSimulation(tm);
                 
@@ -78,10 +77,10 @@ export default function SearchPage(){
         } 
         setTmDataTapesInputs(clearInput);
 
-        setAllowMultipleTapes(tm.specialSettings.allowMultipleTapes)
-        setAllowNondeterminism(tm.specialSettings.allowNondeterminism)
-        setOnlyComplete(tm.specialSettings.onlyComplete)
-        setRejectOnNonAccept(tm.specialSettings.allowMultipleTapes)
+        setAllowMultipleTapes(tm.specialSettings.allowMultipleTapes);
+        setAllowNondeterminism(tm.specialSettings.allowNondeterminism);
+        setOnlyComplete(tm.specialSettings.onlyComplete);
+        setRejectOnNonAccept(tm.specialSettings.rejectOnNonAccept);
         
         setOnlyInputAlphabet(tm.specialSettings.onlyInputAlphabet);
         setOnlyTapeAlphabet(tm.specialSettings.onlyTapeAlphabet);

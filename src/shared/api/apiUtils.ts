@@ -99,9 +99,7 @@ export async function sendSimulation(objToSend: SimulationExport) : Promise<Simu
   }
 
   const responseJson = await apiResponse.json();
-  console.log("got: ", responseJson);
   const out = SimulationNodesRecordSchema.parse(responseJson.nodes); 
-  console.log("after parse");
   return out;
 }
 

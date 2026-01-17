@@ -106,10 +106,6 @@
   cursor: pointer;
 }
 
-.JumpToButton.DisabledButton{
-  /*background-color: var(--color-accent-transparent);*/
-}
-
 .JumpToButton.DisabledButton:hover{
   cursor: default;
 }
@@ -154,9 +150,6 @@
 .SimulationControlsButton.DisabledButton{
   background-color: var(--color-extreme);
   cursor: default;
-}
-
-.SimulationControlsButton:hover{
 }
 
 .SpeedControls{
