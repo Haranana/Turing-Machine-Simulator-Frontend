@@ -155,7 +155,7 @@ export default function SignUpPage(){
                                 <p>To log in to your new account, please activate it by clicking link sent to your email</p>
                             </div>
                             <div className="DefaultModalButtonWrapper ChangePasswordButtonWrapper">
-                                <button className="ModalButton ChangePasswordOkButton" onClick={()=>{ navigate("/login", { replace: true });}}>Ok</button>
+                                <button className="ModalButton ChangePasswordOkButton" onClick={()=>{ navigate("/app/login", { replace: true });}}>Ok</button>
                             </div>
             </Modal>
             </>

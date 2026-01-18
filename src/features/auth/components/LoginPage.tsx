@@ -50,7 +50,7 @@ export default function LoginPage(){
             };
 
             login(data.accessToken, data.tokenType, data.expiresInSeconds, rememberMe);
-            navigate("/account", { replace: true });
+            navigate("/app/account", { replace: true });
             } catch (e: any) {
                 toast.error(e?.message);
             } 

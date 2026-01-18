@@ -40,14 +40,14 @@ export default function AccountActivatedPage(){
         : activated==="loading"?  <span>Loading</span> :  <span>Something went wrong</span>}
         
     </div>*/}
-                <Modal open={true} onClose={()=>{ navigate("/login", { replace: true });}}>
+                <Modal open={true} onClose={()=>{ navigate("/app/login", { replace: true });}}>
                                 <div className="DefaultModalTextWrapper ChangePasswordTextWrapper">
                                     
                                      {activated==="active"?<><h2>Account created</h2>  <p>Account has been successfully activated, please log in  <Link className="accountActivatedLoginLink" to="/login" title='Login'>here</Link></p> </> 
                                     : activated==="loading"?  <p>Loading...</p> :  <p>Something went wrong</p>}
                                 </div>
                                 <div className="DefaultModalButtonWrapper ChangePasswordButtonWrapper">
-                                    <button className="ModalButton ChangePasswordOkButton" onClick={()=>{ navigate("/login", { replace: true });}}>Ok</button>
+                                    <button className="ModalButton ChangePasswordOkButton" onClick={()=>{ navigate("/app/login", { replace: true });}}>Ok</button>
                                 </div>
                 </Modal>
                 </>

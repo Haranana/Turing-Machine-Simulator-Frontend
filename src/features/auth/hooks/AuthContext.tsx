@@ -13,6 +13,8 @@ const AuthContext = createContext<AuthState | null>(null);
 
 const STORAGE_KEY = "auth";
 
+const isBrowser = typeof window !== "undefined";
+
 type StoredAuth = {
   token: string;
   tokenType: string;
@@ -20,6 +22,8 @@ type StoredAuth = {
 };
 
 function loadAuth(): { token: string | null; tokenType: string | null; expiresAt: number | null;} {
+  if (!isBrowser) return { token: null, tokenType: null, expiresAt: null };
+  
   try {
 
     const raw = sessionStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(STORAGE_KEY);

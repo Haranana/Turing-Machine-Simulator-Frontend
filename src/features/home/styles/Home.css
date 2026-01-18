@@ -1,0 +1,46 @@
+.home{
+    background-color: var(--color-extreme);
+    
+    width: 100%;
+    min-height: 100vh;
+    margin-bottom: 40px;
+
+    font-family: var(--font-1);
+    color: var(--color-text);
+
+    display: flex;
+    flex-direction: column;
+}
+
+.home h1{
+    font-family: var(--font-1);
+    margin-top: 20;
+    margin-bottom: 20;
+    font-size: 400%;
+    text-align: center;
+}
+
+.home .HomeSegment{
+    display: flex;
+    flex-direction: row;
+    
+    margin-top: 8vh;
+    margin-bottom: 4vh;
+}
+
+.home .SegmentTitle{
+    font-family: var(--font-1);
+    font-size: 2.5rem;
+    margin: 0;
+}
+
+.home .SegmentDescription{
+    font-size: 1.2rem;
+}
+
+.home .SegmentSecondColumn{
+    flex: 1;
+    margin-top: 5vh;
+    display: flex;
+    flex-direction: column;
+}

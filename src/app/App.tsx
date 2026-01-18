@@ -19,14 +19,20 @@ import ChangePassword from '@account/components/ChangePassword'
 import DeleteAccount from '@account/components/DeleteAccountConfirm'
 import SearchPage from '@search/components/SearchPage'
 import ForgotPasswordPage from '@auth/components/ForgotPasswordPage'
+import HomePage from '@features/home/components/HomePage';
+import AboutPage from '@features/about/components/AboutPage';
 
 export default  function App() {
+  const isBrowser = typeof window !== "undefined";
+
 return (<>
       <div className="content">
           <Routes>
-            <Route path = "/" element={<Layout/>}>
+            <Route path = "/" element={<HomePage/>}></Route>
+            <Route path = "/app" element={<Layout/>}>
               <Route index element={<SimulatorPage />} />
-              <Route path="index" element={<SimulatorPage />} />
+              <Route path="simulation" element={<SimulatorPage />} />
+              <Route path='about' element={<AboutPage/>} />
               <Route path="console" element={<ConsolePage />} />
               <Route path="tree" element={<TreePage></TreePage>}/>
               <Route path="forgotPassword" element={<ForgotPasswordPage/>}/>
@@ -38,7 +44,7 @@ return (<>
                 <Route path="account" element={<AccountPage/>} />
               </Route>
 
-            <Route path="login" element={<LoginPage/>}/>
+              <Route path="login" element={<LoginPage/>}/>
               <Route path="signup" element={<SignUpPage/>} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="activate/*" element={<AccountActivatedPage></AccountActivatedPage>} />
@@ -47,7 +53,7 @@ return (<>
             <Route path="*" element={<NotFoundPage></NotFoundPage>} />
           </Routes>
       </div>
-    <Toaster
+    {isBrowser && <Toaster
         position="top-right"
         toastOptions={{
         className: 'Toast',
@@ -64,7 +70,7 @@ return (<>
         success: { className: 'Toast Toast--success' },
         error:   { className: 'Toast Toast--error' },
       }}
-      />
+      />}
     </>
   );
 }
