@@ -3,7 +3,7 @@
     
     width: 100%;
     min-height: 100vh;
-    margin-bottom: 40px;
+    padding-bottom: 40px;
 
     font-family: var(--font-1);
     color: var(--color-text);
@@ -12,12 +12,42 @@
     flex-direction: column;
 }
 
+.home .SegmentOnlyColumn{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+}
+
+.home .linkButton{
+    background-color: var(--color-accent);
+    color: white;
+    padding: 10px;
+    border-radius: var(--border-radius-strong);
+    margin-left: 20px;
+    margin-right: 20px;
+    text-decoration: none;
+    text-align: center;
+    min-width: 80px;
+
+}
+.home .SecondColumnImage{
+ width: 70%;
+ min-width: 240px;
+}
+
+.home .SaveLoadShareIcon{
+    color: var(--color-text);
+}
+
 .home h1{
     font-family: var(--font-1);
     margin-top: 20;
     margin-bottom: 20;
-    font-size: 400%;
+    font-size: clamp(2rem, 5vw + 1rem, 5rem);
     text-align: center;
+    text-decoration: underline;
+    text-decoration-thickness: 6px;
 }
 
 .home .HomeSegment{
@@ -28,9 +58,12 @@
     margin-bottom: 4vh;
 }
 
+
+
 .home .SegmentTitle{
+    text-align: center;
     font-family: var(--font-1);
-    font-size: 2.5rem;
+    font-size: clamp(1rem, 5vw + 0.4rem, 2.5rem);
     margin: 0;
 }
 
@@ -39,8 +72,30 @@
 }
 
 .home .SegmentSecondColumn{
+    margin-top: 0px;
     flex: 1;
-    margin-top: 5vh;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10%;
+    margin-left: 5%;
+
+}
+
+.home .SegmentFirstColumn{
+        padding-top: 0;
+    width: 35%;
+    margin-left: 10%;
+    margin-right: 5%;
+}
+
+@media (max-width: 800px){
+    .home .HomeSegment{
+        flex-direction: column;
+    }
+
+    .home .SegmentFirstColumn{
+        width: 80%;
+    }
 }
