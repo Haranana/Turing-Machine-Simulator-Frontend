@@ -539,8 +539,10 @@ const doNextSimulationStep = () => {
   function enterInput(tapeId: number){
     if(validateInput(tapeInputRef.current[tapeId], tapeId)){
 
-    setTmDataTapesInputs(tapeInputRef.current);
+      setTmDataTapesInputs(tapeInputRef.current);
       placeInputOnTape(tapeInputRef.current[tapeId], tapeId);
+    }else{
+      toast.error("Incorrect Input, make sure it's compatible with input alphabet");
     }
   }
 
