@@ -12,16 +12,10 @@ import { SaveLoadShareIcon } from "@shared/ui/icons/SaveLoadShare";
 export default function HomePage() {
   const [theme] = useState<Theme>(() => getInitialTheme());
 
-    useEffect(() => {
-        
+    useEffect(() => {        
         document.documentElement.dataset.theme = theme;
         window.localStorage.setItem(THEME_KEY, theme);
     }, [theme]);
-
-    /*
-    function onDontShowThisAgainClicked(){
-      //todo
-    }*/
 
    return(
         <main className='home'>
@@ -30,7 +24,7 @@ export default function HomePage() {
               <div className='SegmentOnlyColumn'>
                 <a className="linkButton" href="/app/simulation">Open simulator</a>              
                 <a className="linkButton" href="/app/about">Learn more</a>
-                {/*<a className="primaryButton" onClick={onDontShowThisAgainClicked} href="/app/simulation">Open simulator and never show this page again</a>*/}
+            
               </div>
             </nav>
                 <section className='HomeSegment'>
