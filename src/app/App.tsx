@@ -1,7 +1,7 @@
 
 import '@app/styles/index.css'
 
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast';
 
 import SimulatorPage from '@tm/simulation/components/SimulatorPage'
@@ -23,8 +23,11 @@ import ForgotPasswordPage from '@auth/components/ForgotPasswordPage'
 export default  function App() {
 return (<>
       <div className="content">
+
           <Routes>
-            <Route path = "/" element={<Layout/>}>
+            <Route path="*" element={<Navigate to="/app" replace />} />
+            
+            <Route path = "/app" element={<Layout/>}>
               <Route index element={<SimulatorPage />} />
               <Route path="index" element={<SimulatorPage />} />
               <Route path="console" element={<ConsolePage />} />
@@ -38,7 +41,7 @@ return (<>
                 <Route path="account" element={<AccountPage/>} />
               </Route>
 
-            <Route path="login" element={<LoginPage/>}/>
+              <Route path="login" element={<LoginPage/>}/>
               <Route path="signup" element={<SignUpPage/>} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="activate/*" element={<AccountActivatedPage></AccountActivatedPage>} />

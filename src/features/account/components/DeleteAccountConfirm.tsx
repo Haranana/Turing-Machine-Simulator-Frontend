@@ -51,18 +51,18 @@ export default function DeleteAccount(){
                         
                             {deletionResult==="successful"?  
                                 <div className="DefaultModalTextWrapper"> <h2>Account has been successfully deleted</h2>
-                                <p>Return to login page by clicking <Link className="DeleteAccountConfirmIndexLink" to="/login" title='index'>here</Link></p>
+                                <p>Return to login page by clicking <Link className="DeleteAccountConfirmIndexLink" to="/app/login" title='index'>here</Link></p>
                                  </div>
                             : deletionResult==="error"?
                             <div className="DefaultModalTextWrapper"> <h2>Account couldn't be deleted</h2>
-                            <p>Return to login page by clicking <Link className="DeleteAccountConfirmIndexLink" to="/login" title='index'>here</Link></p> 
+                            <p>Return to login page by clicking <Link className="DeleteAccountConfirmIndexLink" to="/app/login" title='index'>here</Link></p> 
                             </div>
                             :  deletionResult==="loading"? 
                             <div className="DefaultModalTextWrapper"> <h2>Loading...</h2> </div>
                             : <div className="DefaultModalTextWrapper"> <h2>Account deletion stopped</h2>
-                            <p>Return to login page by clicking <Link className="DeleteAccountConfirmIndexLink" to="/login" title='index'>here</Link></p>  </div>}                        
+                            <p>Return to login page by clicking <Link className="DeleteAccountConfirmIndexLink" to="/app/login" title='index'>here</Link></p>  </div>}                        
                         <div className="DefaultModalButtonWrapper">                           
-                                <button className="ModalButton " onClick={()=>{ navigate("/login", { replace: true });}}>Ok</button>                                                   
+                                <button className="ModalButton " onClick={()=>{ navigate("/app/login", { replace: true });}}>Ok</button>                                                   
                         </div>
                       
             </Modal>
