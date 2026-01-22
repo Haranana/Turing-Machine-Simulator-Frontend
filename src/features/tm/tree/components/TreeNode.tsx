@@ -40,7 +40,8 @@ export function SimulationNodeComponent(props : NodeProps<RfNode>){
       const nodes = props.data.nodes;
       const currentNodeId = props.data.currentNode;
       const currentNode = nodes.get(currentNodeId)!;
-      let out: transitionData = {transitions: new Map<number, string>(), isLeaf: false, output: "", onTransitionChosen: props.data.onTransitionChosen};
+      
+      let out: transitionData = {transitions: new Map<number, string>(), thisNodeId: currentNode.id, isLeaf: false, output: "", onTransitionChosen: props.data.onTransitionChosen};
 
       const isLeaf = currentNode.nextIds.length === 0;
       out.isLeaf = isLeaf;
@@ -105,20 +106,37 @@ export function SimulationNodeComponent(props : NodeProps<RfNode>){
 //viewable data can be list of transitions or in case of leaf an output
 export type transitionData = {
   onTransitionChosen: (id: number)=>void;
+  thisNodeId: number;
   transitions: Map<number, string>; //<id of node , viewable transition>
   isLeaf: boolean;
   output: string;
 }
-export function SimulationNodeComponentDetails( {transitions , isLeaf, output, onTransitionChosen}: transitionData ){
+export function SimulationNodeComponentDetails( {transitions ,thisNodeId, isLeaf, output, onTransitionChosen}: transitionData ){
 
-    return <div className={`SimulationNodeDetails ${isLeaf? "OutputDetails" : ""} `}>
-        {
-          isLeaf? <p className='SimulationNodeDetailsRowText TextOutput'>Output: {output}</p> :
-          Array.from(transitions.entries()).map(([k,v])=>
-            <div key={k} className='SimulationNodeDetailsRow' onClick={()=>{
-              onTransitionChosen(k);
-            }}><p className="SimulationNodeDetailsRowText">{k}: {v}</p></div>
-          )
-        }
-    </div>
+    return isLeaf ? (
+      <div className="SimulationNodeDetails">
+        <div className="SimulationNodeDetailsRow OutputDetailsRow">
+          <p className="SimulationNodeDetailsRowText TextOutput">Output: {output}</p>
+        </div>
+          <div
+            className="SimulationNodeDetailsRow"
+            onClick={() => {console.log(thisNodeId);onTransitionChosen(thisNodeId) }}>
+              <p className="SimulationNodeDetailsRowText">Choose this branch</p>
+          </div>
+      </div>
+    ) : (
+      <div className="SimulationNodeDetails">
+        {Array.from(transitions.entries()).map(([k, v], i) => (
+          <div
+            key={k}
+            className="SimulationNodeDetailsRow"
+            onClick={() => {console.log(thisNodeId);onTransitionChosen(k)}}
+          >
+            <p className="SimulationNodeDetailsRowText">
+              {i + 1}: {v}
+            </p>
+          </div>
+        ))}
+      </div>
+    );
 }

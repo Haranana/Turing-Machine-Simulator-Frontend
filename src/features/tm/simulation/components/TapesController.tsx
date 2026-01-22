@@ -194,7 +194,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
     try{
       
       const simulationNodeRecord : SimulationNodeRecord = await sendSimulation(simulationExport);
-     
+    
       SchemaToSimulation(simulationNodeRecord);
 
       toast.success(`Simulation loaded successfully`);
