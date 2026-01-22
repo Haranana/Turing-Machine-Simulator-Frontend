@@ -83,6 +83,12 @@ export default  function SettingsPage() {
             return;
         }
 
+        if(trimmedSymbolSeparator === trimmedTransitionArrow){
+            toast.error('Changes couldn\'t be saved\nSymbol separator and transition arrow must be different');
+            setSaveError("Symbol separator and transition arrow must be different");
+            return;
+        }
+
         let statesSetWithSpecialStates = [...statesSetFieldValue];
         if(!statesSetFieldValue.includes(trimmedInitial)){
             statesSetWithSpecialStates.push(trimmedInitial);
