@@ -1,16 +1,213 @@
 <!doctype html>
-<html lang="en">
-  <head >
+<html lang="en" data-theme="light">
+  <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/src/assets/favicon.svg" type="image/svg+xml">
+
+    <title>TuringSim — online Turing machine simulator</title>
+    <meta
+      name="description"
+      content="Online Turing machine simulator: multitape, nondeterminism, configurable syntax, saving and sharing machines."
+    />
+
+    <meta property="og:title" content="TuringSim — online Turing machine simulator" />
+    <meta
+      property="og:description"
+      content="Online Turing machine simulator: multitape, nondeterminism, configurable syntax, saving and sharing machines."
+    />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-    <title>TuringSim</title>
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/src/features/home/styles/Home.css" />
   </head>
+
   <body id="main-body">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <main class="home">
+      <h1>Turing machine simulator</h1>
+
+      <nav class="HomeNav">
+        <div class="SegmentOnlyColumn">
+          <a class="linkButton" href="/app/simulation">Open simulator</a>
+          <a class="linkButton" href="/app/about">Learn more</a>
+        </div>
+      </nav>
+
+      <section class="HomeSegment">
+        <div class="SegmentFirstColumn">
+          <h2 class="SegmentTitle">Nondeterministic and multitape machines</h2>
+          <p class="SegmentDescription">
+            Make your machines with up to 8 tapes and nondeterministic. Choose which branch of machine calculation tree to follow.
+          </p>
+        </div>
+
+        <div class="SegmentSecondColumn">
+
+          <img
+            class="TapesImage SecondColumnImage only-light"
+            src="/tapesLightTransparent.png"
+            alt="Image of machine tapes"
+          />
+          <img
+            class="TapesImage SecondColumnImage only-dark"
+            src="/tapesDarkTransparent.png"
+            alt="Image of machine tapes"
+          />
+        </div>
+      </section>
+
+      <hr class="LineSeparator" />
+
+      <section class="HomeSegment">
+        <div class="SegmentFirstColumn">
+          <h2 class="SegmentTitle">Save, load and share your machines</h2>
+          <p class="SegmentDescription">
+            Register an account to be able to save your machines and load them any time you want. Share them by generating 5 characters share codes.
+          </p>
+        </div>
+
+        <div class="SegmentSecondColumn">
+
+           <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="203"
+            height="193"
+            viewBox="0 0 203 193"
+            class="SaveLoadShareIcon"
+            style="color: currentColor; background: transparent;"
+            role="img"
+            aria-label="Save, load and share"
+          >
+            <title>Save, load and share</title>
+
+            <ellipse
+              cx="161"
+              cy="121"
+              rx="40"
+              ry="40"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+            />
+            <ellipse
+              cx="71"
+              cy="41"
+              rx="40"
+              ry="40"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+            />
+            <ellipse
+              cx="41"
+              cy="151"
+              rx="40"
+              ry="40"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+            />
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="50"
+              height="50"
+              viewBox="3 3 18 18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              x="46"
+              y="16"
+            >
+              <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+              <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" />
+              <path d="M7 3v4a1 1 0 0 0 1 1h7" />
+            </svg>
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="42.78"
+              height="55"
+              viewBox="5 3 14 18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              x="19.61"
+              y="123.5"
+            >
+              <path d="M12 17V3" />
+              <path d="m6 11 6 6 6-6" />
+              <path d="M19 21H5" />
+            </svg>
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="50"
+              height="50"
+              viewBox="2.25 2.25 19.5 19.5"
+              fill="none"
+              x="136"
+              y="96"
+            >
+              <path
+                d="M8.68439 10.6578L15.3124 7.34378M15.3156 16.6578L8.69379 13.3469M21 6C21 7.65685 19.6569 9 18 9C16.3431 9 15 7.65685 15 6C15 4.34315 16.3431 3 18 3C19.6569 3 21 4.34315 21 6ZM9 12C9 13.6569 7.65685 15 6 15C4.34315 15 3 13.6569 3 12C3 10.3431 4.34315 9 6 9C7.65685 9 9 10.3431 9 12ZM21 18C21 19.6569 19.6569 21 18 21C16.3431 21 15 19.6569 15 18C15 16.3431 16.3431 15 18 15C19.6569 15 21 16.3431 21 18Z"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+            </svg>
+          </svg>
+        </div>
+      </section>
+
+      <hr class="LineSeparator" />
+
+      <section class="HomeSegment">
+        <div class="SegmentFirstColumn">
+          <h2 class="SegmentTitle">Customize program syntax</h2>
+          <p class="SegmentDescription">
+            Choose whatever naming convention you are used to for your transition instructions and special states.
+          </p>
+        </div>
+
+        <div class="SegmentSecondColumn">
+          <img
+            class="CodeExampleImage SecondColumnImage only-light"
+            src="/codeSnippet2_light.png"
+            alt="Code example"
+          />
+          <img
+            class="CodeExampleImage SecondColumnImage only-dark"
+            src="/codeSnippet2_dark.png"
+            alt="Code example"
+          />
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      const THEME_KEY = "theme";
+      const stored = localStorage.getItem(THEME_KEY);
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const theme = stored === "light" || stored === "dark" ? stored : (prefersDark ? "dark" : "light");
+      document.documentElement.dataset.theme = theme;
+      localStorage.setItem(THEME_KEY, theme);
+    </script>
+
+    <style>
+      .only-dark { display: none; }
+      html[data-theme="dark"] .only-light { display: none; }
+      html[data-theme="dark"] .only-dark { display: inline-block; }
+    </style>
   </body>
 </html>

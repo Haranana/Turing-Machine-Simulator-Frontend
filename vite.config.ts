@@ -11,7 +11,8 @@ const __dirname = path.dirname(__filename);
 const pathResolve = (p: string) => path.resolve(process.cwd(), p);
 
 export default defineConfig(() => {
-  const prerenderEnabled = process.env.PRERENDER !== "false";
+
+  const prerenderEnabled = "false";
 
   return {
     build: {
