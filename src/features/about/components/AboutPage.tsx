@@ -1,16 +1,26 @@
-import { getInitialTheme, THEME_KEY, type Theme } from '@app/providers/ThemeProvider';
-import { useEffect, useState } from 'react';
-import { GithubLogo } from '@shared/ui/icons/GithubLogo';
-import { MailIcon } from '@primer/octicons-react';
-import '@features/about/styles/About.css';
+import { getInitialTheme, THEME_KEY, type Theme } from '@app/providers/ThemeProvider'
+import { useEffect, useState } from 'react'
+import { GithubLogo } from '@shared/ui/icons/GithubLogo'
+import { MailIcon } from '@primer/octicons-react'
+import '@features/about/styles/About.css'
+import { useLocation } from 'react-router-dom'
 
 export default function AboutPage(){
-    const [theme] = useState<Theme>(() => getInitialTheme());
+    const [theme] = useState<Theme>(() => getInitialTheme())
 
     useEffect(() => {        
         document.documentElement.dataset.theme = theme;
         window.localStorage.setItem(THEME_KEY, theme);
-    }, [theme]);
+    }, [theme])
+
+     const { hash } = useLocation();
+
+  useEffect(() => {
+    if (!hash) return;
+    const id = hash.slice(1);
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [hash]);
 
     return(
         <main className='About'>
@@ -79,13 +89,13 @@ export default function AboutPage(){
                     </div>
                 </section>
                 <hr className='LineSeparator'></hr>
-                <section className='AboutSegment'>
+                <section className='AboutSegment' id="privacySection">
                     <div className='SegmentFirstColumn'>
                     <h2 className='SegmentTitle'>Privacy</h2>
                     <p className='SegmentDescription'>This website stores the email address of registered users and a password hash for authentication. It may also send emails to confirm actions such as account activation, password resets, or account deletion.                    
                     </p>
                     <p className='SegmentDescription'>
-                        This data is stored in the database and is not shared with third parties. You can delete your account at any time; doing so permanently removes your account data from the service.                        
+                        This data is stored in the database and is not shared with third parties. You can delete your account at any time. Doing so permanently removes your account data from the service.                        
                     </p>
                     </div>
                     <div className="SegmentSecondColumn">                     
@@ -131,7 +141,7 @@ export default function AboutPage(){
                     </div>
                 </section>                                                 
         </main>  
-    );
+    )
 }
 
 

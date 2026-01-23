@@ -3,7 +3,7 @@ import "@auth/styles/Auth.css"
 import {EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid"
 import { useState } from "react";
 import { toast } from 'react-hot-toast';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import Modal from "@modal/Modal";
 import { API_BASE_URL } from "@api/apiUtils";
@@ -144,6 +144,10 @@ export default function SignUpPage(){
 
                 <div className = "login-form-row">
                     <input className={`login-button SignUpButton ${!initialValidationPassed? "DisabledButton" : ""}`} type="submit" value="Sign up" disabled={!initialValidationPassed} onClick={(e)=>handleSubmit(e)}/>
+                </div>
+
+                                                <div className = "login-form-row">
+                    <Link to="/app/about#privacySection">Site data usage</Link>
                 </div>
                 
             </form>
