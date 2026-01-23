@@ -27,8 +27,10 @@ export default  function App() {
 
 return (<>
       <div className="content">
+
           <Routes>
             <Route path = "/" element={<HomePage/>}></Route>
+
             <Route path = "/app" element={<Layout/>}>
               <Route index element={<SimulatorPage />} />
               <Route path="simulation" element={<SimulatorPage />} />

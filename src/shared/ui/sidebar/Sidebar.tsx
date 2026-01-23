@@ -60,8 +60,8 @@ export default function Sidebar(){
             </li>
 
             <li className={`SidebarElement ${currentSimulationIsNonDet? "" : "disabledLinkButton"} ${chosenPage==="tree"? "HiglistedLink" : ""}`} id='tree-link-button'>
-                <Link onClick={()=> (currentSimulationIsNonDet? setChosenPage("tree") : "")} className='SidebarLink' to="tree" title="Simulation tree">
-                    <Sitemap></Sitemap>
+                <Link onClick={()=> (currentSimulationIsNonDet? setChosenPage("tree") : "")} className='SidebarLink TreeLink' to="tree" title="Simulation tree">
+                    <Sitemap ></Sitemap>
                     <p className='SidebarLinkTitle'>Tree</p>
                 </Link>
             </li>

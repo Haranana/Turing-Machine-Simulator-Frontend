@@ -123,7 +123,7 @@ export default function ChangePassword(){
                 />
                 </div>
                                 <div className="login-form-row login-signup">
-                    <span><Link className="login-signup-link" to="/login" title='Login'>return to login page</Link></span>
+                    <span><Link className="login-signup-link" to="/app/login" title='Login'>return to login page</Link></span>
                 </div>
             </form>
         </div>

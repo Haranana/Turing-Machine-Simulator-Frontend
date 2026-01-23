@@ -84,6 +84,12 @@ export default function ConsolePage() {
       colors: {
         "editorCursor.foreground": "#919191ff",
         "editor.foreground": cssVar("--color-text"),
+
+            "editorSuggestWidget.background": cssVar("--color-extreme"),
+    "editorSuggestWidget.foreground": cssVar("--color-text"),
+    "editorSuggestWidget.selectedBackground": cssVar("--color-accent-hover"),
+    "editorSuggestWidget.highlightForeground": cssVar("--color-accent"),
+    "editorSuggestWidget.border": cssVar("--color-accent-hover"),
       },
     });
 

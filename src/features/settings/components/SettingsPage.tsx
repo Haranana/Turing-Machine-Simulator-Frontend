@@ -66,8 +66,8 @@ export default  function SettingsPage() {
             trimmedRight.length === 0 ||
             trimmedInitial.length === 0 ||
             trimmedAccept.length === 0) {
-                toast.error('Changes couldn\'t be saved\nAliases, initial state and accept state must not be empty');
-                setSaveError("Aliases, initial state and accept state must not be empty");
+                toast.error('Changes couldn\'t be saved\Syntax symbols, initial state and accept state must not be empty');
+                setSaveError("Syntax symbols, initial state and accept state must not be empty");
                 return;
         }
 
@@ -139,8 +139,8 @@ export default  function SettingsPage() {
         <div className='SettingsPage'>
                 <div className='SettingsSegment SimulationAliasesSegment'>
                     <div className='SegmentFirstColumn'>
-                            <p className='SegmentTitle'>Simulation Aliases</p>
-                            <p className='SegmentDescription'>Set what symbol or word should indicate separators, blank and moves in code.</p>
+                            <p className='SegmentTitle'>Transition instruction syntax</p>
+                            <p className='SegmentDescription'>Set what symbol or word should indicate separators, blank and moves in Turing machine's program.</p>
                     </div>
                     <div className="SegmentSecondColumn"> 
                         <div className="SettingsTextFieldRow">
@@ -285,7 +285,7 @@ export default  function SettingsPage() {
                 <div className='SettingsSegment SpecialSettingsSegment'>
                     <div className='SegmentFirstColumn'>
                             <p className='SegmentTitle'>Special Settings</p>
-                            <p className='SegmentDescription'>Set advanced settings of turing machine simulator</p>
+                            <p className='SegmentDescription'>Set additional restrictions to Turing machine and explicitly define alphabets and states set.</p>
                     </div>
                     <div className="SegmentSecondColumn">
                         <div className="SettingsTextFieldRow">

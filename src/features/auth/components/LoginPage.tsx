@@ -100,7 +100,7 @@ export default function LoginPage(){
                     </div>
                     
                     <div>
-                        <Link  className="remember-me-link" to="/password/change" title='ChangePassword'>Forgot password?</Link>
+                        <Link  className="remember-me-link" to="/app/password/change" title='ChangePassword'>Forgot password?</Link>
                     </div>
                     
                 </div>
@@ -114,7 +114,7 @@ export default function LoginPage(){
                 </div>
               
                 <div className="login-form-row login-signup">
-                    <span>Don't have an account? <Link className="login-signup-link" to="/signup" title='SignUp'>Sign up</Link></span>
+                    <span>Don't have an account? <Link className="login-signup-link" to="/app/signup" title='SignUp'>Sign up</Link></span>
                 </div>
 
 

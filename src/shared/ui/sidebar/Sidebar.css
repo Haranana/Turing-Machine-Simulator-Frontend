@@ -86,6 +86,14 @@ li.SidebarElement.StyleModeToggle{
   stroke: var(--color-text-muted);
 }
 
+.sidebar .disabledLinkButton .TreeLink svg{
+  stroke: var(--color-text-muted);
+}
+
+.sidebar .TreeLink svg{
+  stroke: var(--color-text);
+}
+
 .sidebar a:hover {
   background: var(--sidebar-element-hover-color);
 }
