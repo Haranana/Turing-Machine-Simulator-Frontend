@@ -2,18 +2,11 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import path from "path";
-import { fileURLToPath } from "url";
-import { vitePrerenderPlugin } from "vite-prerender-plugin";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const pathResolve = (p: string) => path.resolve(process.cwd(), p);
 
 export default defineConfig(() => {
-
-  const prerenderEnabled = "false";
-
   return {
     build: {
       rollupOptions: {
@@ -26,12 +19,19 @@ export default defineConfig(() => {
     plugins: [
       react(),
       tsconfigPaths({ projects: ["./tsconfig.app.json"] }),
-      prerenderEnabled &&
-        vitePrerenderPlugin({
-          renderTarget: "#root",
-          prerenderScript: path.resolve(__dirname, "src/prerender.tsx"),
-          additionalPrerenderRoutes: ["/"],
-        }),
-    ].filter(Boolean),
+      {
+        name: "dev-rewrite-app-to-apphtml",
+        configureServer(server) {
+          server.middlewares.use((req, _res, next) => {
+            const url = req.url ?? "";
+            // tylko DEV: mapuj /app i /app/* na app.html
+            if (url === "/app" || url.startsWith("/app/")) {
+              req.url = "/app.html";
+            }
+            next();
+          });
+        },
+      },
+    ],
   };
 });

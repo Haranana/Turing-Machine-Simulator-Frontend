@@ -19,7 +19,6 @@ import ChangePassword from '@account/components/ChangePassword'
 import DeleteAccount from '@account/components/DeleteAccountConfirm'
 import SearchPage from '@search/components/SearchPage'
 import ForgotPasswordPage from '@auth/components/ForgotPasswordPage'
-import HomePage from '@features/home/components/HomePage';
 import AboutPage from '@features/about/components/AboutPage';
 
 export default  function App() {
@@ -29,31 +28,30 @@ return (<>
       <div className="content">
 
           <Routes>
-            <Route path = "/" element={<HomePage/>}></Route>
+          <Route path="/app" element={<Layout />}>
+            <Route index element={<SimulatorPage />} />
+            <Route path="simulation" element={<SimulatorPage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="console" element={<ConsolePage />} />
+            <Route path="tree" element={<TreePage />} />
+            <Route path="forgotPassword" element={<ForgotPasswordPage />} />
+            <Route path="password/change" element={<ChangePassword />} />
+            <Route path="account/delete" element={<DeleteAccount />} />
+            <Route path="search" element={<SearchPage />} />
 
-            <Route path = "/app" element={<Layout/>}>
-              <Route index element={<SimulatorPage />} />
-              <Route path="simulation" element={<SimulatorPage />} />
-              <Route path='about' element={<AboutPage/>} />
-              <Route path="console" element={<ConsolePage />} />
-              <Route path="tree" element={<TreePage></TreePage>}/>
-              <Route path="forgotPassword" element={<ForgotPasswordPage/>}/>
-              <Route path="password/change" element={<ChangePassword/>}/>
-              <Route path='account/delete' element={<DeleteAccount/>}/>
-              <Route path='search' element={<SearchPage/>}/>
-            
-              <Route element={<ProtectedRoute/>}>
-                <Route path="account" element={<AccountPage/>} />
-              </Route>
-
-              <Route path="login" element={<LoginPage/>}/>
-              <Route path="signup" element={<SignUpPage/>} />
-              <Route path="settings" element={<SettingsPage />} />
-              <Route path="activate/*" element={<AccountActivatedPage></AccountActivatedPage>} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="account" element={<AccountPage />} />
             </Route>
 
-            <Route path="*" element={<NotFoundPage></NotFoundPage>} />
-          </Routes>
+            <Route path="login" element={<LoginPage />} />
+            <Route path="signup" element={<SignUpPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="activate/*" element={<AccountActivatedPage />} />
+          </Route>
+
+          {/* wszystkie inne ścieżki poza /app... niech będą 404 w SPA */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
       </div>
     {isBrowser && <Toaster
         position="top-right"

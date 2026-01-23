@@ -19,6 +19,10 @@
 
 }
 
+.home .LineSeparator{
+    color: black;
+    width: 80%;
+}
 .home .linkButton{
     background-color: var(--color-accent);
     color: white;
