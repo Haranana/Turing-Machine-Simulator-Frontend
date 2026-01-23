@@ -34,7 +34,7 @@ export default function AccountActivatedPage(){
     },[]);
 
     return <>
-                <Modal open={true} onClose={()=>{ navigate("/login", { replace: true });}}>
+                <Modal open={true} onClose={()=>{ navigate("/app/login", { replace: true });}}>
                                 <div className="DefaultModalTextWrapper ChangePasswordTextWrapper">
                                     
                                      {activated==="active"?<><h2>Account created</h2>  <p>Account has been successfully activated, please log in  <Link className="accountActivatedLoginLink" to="/app/login" title='Login'>here</Link></p> </> 
