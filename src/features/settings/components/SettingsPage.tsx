@@ -333,7 +333,7 @@ export default  function SettingsPage() {
                             />
                         </div>
                         <div className="SettingsTextFieldRow">
-                            <label className="SettingsTextFieldLabel" htmlFor="InputAlphabet">Use defined input alphabet:</label>
+                            <label className="SettingsTextFieldLabel" htmlFor="InputAlphabet">Explicit input alphabet:</label>
                              <input
                                 checked={onlyInputAlphabetFieldValue}
                                 className="SettingsCheckbox"
@@ -353,7 +353,7 @@ export default  function SettingsPage() {
                         }
 
                         <div className="SettingsTextFieldRow">
-                            <label className="SettingsTextFieldLabel" htmlFor="TapeAlphabet">Tape alphabet:</label>
+                            <label className="SettingsTextFieldLabel" htmlFor="TapeAlphabet">Explicit tape alphabet:</label>
                              <input
                                 checked={onlyTapeAlphabetFieldValue}
                                 className="SettingsCheckbox"
@@ -372,7 +372,7 @@ export default  function SettingsPage() {
                         }
 
                         <div className="SettingsTextFieldRow">
-                            <label className="SettingsTextFieldLabel" htmlFor="States">States:</label>
+                            <label className="SettingsTextFieldLabel" htmlFor="States">Explicit States set:</label>
                             <input
                                 checked={onlyStatesFromSetFieldValue}
                                 className="SettingsCheckbox"
