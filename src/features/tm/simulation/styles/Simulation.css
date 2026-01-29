@@ -385,3 +385,65 @@ input[type="range"] {
   margin-bottom: 4px;
   color: var(--color-text);
 }
+
+.TransitionListContainer{
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.TransitionList{
+  border: solid 1px var(--color-weak);
+  background-color: var(--color-extreme);
+  color: var(--color-text);
+  font-family: var(--font-1);
+  border-radius: var(--border-radius-mild);
+   list-style: none; padding: 0; margin: 0; 
+   max-height: 240px;     
+  overflow-y: auto;
+
+}
+
+.TransitionInstuction{
+  padding: 3px 10px 3px 10px;
+  margin: 0px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.CurrentTransitionInstruction{
+  /*border-bottom: 2px solid var(--color-accent);*/
+  background-color: var(--color-medium);
+
+
+}
+
+.TransitionList::-webkit-scrollbar {
+  width: 12px;
+}
+
+.TransitionList::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+.TransitionList::-webkit-scrollbar-thumb {
+  background: var(--color-medium);
+  border-radius: 999px;
+  border: 3px solid transparent;      
+  background-clip: padding-box;
+}
+
+.ShowTransitionListButton{
+  display: flex;
+  flex-direction: row;
+  font-family: var(--font-1);
+  color: var(--color-text);
+  border: none;
+  background: transparent;
+}
+
+.ShowTransitionListButton:hover{
+  cursor: pointer;
+}

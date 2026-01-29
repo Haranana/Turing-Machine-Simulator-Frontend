@@ -27,7 +27,7 @@ function NodeStatusIcon({ status }: { status: SimNodeComponentData["status"] }) 
         <ExclamationCircleIcon></ExclamationCircleIcon>
       );
     default:
-      return <Sitemap />;
+      return <Sitemap  />;
   }
 }
 
