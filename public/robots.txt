@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /app/
 
-Sitemap: https://turingsim/sitemap.xml
+Sitemap: https://turingsim.com/sitemap.xml
