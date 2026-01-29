@@ -18,6 +18,7 @@
 
 .SimulationNode .icon{
   width: 80%;
+  stroke: var(--color-text);
 }
 
 .react-flow__handle.simNodeHandle {

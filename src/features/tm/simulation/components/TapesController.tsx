@@ -1,6 +1,6 @@
 import "@simulation/styles/Simulation.css";
 
-import { PlayIcon, PauseIcon, StopIcon, ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronDownIcon, PlusIcon, MinusIcon } from "@heroicons/react/24/solid";
+import { PlayIcon, PauseIcon, StopIcon, ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon, ChevronDownIcon, PlusIcon, MinusIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { toast } from 'react-hot-toast';
 
@@ -11,6 +11,7 @@ import { buildSimulationExport, sendSimulation} from "@api/apiUtils.ts"
 import { NdSimulation } from "@simulation/domain/Simulation.ts";
 import { useAuth } from "@auth/hooks/AuthContext.tsx";
 import { useSimulationData, useTuringMachineData, useTuringMachineSettings } from "@state/GlobalData.ts";
+import TransitionsList from "./TransitionsList";
 
 export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs = 800 }: TapeViewInput) => {
 
@@ -21,6 +22,7 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   const {allowMultipleTapes, onlyInputAlphabet, inputAlphabet} = useTuringMachineSettings(s=>s.specialSettings);
 
 
+
   // Input taśmy, w przyszłości pewnie będzie zastąpiony listą stringów, dla każdej z taśm
   // Pole przechowuje wartosc tekstowa z inputu, niekoniecznie jest to zatwierdzony input programu
   const tapeInputRef = useRef<string[]>([""]);
@@ -28,6 +30,8 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
   const [tapesAmount, setTapesAmount] = useState<number>(tmDataTapesAmount);
 
   const [isInputFieldVisible , setInputFieldVisibility] = useState<boolean[]>([false]);
+
+  const [isTransitionsListVisible, setTransitionsListVisibility] = useState<boolean>(false);
 
   // Predkosc animacji jednego ruchu
   const animationSpeedRef = useRef(animateMs);
@@ -45,9 +49,6 @@ export const TapesController = ({ tapeState, radius = 10, cellPx = 80, animateMs
 
   // Krok do którego użytkownik chce skoczyc
   let jumpToRef = useRef<number | null>(null);
-
-  // Czy aplikacja otrzymala symulacje z API
-  //const [isSimulationLoaded, setIsSimulationLoaded] = useState<boolean>(false);
 
   // Czy aktualnie trwa animacja (dla przycisków).
   const [isAnimating, setIsAnimating] = useState<boolean[]>([false]);
@@ -645,7 +646,7 @@ const viewportStyle: React.CSSProperties = {
       </div>
 
       {Array.from({ length: tapesAmount }).map((_, i) => (
-    <div className="TapeWrapper" key={i}>
+      <div className="TapeWrapper" key={i}>
         <div className="TapeViewportOuter" ref={i === 0 ? viewportOuterRef : null}>
           <div className="TapeViewport" style={viewportStyle}>
             {tapeData[i] ? <TapeComponent tapeInput={tapeData[i]} /> : null}
@@ -700,7 +701,7 @@ const viewportStyle: React.CSSProperties = {
               Enter
             </button>
           </div>
-        </div>
+      </div>
       ))}
 
       <div className="SimulationControls">
@@ -773,6 +774,17 @@ const viewportStyle: React.CSSProperties = {
           disabled={isSimulationLoaded()} onClick={()=>loadSimulation()}>Load Simulation
         </button>
       </div>
+      
+      {simulation!=null? 
+      <div className="TransitionListContainer">
+        <button className="ShowTransitionListButton" onClick={()=>{setTransitionsListVisibility(!isTransitionsListVisible)}}>
+          {isTransitionsListVisible? <ChevronDownIcon width={25}/> : <ChevronUpIcon width={25}/> }
+          <p>Instructions List</p>
+        </button>
+        {isTransitionsListVisible? <TransitionsList simulation={simulation} currentStep={stepRef.current}></TransitionsList> : ""}
+      </div>: "" }
+
     </div>
+    
   );
 };
