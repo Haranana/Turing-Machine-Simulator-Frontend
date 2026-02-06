@@ -53,7 +53,7 @@
 .About .Subsegment{
   display: flex;
   flex-direction: row;
-  align-items: center;   /* KLUCZ: pionowe centrowanie ikon + tekstu */
+  align-items: center;  
 }
 
 .About .SubsegmentIcon{

@@ -49,7 +49,6 @@ return (<>
             <Route path="activate/*" element={<AccountActivatedPage />} />
           </Route>
 
-          {/* wszystkie inne ścieżki poza /app... niech będą 404 w SPA */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
